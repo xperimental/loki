@@ -87,9 +87,9 @@ require (
 	go.uber.org/atomic v1.9.0
 	go.uber.org/goleak v1.1.12
 	golang.org/x/crypto v0.0.0-20211202192323-5770296d904e
-	golang.org/x/net v0.0.0-20220105145211-5b0dc2dfae98
+	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
+	golang.org/x/sys v0.0.0-20220110181412-a018aaa089fe
 	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11
 	google.golang.org/api v0.65.0
 	google.golang.org/grpc v1.40.1
@@ -105,7 +105,7 @@ require (
 	github.com/google/renameio/v2 v2.0.0
 	github.com/google/uuid v1.2.0
 	github.com/grafana/regexp v0.0.0-20220304095617-2e8d9baf4ac2
-	github.com/mattn/go-ieproxy v0.0.1
+	github.com/mattn/go-ieproxy v0.0.3
 	github.com/xdg-go/scram v1.0.2
 	gopkg.in/Graylog2/go-gelf.v2 v2.0.0-20191017102106-1550ee647df0
 )
