@@ -1048,7 +1048,7 @@ spec:
           resources:
           - apiservers
           - dnses
-          - proxy
+          - proxies
           verbs:
           - get
           - list
