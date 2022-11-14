@@ -292,8 +292,8 @@ spec:
                     type: string
                   readVarsFromEnv:
                     default: false
-                    description: ReadVarsFromEnv defines a flag to use Operator-lib
-                      provides a helper function
+                    description: ReadVarsFromEnv if true, then the proxy configuration
+                      will be read from the environment variables passed to the operator.
                     type: boolean
                 type: object
               replicationFactor:

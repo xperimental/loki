@@ -343,7 +343,7 @@ type ClusterProxy struct {
 	// +kubebuilder:validation:optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,displayName="NoProxy"
 	NoProxy string `json:"noProxy,omitempty"`
-	// ReadVarsFromEnv defines a flag to use Operator-lib provides a helper function
+	// ReadVarsFromEnv if true, then the proxy configuration will be read from the environment variables passed to the operator.
 	//
 	// +optional
 	// +kubebuilder:validation:optional
@@ -698,7 +698,7 @@ type LokiStackSpec struct {
 	// Proxy defines the spec for the object proxy to configure cluster proxy information.
 	//
 	// +optional
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,displayName="Cluster Proxy"
 	Proxy *ClusterProxy `json:"proxy"`
 
