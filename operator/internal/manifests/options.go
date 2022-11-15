@@ -9,6 +9,7 @@ import (
 	"github.com/grafana/loki/operator/internal/manifests/internal"
 	"github.com/grafana/loki/operator/internal/manifests/openshift"
 	"github.com/grafana/loki/operator/internal/manifests/storage"
+	corev1 "k8s.io/api/core/v1"
 )
 
 // Options is a set of configuration values to use when building manifests such as resource sizes, etc.
@@ -25,6 +26,7 @@ type Options struct {
 	Gates                configv1.FeatureGates
 	Stack                lokiv1.LokiStackSpec
 	ResourceRequirements internal.ComponentResources
+	EnvVars              []corev1.EnvVar
 
 	AlertingRules  []lokiv1beta1.AlertingRule
 	RecordingRules []lokiv1beta1.RecordingRule

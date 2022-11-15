@@ -3,9 +3,7 @@ package manifests
 import (
 	"strings"
 
-	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/imdario/mergo"
-	"github.com/operator-framework/operator-lib/proxy"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -15,42 +13,68 @@ const (
 	noProxyKey    = "NO_PROXY"
 )
 
-func configureProxyEnv(spec *lokiv1.ClusterProxy, pod *corev1.PodSpec) error {
-	if spec == nil {
-		return nil
+var (
+	ProxyEnvNames = []string{
+		httpProxyKey,
+		strings.ToLower(httpProxyKey),
+		httpsProxyKey,
+		strings.ToLower(httpsProxyKey),
+		noProxyKey,
+		strings.ToLower(noProxyKey),
 	}
+)
 
-	for _, envVar := range proxy.ProxyEnvNames {
+func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
+	for _, envVar := range ProxyEnvNames {
 		resetProxyVar(pod, envVar)
 	}
 
-	envVars := proxy.ReadProxyVarsFromEnv()
-	if !spec.ReadVarsFromEnv {
-		envVars = []corev1.EnvVar{
-			{
-				Name:  httpProxyKey,
-				Value: spec.HTTPProxy,
-			},
-			{
-				Name:  strings.ToLower(httpProxyKey),
-				Value: spec.HTTPProxy,
-			},
-			{
-				Name:  httpsProxyKey,
-				Value: spec.HTTPSProxy,
-			},
-			{
-				Name:  strings.ToLower(httpsProxyKey),
-				Value: spec.HTTPSProxy,
-			},
-			{
-				Name:  noProxyKey,
-				Value: spec.NoProxy,
-			},
-			{
-				Name:  strings.ToLower(noProxyKey),
-				Value: spec.NoProxy,
-			},
+	envVars := opts.EnvVars
+	if envVars == nil {
+		spec := opts.Stack.Proxy
+		if spec == nil {
+			return nil
+		}
+
+		envVars = []corev1.EnvVar{}
+
+		if spec.HTTPProxy != "" {
+			envVars = append(envVars,
+				corev1.EnvVar{
+					Name:  httpProxyKey,
+					Value: spec.HTTPProxy,
+				},
+				corev1.EnvVar{
+					Name:  strings.ToLower(httpProxyKey),
+					Value: spec.HTTPProxy,
+				},
+			)
+		}
+
+		if spec.HTTPSProxy != "" {
+			envVars = append(envVars,
+				corev1.EnvVar{
+					Name:  httpsProxyKey,
+					Value: spec.HTTPSProxy,
+				},
+				corev1.EnvVar{
+					Name:  strings.ToLower(httpsProxyKey),
+					Value: spec.HTTPSProxy,
+				},
+			)
+		}
+
+		if spec.NoProxy != "" {
+			envVars = append(envVars,
+				corev1.EnvVar{
+					Name:  noProxyKey,
+					Value: spec.NoProxy,
+				},
+				corev1.EnvVar{
+					Name:  strings.ToLower(noProxyKey),
+					Value: spec.NoProxy,
+				},
+			)
 		}
 	}
 

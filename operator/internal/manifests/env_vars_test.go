@@ -10,15 +10,19 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
-func TestContainerEnvVars_ReadVarsFromEnv(t *testing.T) {
-	t.Setenv(httpProxyKey, "http-test")
-	t.Setenv(httpsProxyKey, "https-test")
-	t.Setenv(noProxyKey, "noproxy-test")
-
+func TestContainerEnvVars_ReadVarsFromOptions(t *testing.T) {
 	opt := Options{
 		Name:      "test",
 		Namespace: "test",
 		Image:     "test",
+		EnvVars: []corev1.EnvVar{
+			{Name: httpProxyKey, Value: "http-test"},
+			{Name: strings.ToLower(httpProxyKey), Value: "http-test"},
+			{Name: httpsProxyKey, Value: "https-test"},
+			{Name: strings.ToLower(httpsProxyKey), Value: "https-test"},
+			{Name: noProxyKey, Value: "noproxy-test"},
+			{Name: strings.ToLower(noProxyKey), Value: "noproxy-test"},
+		},
 		Stack: lokiv1.LokiStackSpec{
 			Size: lokiv1.SizeOneXExtraSmall,
 			Proxy: &lokiv1.ClusterProxy{

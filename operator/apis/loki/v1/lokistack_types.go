@@ -347,7 +347,6 @@ type ClusterProxy struct {
 	//
 	// +optional
 	// +kubebuilder:validation:optional
-	// +kubebuilder:default:=false
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch",displayName="ReadVarsFromEnv"
 	ReadVarsFromEnv bool `json:"readVarsFromEnv,omitempty"`
 }

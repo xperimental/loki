@@ -45,7 +45,7 @@ func BuildIngester(opts Options) ([]client.Object, error) {
 		}
 	}
 
-	if err := configureProxyEnv(opts.Stack.Proxy, &statefulSet.Spec.Template.Spec); err != nil {
+	if err := configureProxyEnv(&statefulSet.Spec.Template.Spec, opts); err != nil {
 		return nil, err
 	}
 

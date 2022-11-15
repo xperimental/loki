@@ -12,6 +12,7 @@ import (
 	"github.com/grafana/loki/operator/internal/external/k8s"
 	"github.com/grafana/loki/operator/internal/handlers/internal/gateway"
 	"github.com/grafana/loki/operator/internal/handlers/internal/openshift"
+	"github.com/grafana/loki/operator/internal/handlers/internal/proxy"
 	"github.com/grafana/loki/operator/internal/handlers/internal/rules"
 	"github.com/grafana/loki/operator/internal/handlers/internal/serviceaccounts"
 	"github.com/grafana/loki/operator/internal/handlers/internal/storage"
@@ -230,6 +231,7 @@ func CreateOrUpdateLokiStack(
 		GatewayBaseDomain:      baseDomain,
 		Stack:                  stack.Spec,
 		Gates:                  fg,
+		EnvVars:                proxy.GetEnvVars(stack.Spec.Proxy),
 		ObjectStorage:          *objStore,
 		CertRotationRequiredAt: certRotationRequiredAt,
 		AlertingRules:          alertingRules,
