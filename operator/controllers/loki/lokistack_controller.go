@@ -49,12 +49,12 @@ var (
 	})
 	updateOrDeleteOnlyPred = builder.WithPredicates(predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			switch e.ObjectOld.(type) {
-			case *appsv1.Deployment:
-			case *appsv1.StatefulSet:
-				return true
-			}
-			return false
+			// Update only if generation or annotations change, filter out anything else.
+			// We only need to check generation or annotations change here, because it is only
+			// updated on spec changes. On the other hand RevisionVersion
+			// changes also on status changes. We want to omit reconciliation
+			// for status updates for now.
+			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
 		},
 		CreateFunc: func(e event.CreateEvent) bool { return false },
 		DeleteFunc: func(e event.DeleteEvent) bool {

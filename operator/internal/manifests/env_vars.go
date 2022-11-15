@@ -34,46 +34,7 @@ func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
 			return nil
 		}
 
-		envVars = []corev1.EnvVar{}
-
-		if spec.HTTPProxy != "" {
-			envVars = append(envVars,
-				corev1.EnvVar{
-					Name:  httpProxyKey,
-					Value: spec.HTTPProxy,
-				},
-				corev1.EnvVar{
-					Name:  strings.ToLower(httpProxyKey),
-					Value: spec.HTTPProxy,
-				},
-			)
-		}
-
-		if spec.HTTPSProxy != "" {
-			envVars = append(envVars,
-				corev1.EnvVar{
-					Name:  httpsProxyKey,
-					Value: spec.HTTPSProxy,
-				},
-				corev1.EnvVar{
-					Name:  strings.ToLower(httpsProxyKey),
-					Value: spec.HTTPSProxy,
-				},
-			)
-		}
-
-		if spec.NoProxy != "" {
-			envVars = append(envVars,
-				corev1.EnvVar{
-					Name:  noProxyKey,
-					Value: spec.NoProxy,
-				},
-				corev1.EnvVar{
-					Name:  strings.ToLower(noProxyKey),
-					Value: spec.NoProxy,
-				},
-			)
-		}
+		envVars = ToEnvVars(spec.HTTPProxy, spec.HTTPSProxy, spec.NoProxy)
 	}
 
 	src := corev1.Container{Env: envVars}
@@ -104,4 +65,49 @@ func getEnvVar(name string, envVars []corev1.EnvVar) (bool, int) {
 		}
 	}
 	return false, 0
+}
+
+// ToEnvVars returns a slice of corev1 EnvVar resources
+func ToEnvVars(httpProxy, httpsProxy, noProxy string) []corev1.EnvVar {
+	var envVars []corev1.EnvVar
+	if httpProxy != "" {
+		envVars = append(envVars,
+			corev1.EnvVar{
+				Name:  httpProxyKey,
+				Value: httpProxy,
+			},
+			corev1.EnvVar{
+				Name:  strings.ToLower(httpProxyKey),
+				Value: httpProxy,
+			},
+		)
+	}
+
+	if httpsProxy != "" {
+		envVars = append(envVars,
+			corev1.EnvVar{
+				Name:  httpsProxyKey,
+				Value: httpsProxy,
+			},
+			corev1.EnvVar{
+				Name:  strings.ToLower(httpsProxyKey),
+				Value: httpsProxy,
+			},
+		)
+	}
+
+	if noProxy != "" {
+		envVars = append(envVars,
+			corev1.EnvVar{
+				Name:  noProxyKey,
+				Value: noProxy,
+			},
+			corev1.EnvVar{
+				Name:  strings.ToLower(noProxyKey),
+				Value: noProxy,
+			},
+		)
+	}
+
+	return envVars
 }

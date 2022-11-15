@@ -428,12 +428,6 @@ spec:
       - description: NoProxy configures the NO_PROXY/no_proxy env variable.
         displayName: NoProxy
         path: proxy.noProxy
-      - description: ReadVarsFromEnv if true, then the proxy configuration will be
-          read from the environment variables passed to the operator.
-        displayName: ReadVarsFromEnv
-        path: proxy.readVarsFromEnv
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - description: ReplicationFactor defines the policy for log stream replication.
         displayName: Replication Factor
         path: replicationFactor

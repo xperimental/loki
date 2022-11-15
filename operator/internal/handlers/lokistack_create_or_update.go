@@ -12,7 +12,6 @@ import (
 	"github.com/grafana/loki/operator/internal/external/k8s"
 	"github.com/grafana/loki/operator/internal/handlers/internal/gateway"
 	"github.com/grafana/loki/operator/internal/handlers/internal/openshift"
-	"github.com/grafana/loki/operator/internal/handlers/internal/proxy"
 	"github.com/grafana/loki/operator/internal/handlers/internal/rules"
 	"github.com/grafana/loki/operator/internal/handlers/internal/serviceaccounts"
 	"github.com/grafana/loki/operator/internal/handlers/internal/storage"
@@ -129,6 +128,7 @@ func CreateOrUpdateLokiStack(
 
 	var (
 		baseDomain    string
+		envVars       []corev1.EnvVar
 		tenantSecrets []*manifests.TenantSecrets
 		tenantConfigs map[string]manifests.TenantConfig
 	)
@@ -150,6 +150,11 @@ func CreateOrUpdateLokiStack(
 		switch stack.Spec.Tenants.Mode {
 		case lokiv1.OpenshiftLogging, lokiv1.OpenshiftNetwork:
 			baseDomain, err = gateway.GetOpenShiftBaseDomain(ctx, k, req)
+			if err != nil {
+				return err
+			}
+
+			envVars, err = openshift.GetProxyEnvVars(ctx, k)
 			if err != nil {
 				return err
 			}
@@ -214,7 +219,6 @@ func CreateOrUpdateLokiStack(
 			ll.Error(err, "failed to check OCP AlertManager")
 			return err
 		}
-
 	}
 
 	certRotationRequiredAt := ""
@@ -231,7 +235,7 @@ func CreateOrUpdateLokiStack(
 		GatewayBaseDomain:      baseDomain,
 		Stack:                  stack.Spec,
 		Gates:                  fg,
-		EnvVars:                proxy.GetEnvVars(stack.Spec.Proxy),
+		EnvVars:                envVars,
 		ObjectStorage:          *objStore,
 		CertRotationRequiredAt: certRotationRequiredAt,
 		AlertingRules:          alertingRules,

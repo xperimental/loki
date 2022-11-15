@@ -290,10 +290,6 @@ spec:
                   noProxy:
                     description: NoProxy configures the NO_PROXY/no_proxy env variable.
                     type: string
-                  readVarsFromEnv:
-                    description: ReadVarsFromEnv if true, then the proxy configuration
-                      will be read from the environment variables passed to the operator.
-                    type: boolean
                 type: object
               replicationFactor:
                 default: 1

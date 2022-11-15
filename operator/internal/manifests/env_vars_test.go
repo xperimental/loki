@@ -25,9 +25,6 @@ func TestContainerEnvVars_ReadVarsFromOptions(t *testing.T) {
 		},
 		Stack: lokiv1.LokiStackSpec{
 			Size: lokiv1.SizeOneXExtraSmall,
-			Proxy: &lokiv1.ClusterProxy{
-				ReadVarsFromEnv: true,
-			},
 			Template: &lokiv1.LokiTemplateSpec{
 				Compactor: &lokiv1.LokiComponentSpec{
 					Replicas: 1,

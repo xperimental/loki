@@ -343,12 +343,6 @@ type ClusterProxy struct {
 	// +kubebuilder:validation:optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,displayName="NoProxy"
 	NoProxy string `json:"noProxy,omitempty"`
-	// ReadVarsFromEnv if true, then the proxy configuration will be read from the environment variables passed to the operator.
-	//
-	// +optional
-	// +kubebuilder:validation:optional
-	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors="urn:alm:descriptor:com.tectonic.ui:booleanSwitch",displayName="ReadVarsFromEnv"
-	ReadVarsFromEnv bool `json:"readVarsFromEnv,omitempty"`
 }
 
 // ObjectStorageTLSSpec is the TLS configuration for reaching the object storage endpoint.
