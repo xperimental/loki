@@ -13,16 +13,14 @@ const (
 	noProxyKey    = "NO_PROXY"
 )
 
-var (
-	ProxyEnvNames = []string{
-		httpProxyKey,
-		strings.ToLower(httpProxyKey),
-		httpsProxyKey,
-		strings.ToLower(httpsProxyKey),
-		noProxyKey,
-		strings.ToLower(noProxyKey),
-	}
-)
+var ProxyEnvNames = []string{
+	httpProxyKey,
+	strings.ToLower(httpProxyKey),
+	httpsProxyKey,
+	strings.ToLower(httpsProxyKey),
+	noProxyKey,
+	strings.ToLower(noProxyKey),
+}
 
 func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
 	for _, envVar := range ProxyEnvNames {

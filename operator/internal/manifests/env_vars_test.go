@@ -159,5 +159,4 @@ func lokiContainers(t *testing.T, opt Options) [][]corev1.Container {
 		ig[0].(*appsv1.StatefulSet).Spec.Template.Spec.Containers,
 		rl[0].(*appsv1.StatefulSet).Spec.Template.Spec.Containers,
 	}
-
 }
