@@ -12,6 +12,7 @@ import (
 
 	"github.com/ViaQ/logerr/v2/log"
 	"github.com/go-logr/logr"
+	openshiftconfigv1 "github.com/openshift/api/config/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
@@ -162,6 +163,28 @@ func TestLokiStackController_RegisterOwnedResourcesForUpdateOrDeleteOnly(t *test
 			featureGates: configv1.FeatureGates{
 				OpenShift: configv1.OpenShiftFeatureGates{
 					GatewayRoute: true,
+				},
+			},
+			pred: updateOrDeleteOnlyPred,
+		},
+		{
+			obj:           &openshiftconfigv1.APIServer{},
+			index:         11,
+			ownCallsCount: 12,
+			featureGates: configv1.FeatureGates{
+				OpenShift: configv1.OpenShiftFeatureGates{
+					ClusterTLSPolicy: true,
+				},
+			},
+			pred: updateOrDeleteOnlyPred,
+		},
+		{
+			obj:           &openshiftconfigv1.Proxy{},
+			index:         11,
+			ownCallsCount: 12,
+			featureGates: configv1.FeatureGates{
+				OpenShift: configv1.OpenShiftFeatureGates{
+					ClusterProxy: true,
 				},
 			},
 			pred: updateOrDeleteOnlyPred,

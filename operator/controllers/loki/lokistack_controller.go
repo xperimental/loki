@@ -15,6 +15,7 @@ import (
 	"github.com/grafana/loki/operator/internal/status"
 	routev1 "github.com/openshift/api/route/v1"
 
+	openshiftconfigv1 "github.com/openshift/api/config/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -48,12 +49,12 @@ var (
 	})
 	updateOrDeleteOnlyPred = builder.WithPredicates(predicate.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-			switch e.ObjectOld.(type) {
-			case *appsv1.Deployment:
-			case *appsv1.StatefulSet:
-				return true
-			}
-			return false
+			// Update only if generation or annotations change, filter out anything else.
+			// We only need to check generation or annotations change here, because it is only
+			// updated on spec changes. On the other hand RevisionVersion
+			// changes also on status changes. We want to omit reconciliation
+			// for status updates for now.
+			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
 		},
 		CreateFunc: func(e event.CreateEvent) bool { return false },
 		DeleteFunc: func(e event.DeleteEvent) bool {
@@ -187,6 +188,14 @@ func (r *LokiStackReconciler) buildController(bld k8s.Builder) error {
 		bld = bld.Owns(&routev1.Route{}, updateOrDeleteOnlyPred)
 	} else {
 		bld = bld.Owns(&networkingv1.Ingress{}, updateOrDeleteOnlyPred)
+	}
+
+	if r.FeatureGates.OpenShift.ClusterTLSPolicy {
+		bld = bld.Owns(&openshiftconfigv1.APIServer{}, updateOrDeleteOnlyPred)
+	}
+
+	if r.FeatureGates.OpenShift.ClusterProxy {
+		bld = bld.Owns(&openshiftconfigv1.Proxy{}, updateOrDeleteOnlyPred)
 	}
 
 	return bld.Complete(r)

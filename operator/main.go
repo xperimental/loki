@@ -171,18 +171,6 @@ func main() {
 			os.Exit(1)
 		}
 	}
-	if ctrlCfg.Gates.OpenShift.ClusterProxy || ctrlCfg.Gates.OpenShift.ClusterTLSPolicy {
-		if err = (&lokictrl.ClusterResourceReconciler{
-			Client:       mgr.GetClient(),
-			Log:          logger.WithName("controllers").WithName("clusterresource"),
-			Scheme:       mgr.GetScheme(),
-			FeatureGates: ctrlCfg.Gates,
-		}).SetupWithManager(mgr); err != nil {
-			logger.Error(err, "unable to create controller", "controller", "clusterresource")
-			os.Exit(1)
-		}
-	}
-
 	// +kubebuilder:scaffold:builder
 
 	if err = mgr.AddHealthzCheck("health", healthz.Ping); err != nil {
