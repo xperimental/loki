@@ -3,6 +3,7 @@ package manifests
 import (
 	"strings"
 
+	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/imdario/mergo"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -13,7 +14,7 @@ const (
 	noProxyKey    = "NO_PROXY"
 )
 
-var ProxyEnvNames = []string{
+var proxyEnvNames = []string{
 	httpProxyKey,
 	strings.ToLower(httpProxyKey),
 	httpsProxyKey,
@@ -23,7 +24,7 @@ var ProxyEnvNames = []string{
 }
 
 func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
-	for _, envVar := range ProxyEnvNames {
+	for _, envVar := range proxyEnvNames {
 		resetProxyVar(pod, envVar)
 	}
 
@@ -33,7 +34,7 @@ func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
 	}
 
 	src := corev1.Container{
-		Env: ToEnvVars(proxySpec.HTTPProxy, proxySpec.HTTPSProxy, proxySpec.NoProxy),
+		Env: toEnvVars(proxySpec),
 	}
 
 	for i, dst := range pod.Containers {
@@ -48,15 +49,14 @@ func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
 
 func resetProxyVar(podSpec *corev1.PodSpec, name string) {
 	for i, container := range podSpec.Containers {
-		found, index := getEnvVar(name, container.Env)
+		found, index := findEnvVar(name, container.Env)
 		if found {
 			podSpec.Containers[i].Env = append(podSpec.Containers[i].Env[:index], podSpec.Containers[i].Env[index+1:]...)
 		}
 	}
 }
 
-// getEnvVar matches the given name with the envvar name
-func getEnvVar(name string, envVars []corev1.EnvVar) (bool, int) {
+func findEnvVar(name string, envVars []corev1.EnvVar) (bool, int) {
 	for i, env := range envVars {
 		if env.Name == name || env.Name == strings.ToLower(name) {
 			return true, i
@@ -65,44 +65,43 @@ func getEnvVar(name string, envVars []corev1.EnvVar) (bool, int) {
 	return false, 0
 }
 
-// ToEnvVars returns a slice of corev1 EnvVar resources
-func ToEnvVars(httpProxy, httpsProxy, noProxy string) []corev1.EnvVar {
+func toEnvVars(proxySpec *lokiv1.ClusterProxy) []corev1.EnvVar {
 	var envVars []corev1.EnvVar
-	if httpProxy != "" {
+	if proxySpec.HTTPProxy != "" {
 		envVars = append(envVars,
 			corev1.EnvVar{
 				Name:  httpProxyKey,
-				Value: httpProxy,
+				Value: proxySpec.HTTPProxy,
 			},
 			corev1.EnvVar{
 				Name:  strings.ToLower(httpProxyKey),
-				Value: httpProxy,
+				Value: proxySpec.HTTPProxy,
 			},
 		)
 	}
 
-	if httpsProxy != "" {
+	if proxySpec.HTTPSProxy != "" {
 		envVars = append(envVars,
 			corev1.EnvVar{
 				Name:  httpsProxyKey,
-				Value: httpsProxy,
+				Value: proxySpec.HTTPSProxy,
 			},
 			corev1.EnvVar{
 				Name:  strings.ToLower(httpsProxyKey),
-				Value: httpsProxy,
+				Value: proxySpec.HTTPSProxy,
 			},
 		)
 	}
 
-	if noProxy != "" {
+	if proxySpec.NoProxy != "" {
 		envVars = append(envVars,
 			corev1.EnvVar{
 				Name:  noProxyKey,
-				Value: noProxy,
+				Value: proxySpec.NoProxy,
 			},
 			corev1.EnvVar{
 				Name:  strings.ToLower(noProxyKey),
-				Value: noProxy,
+				Value: proxySpec.NoProxy,
 			},
 		)
 	}
