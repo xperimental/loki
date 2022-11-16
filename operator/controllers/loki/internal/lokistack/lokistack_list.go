@@ -11,9 +11,24 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+const (
+	clusterResourceDiscoveredAtKey = "loki.grafana.com/clusterResourceDiscoveredAt"
+	rulesDiscoveredAtKey           = "loki.grafana.com/rulesDiscoveredAt"
+)
+
+// AnnotateForRequiredClusterResource adds/updates the `loki.grafana.com/clusterResourceDiscoveredAt` annotation
+// to all instance of LokiStack on all namespaces to trigger the reconciliation loop.
+func AnnotateForRequiredClusterResource(ctx context.Context, k k8s.Client) error {
+	return annotateAll(ctx, k, clusterResourceDiscoveredAtKey)
+}
+
 // AnnotateForDiscoveredRules adds/updates the `loki.grafana.com/rulesDiscoveredAt` annotation
 // to all instance of LokiStack on all namespaces to trigger the reconciliation loop.
 func AnnotateForDiscoveredRules(ctx context.Context, k k8s.Client) error {
+	return annotateAll(ctx, k, rulesDiscoveredAtKey)
+}
+
+func annotateAll(ctx context.Context, k k8s.Client, key string) error {
 	var stacks lokiv1.LokiStackList
 	err := k.List(ctx, &stacks, client.MatchingLabelsSelector{Selector: labels.Everything()})
 	if err != nil {
@@ -26,10 +41,10 @@ func AnnotateForDiscoveredRules(ctx context.Context, k k8s.Client) error {
 			ss.Annotations = make(map[string]string)
 		}
 
-		ss.Annotations["loki.grafana.com/rulesDiscoveredAt"] = time.Now().UTC().Format(time.RFC3339)
+		ss.Annotations[key] = time.Now().UTC().Format(time.RFC3339)
 
 		if err := k.Update(ctx, ss); err != nil {
-			return kverrors.Wrap(err, "failed to update lokistack `rulesDiscoveredAt` annotation", "name", ss.Name, "namespace", ss.Namespace)
+			return kverrors.Wrap(err, "failed to update lokistack annotation", "name", ss.Name, "namespace", ss.Namespace, "key", key)
 		}
 	}
 

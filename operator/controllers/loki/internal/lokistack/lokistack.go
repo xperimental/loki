@@ -2,7 +2,6 @@ package lokistack
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/ViaQ/logerr/v2/kverrors"
@@ -12,12 +11,26 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-const certRotationRequiredAtKey = "loki.grafana.com/certRotationRequiredAt"
+const (
+	certRotationRequiredAtKey  = "loki.grafana.com/certRotationRequiredAt"
+	rulerConfigDiscoveredAtKey = "loki.grafana.com/rulerConfigDiscoveredAt"
+)
 
 // AnnotateForRequiredCertRotation adds/updates the `loki.grafana.com/certRotationRequiredAt` annotation
 // to the named Lokistack if any of the managed client/serving/ca certificates expired. If no LokiStack
 // is found, then skip reconciliation.
 func AnnotateForRequiredCertRotation(ctx context.Context, k k8s.Client, name, namespace string) error {
+	return annotate(ctx, k, name, namespace, certRotationRequiredAtKey)
+}
+
+// AnnotateForRulerConfig adds/updates the `loki.grafana.com/rulerConfigDiscoveredAt` annotation
+// to the named Lokistack in the same namespace of the RulerConfig. If no LokiStack is found, then
+// skip reconciliation.
+func AnnotateForRulerConfig(ctx context.Context, k k8s.Client, name, namespace string) error {
+	return annotate(ctx, k, name, namespace, rulerConfigDiscoveredAtKey)
+}
+
+func annotate(ctx context.Context, k k8s.Client, name, namespace, annotationKey string) error {
 	var s lokiv1.LokiStack
 	key := client.ObjectKey{Name: name, Namespace: namespace}
 
@@ -35,10 +48,10 @@ func AnnotateForRequiredCertRotation(ctx context.Context, k k8s.Client, name, na
 		ss.Annotations = make(map[string]string)
 	}
 
-	ss.Annotations[certRotationRequiredAtKey] = time.Now().UTC().Format(time.RFC3339)
+	ss.Annotations[annotationKey] = time.Now().UTC().Format(time.RFC3339)
 
 	if err := k.Update(ctx, ss); err != nil {
-		return kverrors.Wrap(err, fmt.Sprintf("failed to update lokistack `%s` annotation", certRotationRequiredAtKey), "key", key)
+		return kverrors.Wrap(err, "failed to update lokistack `rulerConfigDiscoveredAt` annotation", "key", key)
 	}
 
 	return nil
