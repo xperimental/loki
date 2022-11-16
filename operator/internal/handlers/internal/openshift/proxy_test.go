@@ -13,7 +13,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func TestGetProxyEnvVars_ReturnError_WhenOtherThanNotFound(t *testing.T) {
+func TestGetProxy_ReturnError_WhenOtherThanNotFound(t *testing.T) {
 	k := &k8sfakes.FakeClient{}
 
 	k.GetStub = func(_ context.Context, name types.NamespacedName, object client.Object, _ ...client.GetOption) error {
@@ -24,7 +24,7 @@ func TestGetProxyEnvVars_ReturnError_WhenOtherThanNotFound(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestGetProxyEnvVars_ReturnEmpty_WhenNotFound(t *testing.T) {
+func TestGetProxy_ReturnEmpty_WhenNotFound(t *testing.T) {
 	k := &k8sfakes.FakeClient{}
 
 	k.GetStub = func(_ context.Context, name types.NamespacedName, object client.Object, _ ...client.GetOption) error {
@@ -36,13 +36,13 @@ func TestGetProxyEnvVars_ReturnEmpty_WhenNotFound(t *testing.T) {
 	require.Nil(t, proxy)
 }
 
-func TestGetProxyEnvVars_ReturnEnvVars_WhenProxyExists(t *testing.T) {
+func TestGetProxy_ReturnEnvVars_WhenProxyExists(t *testing.T) {
 	k := &k8sfakes.FakeClient{}
 
 	k.GetStub = func(_ context.Context, name types.NamespacedName, out client.Object, _ ...client.GetOption) error {
 		if name.Name == proxyName {
 			k.SetClientObject(out, &configv1.Proxy{
-				Spec: configv1.ProxySpec{
+				Status: configv1.ProxyStatus{
 					HTTPProxy:  "http-test",
 					HTTPSProxy: "https-test",
 					NoProxy:    "noproxy-test",
@@ -55,6 +55,7 @@ func TestGetProxyEnvVars_ReturnEnvVars_WhenProxyExists(t *testing.T) {
 
 	proxy, err := GetProxy(context.TODO(), k)
 	require.NoError(t, err)
+	require.NotNil(t, proxy)
 	require.Equal(t, "http-test", proxy.HTTPProxy)
 	require.Equal(t, "https-test", proxy.HTTPSProxy)
 	require.Equal(t, "noproxy-test", proxy.NoProxy)

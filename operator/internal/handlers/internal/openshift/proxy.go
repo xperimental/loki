@@ -24,13 +24,13 @@ func GetProxy(ctx context.Context, k k8s.Client) (*lokiv1.ClusterProxy, error) {
 		return nil, err
 	}
 
-	if p.Spec.HTTPProxy == "" && p.Spec.HTTPSProxy == "" && p.Spec.NoProxy == "" {
+	if p.Status.HTTPProxy == "" && p.Status.HTTPSProxy == "" && p.Status.NoProxy == "" {
 		return nil, nil
 	}
 
 	return &lokiv1.ClusterProxy{
-		HTTPProxy:  p.Spec.HTTPProxy,
-		HTTPSProxy: p.Spec.HTTPSProxy,
-		NoProxy:    p.Spec.NoProxy,
+		HTTPProxy:  p.Status.HTTPProxy,
+		HTTPSProxy: p.Status.HTTPSProxy,
+		NoProxy:    p.Status.NoProxy,
 	}, nil
 }
