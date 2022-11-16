@@ -7,7 +7,6 @@ import (
 	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
 	configv1 "github.com/openshift/api/config/v1"
 	"github.com/stretchr/testify/require"
-	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -21,7 +20,7 @@ func TestGetProxyEnvVars_ReturnError_WhenOtherThanNotFound(t *testing.T) {
 		return apierrors.NewBadRequest("bad request")
 	}
 
-	_, err := GetProxyEnvVars(context.TODO(), k)
+	_, err := GetProxy(context.TODO(), k)
 	require.Error(t, err)
 }
 
@@ -32,9 +31,9 @@ func TestGetProxyEnvVars_ReturnEmpty_WhenNotFound(t *testing.T) {
 		return apierrors.NewNotFound(schema.GroupResource{}, "something wasn't found")
 	}
 
-	envVars, err := GetProxyEnvVars(context.TODO(), k)
+	proxy, err := GetProxy(context.TODO(), k)
 	require.NoError(t, err)
-	require.Nil(t, envVars)
+	require.Nil(t, proxy)
 }
 
 func TestGetProxyEnvVars_ReturnEnvVars_WhenProxyExists(t *testing.T) {
@@ -54,12 +53,9 @@ func TestGetProxyEnvVars_ReturnEnvVars_WhenProxyExists(t *testing.T) {
 		return apierrors.NewNotFound(schema.GroupResource{}, "something wasn't found")
 	}
 
-	envVars, err := GetProxyEnvVars(context.TODO(), k)
+	proxy, err := GetProxy(context.TODO(), k)
 	require.NoError(t, err)
-	require.Contains(t, envVars, corev1.EnvVar{Name: "HTTP_PROXY", Value: "http-test"})
-	require.Contains(t, envVars, corev1.EnvVar{Name: "http_proxy", Value: "http-test"})
-	require.Contains(t, envVars, corev1.EnvVar{Name: "HTTPS_PROXY", Value: "https-test"})
-	require.Contains(t, envVars, corev1.EnvVar{Name: "https_proxy", Value: "https-test"})
-	require.Contains(t, envVars, corev1.EnvVar{Name: "NO_PROXY", Value: "noproxy-test"})
-	require.Contains(t, envVars, corev1.EnvVar{Name: "no_proxy", Value: "noproxy-test"})
+	require.Equal(t, "http-test", proxy.HTTPProxy)
+	require.Equal(t, "https-test", proxy.HTTPSProxy)
+	require.Equal(t, "noproxy-test", proxy.NoProxy)
 }

@@ -128,7 +128,6 @@ func CreateOrUpdateLokiStack(
 
 	var (
 		baseDomain    string
-		envVars       []corev1.EnvVar
 		tenantSecrets []*manifests.TenantSecrets
 		tenantConfigs map[string]manifests.TenantConfig
 	)
@@ -154,9 +153,15 @@ func CreateOrUpdateLokiStack(
 				return err
 			}
 
-			envVars, err = openshift.GetProxyEnvVars(ctx, k)
-			if err != nil {
-				return err
+			if stack.Spec.Proxy == nil {
+				// If the LokiStack has no proxy set but there is a cluster-wide proxy setting,
+				// set the LokiStack proxy to that.
+				ocpProxy, proxyErr := openshift.GetProxy(ctx, k)
+				if proxyErr != nil {
+					return proxyErr
+				}
+
+				stack.Spec.Proxy = ocpProxy
 			}
 		default:
 			tenantSecrets, err = gateway.GetTenantSecrets(ctx, k, req, &stack)
@@ -235,7 +240,6 @@ func CreateOrUpdateLokiStack(
 		GatewayBaseDomain:      baseDomain,
 		Stack:                  stack.Spec,
 		Gates:                  fg,
-		EnvVars:                envVars,
 		ObjectStorage:          *objStore,
 		CertRotationRequiredAt: certRotationRequiredAt,
 		AlertingRules:          alertingRules,

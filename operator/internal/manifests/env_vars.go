@@ -27,17 +27,15 @@ func configureProxyEnv(pod *corev1.PodSpec, opts Options) error {
 		resetProxyVar(pod, envVar)
 	}
 
-	envVars := opts.EnvVars
-	if envVars == nil {
-		spec := opts.Stack.Proxy
-		if spec == nil {
-			return nil
-		}
-
-		envVars = ToEnvVars(spec.HTTPProxy, spec.HTTPSProxy, spec.NoProxy)
+	proxySpec := opts.Stack.Proxy
+	if proxySpec == nil {
+		return nil
 	}
 
-	src := corev1.Container{Env: envVars}
+	src := corev1.Container{
+		Env: ToEnvVars(proxySpec.HTTPProxy, proxySpec.HTTPSProxy, proxySpec.NoProxy),
+	}
+
 	for i, dst := range pod.Containers {
 		if err := mergo.Merge(&dst, src, mergo.WithAppendSlice); err != nil {
 			return err
