@@ -20,6 +20,8 @@
 
 * [7708](https://github.com/grafana/loki/pull/7708) **DylanGuedes**: Fix multitenant querying.
 
+* [7784](https://github.com/grafana/loki/pull/7784) **isodude**: Fix default values of connect addresses for compactor and querier workers to work with IPv6.
+
 ##### Changes
 
 #### Promtail
@@ -31,6 +33,7 @@
 * [7602](https://github.com/grafana/loki/pull/7602) **vmax**: Add decolorize stage to Promtail to easily parse colored logs.
 
 ##### Fixes
+* [7771](https://github.com/grafana/loki/pull/7771) **GeorgeTsilias**: Handle nil error on target Details() call.
 
 * [7461](https://github.com/grafana/loki/pull/7461) **MarNicGit**: Promtail: Fix collecting userdata field from Windows Event Log
 
