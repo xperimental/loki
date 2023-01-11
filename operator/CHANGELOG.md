@@ -1,5 +1,6 @@
 ## Main
 
+- [8087](https://github.com/grafana/loki/pull/8087) **xperimental**: Fix status not updating when state of pods changes
 - [8173](https://github.com/grafana/loki/pull/8173) **periklis**: Remove custom webhook cert mounts for OLM-based deployment (OpenShift)
 - [8068](https://github.com/grafana/loki/pull/8068) **periklis**: Use lokistack-gateway replicas from size table
 - [7910](https://github.com/grafana/loki/pull/7910) **periklis**: Update Loki operand to v2.7.1
