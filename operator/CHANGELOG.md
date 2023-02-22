@@ -2,6 +2,7 @@
 
 ## Release 5.6.21
 
+- [8579](https://github.com/grafana/loki/pull/8579) **periklis**: operator: Remove deprecated field querier.engine.timeout
 - [319](https://github.com/openshift/loki/pull/319) **periklis**: fix(operator): Disable structured metadata
 - [13422](https://github.com/grafana/loki/pull/13422) **periklis** feat(operator): Update Loki operand to v3.1.0
 - [13369](https://github.com/grafana/loki/pull/13369) **jatinsu**: feat(operator): Add support for the volume API
