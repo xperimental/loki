@@ -1,5 +1,6 @@
 ## Main
 
+- [8577](https://github.com/grafana/loki/pull/8577) **Red-GV**: Store gateway tenant information in secret instead of configmap
 - [8397](https://github.com/grafana/loki/pull/8397) **periklis**: Update Loki operand to v2.7.3
 - [8336](https://github.com/grafana/loki/pull/8336) **periklis**: Update Loki operand to v2.7.2
 - [8265](https://github.com/grafana/loki/pull/8265) **Red-GV**: Use gRPC compactor service instead of http for retention
