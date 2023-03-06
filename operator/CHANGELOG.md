@@ -1,6 +1,7 @@
 ## Main
 
 - [8771](https://github.com/grafana/loki/pull/8771) **periklis**: Update Loki operand to v2.7.4
+- [8707](https://github.com/grafana/loki/pull/8707) **aminesnow**: Fix gateway's nodeSelector and toleration
 - [8577](https://github.com/grafana/loki/pull/8577) **Red-GV**: Store gateway tenant information in secret instead of configmap
 - [8397](https://github.com/grafana/loki/pull/8397) **periklis**: Update Loki operand to v2.7.3
 - [8336](https://github.com/grafana/loki/pull/8336) **periklis**: Update Loki operand to v2.7.2
