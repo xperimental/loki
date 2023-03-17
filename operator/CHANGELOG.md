@@ -1,5 +1,6 @@
 ## Main
 
+- [8672](https://github.com/grafana/loki/pull/8672) **periklis**: Add support for memberlist bind network configuration
 - [8771](https://github.com/grafana/loki/pull/8771) **periklis**: Update Loki operand to v2.7.4
 - [8707](https://github.com/grafana/loki/pull/8707) **aminesnow**: Fix gateway's nodeSelector and toleration
 - [8577](https://github.com/grafana/loki/pull/8577) **Red-GV**: Store gateway tenant information in secret instead of configmap
