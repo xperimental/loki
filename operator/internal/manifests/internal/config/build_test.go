@@ -109,6 +109,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -350,6 +351,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -682,6 +684,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -1024,6 +1027,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -1367,6 +1371,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -1748,6 +1753,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -2034,6 +2040,7 @@ limits_config:
   query_timeout: 2m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -2458,6 +2465,7 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
@@ -2768,6 +2776,8 @@ limits_config:
   query_timeout: 1m
 memberlist:
   abort_if_cluster_join_fails: true
+  advertise_addr: ${HASH_RING_INSTANCE_ADDR}
+  advertise_port: 7946
   bind_port: 7946
   join_members:
     - loki-gossip-ring-lokistack-dev.default.svc.cluster.local:7946
