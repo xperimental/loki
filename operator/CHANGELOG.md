@@ -1,5 +1,7 @@
 ## Main
 
+- [9036](https://github.com/grafana/loki/pull/9036) **periklis**: Update Loki operand to v2.8.0
+
 ## Release 5.6.5
 
 - [8958](https://github.com/grafana/loki/pull/8958) **periklis**: Align common instance addr with memberlist advertise addr
