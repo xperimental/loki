@@ -1,5 +1,11 @@
 ## Main
 
+## Release 5.6.5
+
+- [8958](https://github.com/grafana/loki/pull/8958) **periklis**: Align common instance addr with memberlist advertise addr
+
+## Release 5.6.4
+
 - [8672](https://github.com/grafana/loki/pull/8672) **periklis**: Add support for memberlist bind network configuration
 - [8771](https://github.com/grafana/loki/pull/8771) **periklis**: Update Loki operand to v2.7.4
 - [8707](https://github.com/grafana/loki/pull/8707) **aminesnow**: Fix gateway's nodeSelector and toleration
