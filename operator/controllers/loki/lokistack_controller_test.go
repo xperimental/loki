@@ -57,6 +57,7 @@ func TestLokiStackController_RegistersCustomResourceForCreateOrUpdate(t *testing
 
 	b.ForReturns(b)
 	b.OwnsReturns(b)
+	b.WatchesReturns(b)
 
 	err := c.buildController(b)
 	require.NoError(t, err)
