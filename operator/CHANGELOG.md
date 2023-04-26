@@ -4,6 +4,7 @@
 
 ## Release 5.6.5
 
+- [8978](https://github.com/grafana/loki/pull/8978) **aminesnow**: Add watch for the object storage secret
 - [8958](https://github.com/grafana/loki/pull/8958) **periklis**: Align common instance addr with memberlist advertise addr
 
 ## Release 5.6.4
