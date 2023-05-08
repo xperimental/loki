@@ -150,7 +150,7 @@ metadata:
     categories: OpenShift Optional, Logging & Tracing
     certified: "false"
     containerImage: docker.io/grafana/loki-operator:main-99acb9b
-    createdAt: "2023-05-04T16:51:30Z"
+    createdAt: "2023-05-23T07:47:18Z"
     description: The Community Loki Operator provides Kubernetes native deployment
       and management of Loki and related logging components.
     operators.operatorframework.io/builder: operator-sdk-unknown
@@ -1206,7 +1206,6 @@ spec:
 
     In addition it enables the following OpenShift-only related feature gates:
     * `servingCertsService`: Enables OpenShift ServiceCA annotations on the lokistack-gateway service only.
-    * `gatewayRoute`: Enables creating an OpenShift Route for the LokiStack.
     * `ruleExtendedValidation`: Enables extended validation of AlertingRule and RecordingRule to enforce tenancy in an OpenShift context.
     * `clusterTLSPolicy`: Enables usage of TLS policies set in the API Server.
     * `clusterProxy`: Enables usage of the proxy variables set in the proxy resource.
