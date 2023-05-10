@@ -1,18 +1,17 @@
-package manifests_test
+package manifests
 
 import (
 	"math/rand"
 	"testing"
 
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
-	"github.com/grafana/loki/operator/internal/manifests"
 	"github.com/grafana/loki/operator/internal/manifests/openshift"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 )
 
 func TestNewRulerStatefulSet_HasTemplateConfigHashAnnotation(t *testing.T) {
-	ss := manifests.NewRulerStatefulSet(manifests.Options{
+	ss := NewRulerStatefulSet(Options{
 		Name:       "abcd",
 		Namespace:  "efgh",
 		ConfigSHA1: "deadbeef",
@@ -33,7 +32,7 @@ func TestNewRulerStatefulSet_HasTemplateConfigHashAnnotation(t *testing.T) {
 }
 
 func TestNewRulerStatefulSet_HasTemplateCertRotationRequiredAtAnnotation(t *testing.T) {
-	ss := manifests.NewRulerStatefulSet(manifests.Options{
+	ss := NewRulerStatefulSet(Options{
 		Name:                   "abcd",
 		Namespace:              "efgh",
 		CertRotationRequiredAt: "deadbeef",
@@ -53,7 +52,7 @@ func TestNewRulerStatefulSet_HasTemplateCertRotationRequiredAtAnnotation(t *test
 }
 
 func TestBuildRuler_HasExtraObjectsForTenantMode(t *testing.T) {
-	objs, err := manifests.BuildRuler(manifests.Options{
+	objs, err := BuildRuler(Options{
 		Name:      "abcd",
 		Namespace: "efgh",
 		OpenShiftOptions: openshift.Options{
@@ -88,7 +87,7 @@ func TestNewRulerStatefulSet_SelectorMatchesLabels(t *testing.T) {
 	// failing to specify a matching Pod Selector will result in a validation error
 	// during StatefulSet creation.
 	// See https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#pod-selector
-	sts := manifests.NewRulerStatefulSet(manifests.Options{
+	sts := NewRulerStatefulSet(Options{
 		Name:      "abcd",
 		Namespace: "efgh",
 		Stack: lokiv1.LokiStackSpec{
@@ -109,7 +108,7 @@ func TestNewRulerStatefulSet_SelectorMatchesLabels(t *testing.T) {
 }
 
 func TestNewRulerStatefulSet_MountsRulesInPerTenantIDSubDirectories(t *testing.T) {
-	opts := manifests.Options{
+	opts := Options{
 		Name:      "abcd",
 		Namespace: "efgh",
 		Stack: lokiv1.LokiStackSpec{
@@ -120,15 +119,15 @@ func TestNewRulerStatefulSet_MountsRulesInPerTenantIDSubDirectories(t *testing.T
 				},
 			},
 		},
-		Tenants: manifests.Tenants{
-			Configs: map[string]manifests.TenantConfig{
+		Tenants: Tenants{
+			Configs: map[string]TenantConfig{
 				"tenant-a": {RuleFiles: []string{"test-rules-0___tenant-a___rule-a-alerts.yaml", "test-rules-0___tenant-a___rule-b-recs.yaml"}},
 				"tenant-b": {RuleFiles: []string{"test-rules-0___tenant-b___rule-a-alerts.yaml", "test-rules-0___tenant-b___rule-b-recs.yaml"}},
 			},
 		},
 		RulesConfigMapNames: []string{"config"},
 	}
-	sts := manifests.NewRulerStatefulSet(opts)
+	sts := NewRulerStatefulSet(opts)
 
 	vs := sts.Spec.Template.Spec.Volumes
 
@@ -143,7 +142,7 @@ func TestNewRulerStatefulSet_MountsRulesInPerTenantIDSubDirectories(t *testing.T
 func TestNewRulerStatefulSet_ShardedRulesConfigMap(t *testing.T) {
 	// Create a large config map which will be split into 2 shards
 	opts := testOptions_withSharding()
-	rulesCMShards, err := manifests.RulesConfigMapShards(opts)
+	rulesCMShards, err := RulesConfigMapShards(opts)
 	require.NoError(t, err)
 	require.NotNil(t, rulesCMShards)
 	require.Len(t, rulesCMShards, 2)
@@ -153,7 +152,7 @@ func TestNewRulerStatefulSet_ShardedRulesConfigMap(t *testing.T) {
 	}
 
 	// Create the Ruler StatefulSet and mount the ConfigMap shards into the Ruler pod
-	sts := manifests.NewRulerStatefulSet(*opts)
+	sts := NewRulerStatefulSet(*opts)
 
 	vs := sts.Spec.Template.Spec.Volumes
 
@@ -161,7 +160,7 @@ func TestNewRulerStatefulSet_ShardedRulesConfigMap(t *testing.T) {
 	var volumeProjections []corev1.VolumeProjection
 	for _, v := range vs {
 		volumeNames = append(volumeNames, v.Name)
-		if v.Name == manifests.RulesStorageVolumeName() {
+		if v.Name == RulesStorageVolumeName() {
 			volumeProjections = append(volumeProjections, v.Projected.Sources...)
 		}
 	}
