@@ -162,6 +162,7 @@ func ConfigOptions(opt Options) config.Options {
 			IngesterMemoryRequest: opt.ResourceRequirements.Ingester.Requests.Memory().Value(),
 		},
 		ObjectStorage:         opt.ObjectStorage,
+		HTTPTimeouts:          opt.Timeouts.Loki,
 		EnableRemoteReporting: opt.Gates.GrafanaLabsUsageReport,
 		Ruler: config.Ruler{
 			Enabled:               rulerEnabled,
