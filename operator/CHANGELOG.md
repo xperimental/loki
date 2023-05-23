@@ -1,5 +1,6 @@
 ## Main
 
+- [9405](https://github.com/grafana/loki/pull/9405) **periklis**: Add support for configuring HTTP server timeouts
 - [9346](https://github.com/grafana/loki/pull/9346) **periklis**: Enable Route by default on OpenShift clusters
 - [9036](https://github.com/grafana/loki/pull/9036) **periklis**: Update Loki operand to v2.8.0
 - [8978](https://github.com/grafana/loki/pull/8978) **aminesnow**: Add watch for the object storage secret
