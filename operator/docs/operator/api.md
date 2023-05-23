@@ -1604,10 +1604,12 @@ are degraded or the cluster cannot connect to object storage.</p>
 </thead>
 <tbody><tr><td><p>&#34;1x.extra-small&#34;</p></td>
 <td><p>SizeOneXExtraSmall defines the size of a single Loki deployment
-with extra small resources/limits requirements and without HA support.
-This size is ultimately dedicated for development and demo purposes.
-DO NOT USE THIS IN PRODUCTION!</p>
-<p>FIXME: Add clear description of ingestion/query performance expectations.</p>
+with minimal resource requirements and without HA support.</p>
+<p>This is ONLY for development, testing, or demos on limited single-node clusters.
+There are NO performance guarantees.
+LokiStack will use whatever resources are available,
+and WILL NOT FUNCTION CORRECTLY if there is not enough memory or CPU.</p>
+<p>DO NOT USE THIS IN PRODUCTION!</p>
 </td>
 </tr><tr><td><p>&#34;1x.medium&#34;</p></td>
 <td><p>SizeOneXMedium defines the size of a single Loki deployment
