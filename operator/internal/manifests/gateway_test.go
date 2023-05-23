@@ -234,6 +234,9 @@ func TestBuildGateway_HasExtraObjectsForTenantMode(t *testing.T) {
 		Namespace: "efgh",
 		Gates: configv1.FeatureGates{
 			LokiStackGateway: true,
+			OpenShift: configv1.OpenShiftFeatureGates{
+				Enabled: true,
+			},
 		},
 		OpenShiftOptions: openshift.Options{
 			BuildOpts: openshift.BuildOptions{
@@ -264,6 +267,9 @@ func TestBuildGateway_WithExtraObjectsForTenantMode_RouteSvcMatches(t *testing.T
 		Namespace: "efgh",
 		Gates: configv1.FeatureGates{
 			LokiStackGateway: true,
+			OpenShift: configv1.OpenShiftFeatureGates{
+				Enabled: true,
+			},
 		},
 		OpenShiftOptions: openshift.Options{
 			BuildOpts: openshift.BuildOptions{
@@ -336,6 +342,9 @@ func TestBuildGateway_WithExtraObjectsForTenantMode_ReplacesIngressWithRoute(t *
 		Namespace: "efgh",
 		Gates: configv1.FeatureGates{
 			LokiStackGateway: true,
+			OpenShift: configv1.OpenShiftFeatureGates{
+				Enabled: true,
+			},
 		},
 		OpenShiftOptions: openshift.Options{
 			BuildOpts: openshift.BuildOptions{

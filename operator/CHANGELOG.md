@@ -1,5 +1,11 @@
 ## Main
 
+## Release 5.6.7
+
+- [9346](https://github.com/grafana/loki/pull/9346) **periklis**: Enable Route by default on OpenShift clusters
+
+## Release 5.6.6
+
 - [9036](https://github.com/grafana/loki/pull/9036) **periklis**: Update Loki operand to v2.8.0
 
 ## Release 5.6.5
