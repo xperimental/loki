@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/ViaQ/logerr/v2/kverrors"
 	"github.com/go-logr/logr"
 	"github.com/google/go-cmp/cmp"
 	"github.com/grafana/loki/operator/controllers/loki/internal/management/state"
@@ -150,14 +151,14 @@ func (r *LokiStackReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 	if r.FeatureGates.BuiltInCertManagement.Enabled {
 		err = handlers.CreateOrRotateCertificates(ctx, r.Log, req, r.Client, r.Scheme, r.FeatureGates)
-		if res, derr := handleDegradedError(ctx, r.Client, req, err); derr != nil {
-			return res, derr
+		if err != nil {
+			return handleDegradedError(ctx, r.Client, req, err)
 		}
 	}
 
 	err = handlers.CreateOrUpdateLokiStack(ctx, r.Log, req, r.Client, r.Scheme, r.FeatureGates)
-	if res, derr := handleDegradedError(ctx, r.Client, req, err); derr != nil {
-		return res, derr
+	if err != nil {
+		return handleDegradedError(ctx, r.Client, req, err)
 	}
 
 	err = status.Refresh(ctx, r.Client, req)
@@ -173,7 +174,7 @@ func handleDegradedError(ctx context.Context, c client.Client, req ctrl.Request,
 	if errors.As(err, &degraded) {
 		err = status.SetDegradedCondition(ctx, c, req, degraded.Message, degraded.Reason)
 		if err != nil {
-			return ctrl.Result{}, err
+			return ctrl.Result{}, kverrors.Wrap(err, "error setting degraded condition")
 		}
 
 		return ctrl.Result{
@@ -181,11 +182,7 @@ func handleDegradedError(ctx context.Context, c client.Client, req ctrl.Request,
 		}, nil
 	}
 
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	return ctrl.Result{}, nil
+	return ctrl.Result{}, err
 }
 
 // SetupWithManager sets up the controller with the Manager.
