@@ -1,8 +1,16 @@
 ## Main
 
+## Release 5.7.2
+
+- [9623](https://github.com/grafana/loki/pull/9623) **periklis**: Fix timeout config constructor when only tenants limits
 - [9448](https://github.com/grafana/loki/pull/9448) **btaani**: Include runtime-config in compiling the SHA1 checksum
 - [9511](https://github.com/grafana/loki/pull/9511) **xperimental**: Do not update status after setting degraded condition
 - [9405](https://github.com/grafana/loki/pull/9405) **periklis**: Add support for configuring HTTP server timeouts
+
+## Release 5.7.1
+
+## Release 5.7.0
+
 - [9346](https://github.com/grafana/loki/pull/9346) **periklis**: Enable Route by default on OpenShift clusters
 - [9036](https://github.com/grafana/loki/pull/9036) **periklis**: Update Loki operand to v2.8.0
 - [8978](https://github.com/grafana/loki/pull/8978) **aminesnow**: Add watch for the object storage secret
