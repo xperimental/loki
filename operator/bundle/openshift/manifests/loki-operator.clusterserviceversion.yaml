@@ -150,7 +150,7 @@ metadata:
     categories: OpenShift Optional, Logging & Tracing
     certified: "false"
     containerImage: quay.io/openshift-logging/loki-operator:v0.1.0
-    createdAt: "2023-06-30T04:22:23Z"
+    createdAt: "2023-06-30T07:14:36Z"
     description: |
       The Loki Operator for OCP provides a means for configuring and managing a Loki stack for cluster logging.
       ## Prerequisites and Requirements
@@ -342,6 +342,18 @@ spec:
         path: limits.global.ingestion.maxLineSize
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
+      - description: PerStreamRateLimit defines the maximum byte rate per second per
+          stream. Units MB.
+        displayName: Maximum byte rate per second per stream (in MB)
+        path: limits.global.ingestion.perStreamRateLimit
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: PerStreamRateLimitBurst defines the maximum burst bytes per stream.
+          Units MB.
+        displayName: Maximum burst bytes per stream (in MB)
+        path: limits.global.ingestion.perStreamRateLimitBurst
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
       - description: CardinalityLimit defines the cardinality limit for index queries.
         displayName: Cardinality Limit
         path: limits.global.queries.cardinalityLimit
@@ -412,6 +424,18 @@ spec:
           Units in Bytes.
         displayName: Max Line Size
         path: limits.tenants.ingestion.maxLineSize
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: PerStreamRateLimit defines the maximum byte rate per second per
+          stream. Units MB.
+        displayName: Maximum byte rate per second per stream (in MB)
+        path: limits.tenants.ingestion.perStreamRateLimit
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: PerStreamRateLimitBurst defines the maximum burst bytes per stream.
+          Units MB.
+        displayName: Maximum burst bytes per stream (in MB)
+        path: limits.tenants.ingestion.perStreamRateLimitBurst
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
       - description: CardinalityLimit defines the cardinality limit for index queries.
