@@ -3,6 +3,7 @@
 ## Release 5.6.8
 
 - [9830](https://github.com/grafana/loki/pull/9830) **periklis**: Expose limits config setting cardinality_limit
+- [9630](https://github.com/grafana/loki/pull/9630) **jpinsonneau**: Expose per_stream_rate_limit & burst
 
 ## Release 5.6.7
 
