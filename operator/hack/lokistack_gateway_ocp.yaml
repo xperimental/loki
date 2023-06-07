@@ -12,14 +12,6 @@ spec:
     secret:
       name: test
       type: s3
-  storageClassName: gp2
+  storageClassName: gp3-csi
   tenants:
     mode: openshift-logging
-  rules:
-    enabled: true
-    selector:
-      matchLabels:
-        openshift.io/cluster-monitoring: "true"
-    namespaceSelector:
-      matchLabels:
-        openshift.io/cluster-monitoring: "true"
