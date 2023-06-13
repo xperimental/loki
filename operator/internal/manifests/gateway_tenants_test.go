@@ -397,7 +397,7 @@ func TestApplyGatewayDefaultsOptions(t *testing.T) {
 func TestConfigureDeploymentForMode(t *testing.T) {
 	type tt struct {
 		desc         string
-		mode         lokiv1.ModeType
+		tenantSpec   lokiv1.TenantsSpec
 		stackName    string
 		stackNs      string
 		featureGates configv1.FeatureGates
@@ -408,19 +408,25 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 	tc := []tt{
 		{
 			desc: "static mode",
-			mode: lokiv1.Static,
+			tenantSpec: lokiv1.TenantsSpec{
+				Mode: lokiv1.Static,
+			},
 			dpl:  &appsv1.Deployment{},
 			want: &appsv1.Deployment{},
 		},
 		{
 			desc: "dynamic mode",
-			mode: lokiv1.Dynamic,
+			tenantSpec: lokiv1.TenantsSpec{
+				Mode: lokiv1.Dynamic,
+			},
 			dpl:  &appsv1.Deployment{},
 			want: &appsv1.Deployment{},
 		},
 		{
-			desc:      "openshift-logging mode",
-			mode:      lokiv1.OpenshiftLogging,
+			desc: "openshift-logging mode",
+			tenantSpec: lokiv1.TenantsSpec{
+				Mode: lokiv1.OpenshiftLogging,
+			},
 			stackName: "test",
 			stackNs:   "test-ns",
 			dpl: &appsv1.Deployment{
@@ -456,11 +462,11 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 									Args: []string{
 										"--log.level=warn",
 										"--opa.skip-tenants=audit,infrastructure",
-										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--web.listen=:8082",
 										"--web.internal.listen=:8083",
 										"--web.healthchecks.url=http://localhost:8082",
 										"--opa.package=lokistack",
+										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--opa.matcher=kubernetes_namespace_name",
 										`--openshift.mappings=application=loki.grafana.com`,
 										`--openshift.mappings=infrastructure=loki.grafana.com`,
@@ -510,8 +516,10 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 			},
 		},
 		{
-			desc:      "openshift-logging mode with http encryption",
-			mode:      lokiv1.OpenshiftLogging,
+			desc: "openshift-logging mode with http encryption",
+			tenantSpec: lokiv1.TenantsSpec{
+				Mode: lokiv1.OpenshiftLogging,
+			},
 			stackName: "test",
 			stackNs:   "test-ns",
 			featureGates: configv1.FeatureGates{
@@ -559,11 +567,11 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 									Args: []string{
 										"--log.level=warn",
 										"--opa.skip-tenants=audit,infrastructure",
-										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--web.listen=:8082",
 										"--web.internal.listen=:8083",
 										"--web.healthchecks.url=http://localhost:8082",
 										"--opa.package=lokistack",
+										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--opa.matcher=kubernetes_namespace_name",
 										"--tls.internal.server.cert-file=/var/run/tls/http/server/tls.crt",
 										"--tls.internal.server.key-file=/var/run/tls/http/server/tls.key",
@@ -629,8 +637,10 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 			},
 		},
 		{
-			desc:      "openshift-network mode",
-			mode:      lokiv1.OpenshiftNetwork,
+			desc: "openshift-network mode",
+			tenantSpec: lokiv1.TenantsSpec{
+				Mode: lokiv1.OpenshiftNetwork,
+			},
 			stackName: "test",
 			stackNs:   "test-ns",
 			dpl: &appsv1.Deployment{
@@ -671,11 +681,11 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 									Args: []string{
 										"--log.level=warn",
 										"--opa.skip-tenants=audit,infrastructure",
-										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--web.listen=:8082",
 										"--web.internal.listen=:8083",
 										"--web.healthchecks.url=http://localhost:8082",
 										"--opa.package=lokistack",
+										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--opa.matcher=SrcK8S_Namespace,DstK8S_Namespace",
 										"--opa.matcher-op=or",
 										`--openshift.mappings=network=loki.grafana.com`,
@@ -729,8 +739,10 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 			},
 		},
 		{
-			desc:      "openshift-network mode with http encryption",
-			mode:      lokiv1.OpenshiftNetwork,
+			desc: "openshift-network mode with http encryption",
+			tenantSpec: lokiv1.TenantsSpec{
+				Mode: lokiv1.OpenshiftNetwork,
+			},
 			stackName: "test",
 			stackNs:   "test-ns",
 			featureGates: configv1.FeatureGates{
@@ -775,11 +787,11 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 									Args: []string{
 										"--log.level=warn",
 										"--opa.skip-tenants=audit,infrastructure",
-										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--web.listen=:8082",
 										"--web.internal.listen=:8083",
 										"--web.healthchecks.url=http://localhost:8082",
 										"--opa.package=lokistack",
+										"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 										"--opa.matcher=SrcK8S_Namespace,DstK8S_Namespace",
 										"--opa.matcher-op=or",
 										"--tls.internal.server.cert-file=/var/run/tls/http/server/tls.crt",
@@ -849,7 +861,7 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
-			err := configureGatewayDeploymentForMode(tc.dpl, tc.mode, tc.featureGates, "min-version", "cipher1,cipher2")
+			err := configureGatewayDeploymentForTenants(tc.dpl, &tc.tenantSpec, tc.featureGates, "min-version", "cipher1,cipher2")
 			require.NoError(t, err)
 			require.Equal(t, tc.want, tc.dpl)
 		})

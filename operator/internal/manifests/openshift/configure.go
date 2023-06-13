@@ -57,7 +57,7 @@ func GetTenants(mode lokiv1.ModeType) []string {
 // This function also forces the use of a TLS connection for the gateway.
 func ConfigureGatewayDeployment(
 	d *appsv1.Deployment,
-	mode lokiv1.ModeType,
+	tenants *lokiv1.TenantsSpec,
 	secretVolumeName, tlsDir string,
 	minTLSVersion, ciphers string,
 	withTLS bool,
@@ -65,7 +65,7 @@ func ConfigureGatewayDeployment(
 	p := corev1.PodSpec{
 		ServiceAccountName: d.GetName(),
 		Containers: []corev1.Container{
-			newOPAOpenShiftContainer(mode, secretVolumeName, tlsDir, minTLSVersion, ciphers, withTLS),
+			newOPAOpenShiftContainer(tenants, secretVolumeName, tlsDir, minTLSVersion, ciphers, withTLS),
 		},
 	}
 

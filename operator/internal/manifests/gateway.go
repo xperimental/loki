@@ -69,12 +69,12 @@ func BuildGateway(opts Options) ([]client.Object, error) {
 	}
 
 	if opts.Stack.Tenants != nil {
-		mode := opts.Stack.Tenants.Mode
-		if err := configureGatewayDeploymentForMode(dpl, mode, opts.Gates, minTLSVersion, ciphers); err != nil {
+		tenants := opts.Stack.Tenants
+		if err := configureGatewayDeploymentForTenants(dpl, tenants, opts.Gates, minTLSVersion, ciphers); err != nil {
 			return nil, err
 		}
 
-		if err := configureGatewayServiceForMode(&svc.Spec, mode); err != nil {
+		if err := configureGatewayServiceForMode(&svc.Spec, tenants.Mode); err != nil {
 			return nil, err
 		}
 

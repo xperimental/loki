@@ -62,13 +62,13 @@ func ApplyGatewayDefaultOptions(opts *Options) error {
 	return nil
 }
 
-func configureGatewayDeploymentForMode(d *appsv1.Deployment, mode lokiv1.ModeType, fg configv1.FeatureGates, minTLSVersion string, ciphers string) error {
-	switch mode {
+func configureGatewayDeploymentForTenants(d *appsv1.Deployment, tenants *lokiv1.TenantsSpec, fg configv1.FeatureGates, minTLSVersion string, ciphers string) error {
+	switch tenants.Mode {
 	case lokiv1.Static, lokiv1.Dynamic:
 		return nil // nothing to configure
 	case lokiv1.OpenshiftLogging, lokiv1.OpenshiftNetwork:
 		tlsDir := gatewayServerHTTPTLSDir()
-		return openshift.ConfigureGatewayDeployment(d, mode, tlsSecretVolume, tlsDir, minTLSVersion, ciphers, fg.HTTPEncryption)
+		return openshift.ConfigureGatewayDeployment(d, tenants, tlsSecretVolume, tlsDir, minTLSVersion, ciphers, fg.HTTPEncryption)
 	}
 
 	return nil

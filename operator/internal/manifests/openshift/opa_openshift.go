@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -22,7 +23,15 @@ const (
 	opaNetworkLabelMatchers = "SrcK8S_Namespace,DstK8S_Namespace"
 )
 
-func newOPAOpenShiftContainer(mode lokiv1.ModeType, secretVolumeName, tlsDir, minTLSVersion, ciphers string, withTLS bool) corev1.Container {
+var (
+	opaDefaultAdminGroups = []string{
+		"system:cluster-admins",
+		"cluster-admin",
+		"dedicated-admin",
+	}
+)
+
+func newOPAOpenShiftContainer(tenantSpec *lokiv1.TenantsSpec, secretVolumeName, tlsDir, minTLSVersion, ciphers string, withTLS bool) corev1.Container {
 	var (
 		image        string
 		args         []string
@@ -39,18 +48,30 @@ func newOPAOpenShiftContainer(mode lokiv1.ModeType, secretVolumeName, tlsDir, mi
 	args = []string{
 		"--log.level=warn",
 		"--opa.skip-tenants=audit,infrastructure",
-		"--opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin",
 		fmt.Sprintf("--web.listen=:%d", GatewayOPAHTTPPort),
 		fmt.Sprintf("--web.internal.listen=:%d", GatewayOPAInternalPort),
 		fmt.Sprintf("--web.healthchecks.url=http://localhost:%d", GatewayOPAHTTPPort),
 		fmt.Sprintf("--opa.package=%s", opaDefaultPackage),
 	}
 
-	if mode != lokiv1.OpenshiftNetwork {
+	adminGroups := opaDefaultAdminGroups
+	if tenantSpec.OpenShift != nil && tenantSpec.OpenShift.AdminGroups != nil {
+		adminGroups = tenantSpec.OpenShift.AdminGroups
+		if len(adminGroups) == 1 && adminGroups[0] == "" {
+			adminGroups = []string{}
+		}
+	}
+
+	if len(adminGroups) > 0 {
+		args = append(args, fmt.Sprintf("--opa.admin-groups=%s", strings.Join(adminGroups, ",")))
+	}
+
+	switch tenantSpec.Mode {
+	case lokiv1.OpenshiftLogging:
 		args = append(args, []string{
 			fmt.Sprintf("--opa.matcher=%s", opaDefaultLabelMatcher),
 		}...)
-	} else {
+	case lokiv1.OpenshiftNetwork:
 		args = append(args, []string{
 			fmt.Sprintf("--opa.matcher=%s", opaNetworkLabelMatchers),
 			"--opa.matcher-op=or",
@@ -79,7 +100,7 @@ func newOPAOpenShiftContainer(mode lokiv1.ModeType, secretVolumeName, tlsDir, mi
 		}
 	}
 
-	tenants := GetTenants(mode)
+	tenants := GetTenants(tenantSpec.Mode)
 	for _, t := range tenants {
 		args = append(args, fmt.Sprintf(`--openshift.mappings=%s=%s`, t, opaDefaultAPIGroup))
 	}
