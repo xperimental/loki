@@ -1607,7 +1607,7 @@ spec:
                 - name: RELATED_IMAGE_GATEWAY
                   value: quay.io/rojacob/observatorium-api:spike-namespaced-auth-2023-06-13-v0.1.2-396-g09caa77
                 - name: RELATED_IMAGE_OPA
-                  value: quay.io/observatorium/opa-openshift:latest
+                  value: quay.io/rojacob/opa-openshift:spike-namespaced-auth-2023-06-13-dfb28ce
                 image: quay.io/openshift-logging/loki-operator:v0.1.0
                 imagePullPolicy: IfNotPresent
                 livenessProbe:
@@ -1730,7 +1730,7 @@ spec:
     name: loki
   - image: quay.io/rojacob/observatorium-api:spike-namespaced-auth-2023-06-13-v0.1.2-396-g09caa77
     name: gateway
-  - image: quay.io/observatorium/opa-openshift:latest
+  - image: quay.io/rojacob/opa-openshift:spike-namespaced-auth-2023-06-13-dfb28ce
     name: opa
   version: 0.1.0
   webhookdefinitions:
