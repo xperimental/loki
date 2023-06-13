@@ -150,7 +150,7 @@ metadata:
     categories: OpenShift Optional, Logging & Tracing
     certified: "false"
     containerImage: quay.io/openshift-logging/loki-operator:v0.1.0
-    createdAt: "2023-06-12T17:36:51Z"
+    createdAt: "2023-06-13T15:37:04Z"
     description: |
       The Loki Operator for OCP provides a means for configuring and managing a Loki stack for cluster logging.
       ## Prerequisites and Requirements
@@ -752,6 +752,20 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:select:dynamic
         - urn:alm:descriptor:com.tectonic.ui:select:openshift-logging
         - urn:alm:descriptor:com.tectonic.ui:select:openshift-network
+      - description: OpenShift contains options specific to the OpenShift tenancy
+          modes.
+        displayName: OpenShift Tenancy
+        path: tenants.openShift
+      - description: "AdminGroups contains the names of Groups treated as \"cluster
+          administrators\". Users which are part of one or more of these groups do
+          not need to specify a Kubernetes namespace in their log queries, which makes
+          them able to fully make use of the \"infrastructure\" and \"audit\" tenants.
+          It also enables cross-namespace queries in the \"application\" tenant. \n
+          There is a default list of admin groups that will be used when the array
+          is empty. To explicitly configure \"no admin groups\" have this array contain
+          a single element with an empty string: adminGroups: [ \"\" ]"
+        displayName: Cluster Administrator Groups
+        path: tenants.openShift.adminGroups
       statusDescriptors:
       - description: Distributor is a map to the per pod status of the distributor
           deployment

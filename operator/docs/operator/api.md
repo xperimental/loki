@@ -2534,6 +2534,42 @@ It needs to be in the same namespace as the LokiStack custom resource.</p>
 </tbody>
 </table>
 
+## OpenShiftTenancySpec { #loki-grafana-com-v1-OpenShiftTenancySpec }
+<p>
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-TenantsSpec">TenantsSpec</a>)
+</p>
+<div>
+<p>OpenShiftTenancySpec contains optional configuration for the OpenShift tenancy modes.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>adminGroups</code><br/>
+<em>
+[]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>AdminGroups contains the names of Groups treated as &ldquo;cluster administrators&rdquo;. Users which are part of
+one or more of these groups do not need to specify a Kubernetes namespace in their log queries, which makes
+them able to fully make use of the &ldquo;infrastructure&rdquo; and &ldquo;audit&rdquo; tenants. It also enables cross-namespace queries
+in the &ldquo;application&rdquo; tenant.</p>
+<p>There is a default list of admin groups that will be used when the array is empty.
+To explicitly configure &ldquo;no admin groups&rdquo; have this array contain a single element with an empty string:
+adminGroups: [ &ldquo;&rdquo; ]</p>
+</td>
+</tr>
+</tbody>
+</table>
+
 ## PermissionType { #loki-grafana-com-v1-PermissionType }
 (<code>string</code> alias)
 <p>
@@ -4005,6 +4041,20 @@ AuthorizationSpec
 <td>
 <em>(Optional)</em>
 <p>Authorization defines the lokistack-gateway component authorization configuration spec per tenant.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>openShift</code><br/>
+<em>
+<a href="#loki-grafana-com-v1-OpenShiftTenancySpec">
+OpenShiftTenancySpec
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>OpenShift contains options specific to the OpenShift tenancy modes.</p>
 </td>
 </tr>
 </tbody>

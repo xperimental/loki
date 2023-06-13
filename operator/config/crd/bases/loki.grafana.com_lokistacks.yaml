@@ -3772,6 +3772,25 @@ spec:
                     - openshift-logging
                     - openshift-network
                     type: string
+                  openShift:
+                    description: OpenShift contains options specific to the OpenShift
+                      tenancy modes.
+                    properties:
+                      adminGroups:
+                        description: "AdminGroups contains the names of Groups treated
+                          as \"cluster administrators\". Users which are part of one
+                          or more of these groups do not need to specify a Kubernetes
+                          namespace in their log queries, which makes them able to
+                          fully make use of the \"infrastructure\" and \"audit\" tenants.
+                          It also enables cross-namespace queries in the \"application\"
+                          tenant. \n There is a default list of admin groups that
+                          will be used when the array is empty. To explicitly configure
+                          \"no admin groups\" have this array contain a single element
+                          with an empty string: adminGroups: [ \"\" ]"
+                        items:
+                          type: string
+                        type: array
+                    type: object
                 required:
                 - mode
                 type: object

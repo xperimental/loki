@@ -205,6 +205,23 @@ type AuthenticationSpec struct {
 	OIDC *OIDCSpec `json:"oidc"`
 }
 
+// OpenShiftTenancySpec contains optional configuration for the OpenShift tenancy modes.
+type OpenShiftTenancySpec struct {
+	// AdminGroups contains the names of Groups treated as "cluster administrators". Users which are part of
+	// one or more of these groups do not need to specify a Kubernetes namespace in their log queries, which makes
+	// them able to fully make use of the "infrastructure" and "audit" tenants. It also enables cross-namespace queries
+	// in the "application" tenant.
+	//
+	// There is a default list of admin groups that will be used when the array is empty.
+	// To explicitly configure "no admin groups" have this array contain a single element with an empty string:
+	//   adminGroups: [ "" ]
+	//
+	// +optional
+	// +kubebuilder:validation:Optional
+	// +operator-sdk:csv:customresourcedefinitions:type=spec,displayName="Cluster Administrator Groups"
+	AdminGroups []string `json:"adminGroups,omitempty"`
+}
+
 // ModeType is the authentication/authorization mode in which LokiStack Gateway will be configured.
 //
 // +kubebuilder:validation:Enum=static;dynamic;openshift-logging;openshift-network
@@ -244,6 +261,13 @@ type TenantsSpec struct {
 	// +kubebuilder:validation:Optional
 	// +operator-sdk:csv:customresourcedefinitions:type=spec,displayName="Authorization"
 	Authorization *AuthorizationSpec `json:"authorization,omitempty"`
+
+	// OpenShift contains options specific to the OpenShift tenancy modes.
+	//
+	// +optional
+	// +kubebuilder:validation:Optional
+	// +operator-sdk:csv:customresourcedefinitions:type=spec,displayName="OpenShift Tenancy"
+	OpenShift *OpenShiftTenancySpec `json:"openShift,omitempty"`
 }
 
 // LokiComponentSpec defines the requirements to configure scheduling
