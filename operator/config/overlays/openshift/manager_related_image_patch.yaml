@@ -13,4 +13,4 @@ spec:
           - name: RELATED_IMAGE_GATEWAY
             value: quay.io/rojacob/observatorium-api:spike-namespaced-auth-2023-06-13-v0.1.2-396-g09caa77
           - name: RELATED_IMAGE_OPA
-            value: quay.io/rojacob/opa-openshift:spike-namespaced-auth-2023-06-13-dfb28ce
+            value: quay.io/rojacob/opa-openshift:spike-namespaced-auth-2023-06-16-6098c8c
