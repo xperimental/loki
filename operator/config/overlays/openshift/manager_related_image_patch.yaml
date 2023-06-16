@@ -11,6 +11,6 @@ spec:
           - name: RELATED_IMAGE_LOKI
             value: quay.io/openshift-logging/loki:v2.8.0
           - name: RELATED_IMAGE_GATEWAY
-            value: quay.io/rojacob/observatorium-api:spike-namespaced-auth-2023-06-16-v0.1.2-397-g8b8f977
+            value: quay.io/rojacob/observatorium-api:spike-namespaced-auth-2023-06-16-v0.1.2-398-gdf6aa7f
           - name: RELATED_IMAGE_OPA
-            value: quay.io/rojacob/opa-openshift:spike-namespaced-auth-2023-06-16-6657ad5
+            value: quay.io/rojacob/opa-openshift:spike-namespaced-auth-2023-06-16-e90dfbe
