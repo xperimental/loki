@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.7.3
+
+- [9830](https://github.com/grafana/loki/pull/9830) **periklis**: Expose limits config setting cardinality_limit
+
 ## Release 5.7.2
 
 - [9623](https://github.com/grafana/loki/pull/9623) **periklis**: Fix timeout config constructor when only tenants limits
