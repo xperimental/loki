@@ -211,12 +211,14 @@ var StackSizeTable = map[lokiv1.LokiStackSizeType]lokiv1.LokiStackSpec{
 			Global: &lokiv1.LimitsTemplateSpec{
 				IngestionLimits: &lokiv1.IngestionLimitSpec{
 					// Defaults from Loki docs
-					IngestionRate:          4,
-					IngestionBurstSize:     6,
-					MaxLabelNameLength:     1024,
-					MaxLabelValueLength:    2048,
-					MaxLabelNamesPerSeries: 30,
-					MaxLineSize:            256000,
+					IngestionRate:           4,
+					IngestionBurstSize:      6,
+					MaxLabelNameLength:      1024,
+					MaxLabelValueLength:     2048,
+					MaxLabelNamesPerSeries:  30,
+					MaxLineSize:             256000,
+					PerStreamRateLimit:      3,
+					PerStreamRateLimitBurst: 15,
 				},
 				QueryLimits: &lokiv1.QueryLimitSpec{
 					// Defaults from Loki docs
@@ -267,10 +269,12 @@ var StackSizeTable = map[lokiv1.LokiStackSizeType]lokiv1.LokiStackSpec{
 					IngestionBurstSize:        20,
 					MaxGlobalStreamsPerTenant: 10000,
 					// Defaults from Loki docs
-					MaxLabelNameLength:     1024,
-					MaxLabelValueLength:    2048,
-					MaxLabelNamesPerSeries: 30,
-					MaxLineSize:            256000,
+					MaxLabelNameLength:      1024,
+					MaxLabelValueLength:     2048,
+					MaxLabelNamesPerSeries:  30,
+					MaxLineSize:             256000,
+					PerStreamRateLimit:      3,
+					PerStreamRateLimitBurst: 15,
 				},
 				QueryLimits: &lokiv1.QueryLimitSpec{
 					// Defaults from Loki docs
@@ -321,10 +325,12 @@ var StackSizeTable = map[lokiv1.LokiStackSizeType]lokiv1.LokiStackSpec{
 					IngestionBurstSize:        20,
 					MaxGlobalStreamsPerTenant: 25000,
 					// Defaults from Loki docs
-					MaxLabelNameLength:     1024,
-					MaxLabelValueLength:    2048,
-					MaxLabelNamesPerSeries: 30,
-					MaxLineSize:            256000,
+					MaxLabelNameLength:      1024,
+					MaxLabelValueLength:     2048,
+					MaxLabelNamesPerSeries:  30,
+					MaxLineSize:             256000,
+					PerStreamRateLimit:      3,
+					PerStreamRateLimitBurst: 15,
 				},
 				QueryLimits: &lokiv1.QueryLimitSpec{
 					// Defaults from Loki docs
