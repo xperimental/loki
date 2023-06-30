@@ -254,6 +254,11 @@ spec:
         path: limits.global.ingestion.maxLineSize
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
+      - description: CardinalityLimit defines the cardinality limit for index queries.
+        displayName: Cardinality Limit
+        path: limits.global.queries.cardinalityLimit
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
       - description: MaxChunksPerQuery defines the maximum number of chunks that can
           be fetched by a single query.
         displayName: Max Chunk per Query
@@ -319,6 +324,11 @@ spec:
           Units in Bytes.
         displayName: Max Line Size
         path: limits.tenants.ingestion.maxLineSize
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - description: CardinalityLimit defines the cardinality limit for index queries.
+        displayName: Cardinality Limit
+        path: limits.tenants.queries.cardinalityLimit
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:number
       - description: MaxChunksPerQuery defines the maximum number of chunks that can
