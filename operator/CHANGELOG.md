@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.7.4
+
+- [9963](https://github.com/grafana/loki/pull/9963) **xperimental**: Fix application tenant alertmanager configuration
+
 ## Release 5.7.3
 
 - [9830](https://github.com/grafana/loki/pull/9830) **periklis**: Expose limits config setting cardinality_limit
