@@ -2,6 +2,7 @@
 
 ## Release 5.7.4
 
+- [10019](https://github.com/grafana/loki/pull/10019) **periklis**: Update Loki operand to v2.8.3
 - [9963](https://github.com/grafana/loki/pull/9963) **xperimental**: Fix application tenant alertmanager configuration
 
 ## Release 5.7.3
