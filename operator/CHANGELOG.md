@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.6.9
+
+- [10019](https://github.com/grafana/loki/pull/10019) **periklis**: Update Loki operand to v2.8.3
+
 ## Release 5.6.8
 
 - [9830](https://github.com/grafana/loki/pull/9830) **periklis**: Expose limits config setting cardinality_limit
