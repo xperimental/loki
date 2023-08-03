@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-logr/logr"
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/manifests"
 	"github.com/stretchr/testify/require"
@@ -20,7 +19,6 @@ import (
 )
 
 func TestRefreshSuccess(t *testing.T) {
-	var log logr.Logger
 	now := time.Now()
 	stack := &lokiv1.LokiStack{
 		ObjectMeta: metav1.ObjectMeta{
@@ -72,7 +70,7 @@ func TestRefreshSuccess(t *testing.T) {
 
 	k, sw := setupListClient(t, stack, componentPods)
 
-	err := Refresh(context.Background(), k, log, req, now)
+	err := Refresh(context.Background(), k, req, now)
 
 	require.NoError(t, err)
 	require.Equal(t, 1, k.GetCallCount())
@@ -88,9 +86,7 @@ func TestRefreshSuccess(t *testing.T) {
 	require.Equal(t, wantStatus, updatedStack.Status)
 }
 
-// TODO add unit test for the new function
 func TestRefreshSuccess_ZoneAwarePendingPod(t *testing.T) {
-	var log logr.Logger
 	now := time.Now()
 	req := ctrl.Request{
 		NamespacedName: types.NamespacedName{
@@ -184,7 +180,7 @@ func TestRefreshSuccess_ZoneAwarePendingPod(t *testing.T) {
 		return nil
 	}
 
-	err := Refresh(context.Background(), k, log, req, now)
+	err := Refresh(context.Background(), k, req, now)
 
 	require.NoError(t, err)
 	require.Equal(t, 3, k.GetCallCount())

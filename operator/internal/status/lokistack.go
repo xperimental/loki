@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/ViaQ/logerr/v2/kverrors"
-	"github.com/go-logr/logr"
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/external/k8s"
 	corev1 "k8s.io/api/core/v1"
@@ -64,10 +63,7 @@ func SetDegradedCondition(ctx context.Context, k k8s.Client, req ctrl.Request, m
 	return updateCondition(ctx, k, req, degraded)
 }
 
-func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k client.Client, log logr.Logger, req ctrl.Request, stack *lokiv1.LokiStack) metav1.Condition {
-	// func generateCondition(cs *lokiv1.LokiStackComponentStatus) metav1.Condition {
-	//ll := log.WithValues("lokistack", req.NamespacedName, "event", "createOrUpdate")
-
+func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k client.Client, req ctrl.Request, stack *lokiv1.LokiStack) (metav1.Condition, error) {
 	// Check for failed pods first
 	failed := len(cs.Compactor[corev1.PodFailed]) +
 		len(cs.Distributor[corev1.PodFailed]) +
@@ -79,7 +75,7 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 		len(cs.Ruler[corev1.PodFailed])
 
 	if failed != 0 {
-		return conditionFailed
+		return conditionFailed, nil
 	}
 
 	// Check for pending pods
@@ -102,8 +98,7 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 					"app.kubernetes.io/instance": stack.Name,
 				}),
 			}); err != nil {
-				log.Error(err, "Error getting pod resources")
-				return conditionPending
+				return metav1.Condition{}, err
 			}
 
 			for _, pod := range podList.Items {
@@ -114,8 +109,7 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 							lokiv1.AnnotationAvailabilityZoneLabels: pod.Annotations[lokiv1.AnnotationAvailabilityZoneLabels],
 						}),
 					}); err != nil {
-						log.Error(err, "Error getting nodes")
-						return conditionPending
+						return metav1.Condition{}, err
 					}
 
 					if len(nodeList.Items) == 0 {
@@ -125,17 +119,17 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 							Requeue: false,
 						}
 						if err := SetDegradedCondition(ctx, k, req, degradedError.Message, degradedError.Reason); err != nil {
-							return conditionPending
+							return metav1.Condition{}, err
 						}
 					}
 				}
 			}
 		}
 
-		return conditionPending
+		return conditionPending, nil
 	}
 
-	return conditionReady
+	return conditionReady, nil
 }
 
 func updateCondition(ctx context.Context, k k8s.Client, req ctrl.Request, condition metav1.Condition) error {
