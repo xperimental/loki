@@ -12,7 +12,6 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -109,16 +108,13 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 }
 
 func checkForZoneawareNodes(ctx context.Context, k client.Client, zones []lokiv1.ZoneSpec) (metav1.Condition, error) {
-	nodeLabels := labels.Set{}
+	nodeLabels := client.HasLabels{}
 	for _, z := range zones {
-		nodeLabels[z.TopologyKey] = ""
+		nodeLabels = append(nodeLabels, z.TopologyKey)
 	}
-	nodeSelector := labels.SelectorFromSet(nodeLabels)
 
 	nodeList := &corev1.NodeList{}
-	if err := k.List(ctx, nodeList, &client.ListOptions{
-		LabelSelector: nodeSelector,
-	}); err != nil {
+	if err := k.List(ctx, nodeList, nodeLabels); err != nil {
 		return metav1.Condition{}, err
 	}
 
