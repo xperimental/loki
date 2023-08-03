@@ -89,40 +89,16 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 		len(cs.Ruler[corev1.PodPending])
 
 	if pending != 0 {
-		// TODO if condition is pending then look at the nodes if the labels match the topologyKey
 		if stack.Spec.Replication != nil && len(stack.Spec.Replication.Zones) > 0 {
-			podList := &corev1.PodList{}
-			if err := k.List(ctx, podList, &client.ListOptions{
-				Namespace: stack.Namespace,
-				LabelSelector: labels.SelectorFromSet(labels.Set{
-					"app.kubernetes.io/instance": stack.Name,
-				}),
-			}); err != nil {
+			// When there are pending pods and zone-awareness is enabled check if there are any nodes
+			// that can satisfy the constraints and emit a condition if not.
+			condition, err := checkForZoneawareNodes(ctx, k, stack.Spec.Replication.Zones)
+			if err != nil {
 				return metav1.Condition{}, err
 			}
 
-			for _, pod := range podList.Items {
-				if pod.Status.Phase == corev1.PodPending {
-					nodeList := corev1.NodeList{}
-					if err := k.List(ctx, &nodeList, &client.ListOptions{
-						LabelSelector: labels.SelectorFromSet(labels.Set{
-							lokiv1.AnnotationAvailabilityZoneLabels: pod.Annotations[lokiv1.AnnotationAvailabilityZoneLabels],
-						}),
-					}); err != nil {
-						return metav1.Condition{}, err
-					}
-
-					if len(nodeList.Items) == 0 {
-						degradedError := DegradedError{
-							Message: "Availability zone pod annotation does not match it's node's labels",
-							Reason:  lokiv1.ReasonAvailabilityZoneLabelsMismatch,
-							Requeue: false,
-						}
-						if err := SetDegradedCondition(ctx, k, req, degradedError.Message, degradedError.Reason); err != nil {
-							return metav1.Condition{}, err
-						}
-					}
-				}
+			if condition.Type != "" {
+				return condition, err
 			}
 		}
 
@@ -130,6 +106,31 @@ func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus,
 	}
 
 	return conditionReady, nil
+}
+
+func checkForZoneawareNodes(ctx context.Context, k client.Client, zones []lokiv1.ZoneSpec) (metav1.Condition, error) {
+	nodeLabels := labels.Set{}
+	for _, z := range zones {
+		nodeLabels[z.TopologyKey] = ""
+	}
+	nodeSelector := labels.SelectorFromSet(nodeLabels)
+
+	nodeList := &corev1.NodeList{}
+	if err := k.List(ctx, nodeList, &client.ListOptions{
+		LabelSelector: nodeSelector,
+	}); err != nil {
+		return metav1.Condition{}, err
+	}
+
+	if len(nodeList.Items) == 0 {
+		return metav1.Condition{
+			Type:    string(lokiv1.ConditionDegraded),
+			Message: "No nodes matching the labels used for zone-awareness found in the cluster.",
+			Reason:  string(lokiv1.ReasonAvailabilityZoneLabelsMismatch),
+		}, nil
+	}
+
+	return metav1.Condition{}, nil
 }
 
 func updateCondition(ctx context.Context, k k8s.Client, req ctrl.Request, condition metav1.Condition) error {
