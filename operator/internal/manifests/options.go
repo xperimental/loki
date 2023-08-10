@@ -4,12 +4,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/grafana/loki/operator/internal/manifests/internal/config"
-
 	configv1 "github.com/grafana/loki/operator/apis/config/v1"
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
 	"github.com/grafana/loki/operator/internal/manifests/internal"
+	"github.com/grafana/loki/operator/internal/manifests/internal/config"
 	"github.com/grafana/loki/operator/internal/manifests/openshift"
 	"github.com/grafana/loki/operator/internal/manifests/storage"
 )
