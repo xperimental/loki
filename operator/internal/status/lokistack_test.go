@@ -70,8 +70,8 @@ func TestGenerateCondition(t *testing.T) {
 		{
 			desc: "container pending",
 			componentStatus: &lokiv1.LokiStackComponentStatus{
-				Ingester: map[corev1.PodPhase][]string{
-					corev1.PodPending: {
+				Ingester: lokiv1.PodStatusMap{
+					lokiv1.PodPending: {
 						"pod-0",
 					},
 				},
@@ -81,8 +81,8 @@ func TestGenerateCondition(t *testing.T) {
 		{
 			desc: "container failed",
 			componentStatus: &lokiv1.LokiStackComponentStatus{
-				Ingester: map[corev1.PodPhase][]string{
-					corev1.PodFailed: {
+				Ingester: lokiv1.PodStatusMap{
+					lokiv1.PodFailed: {
 						"pod-0",
 					},
 				},
@@ -92,8 +92,8 @@ func TestGenerateCondition(t *testing.T) {
 		{
 			desc: "degraded error",
 			componentStatus: &lokiv1.LokiStackComponentStatus{
-				Ingester: map[corev1.PodPhase][]string{
-					corev1.PodRunning: {
+				Ingester: map[lokiv1.PodStatus][]string{
+					lokiv1.PodRunning: {
 						"pod-0",
 					},
 				},
@@ -172,8 +172,8 @@ func TestGenerateCondition_ZoneAwareLokiStack(t *testing.T) {
 				},
 			}
 			componentStatus := &lokiv1.LokiStackComponentStatus{
-				Ingester: map[corev1.PodPhase][]string{
-					corev1.PodPending: {
+				Ingester: lokiv1.PodStatusMap{
+					lokiv1.PodPending: {
 						"pod-0",
 					},
 				},
