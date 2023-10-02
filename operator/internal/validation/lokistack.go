@@ -68,6 +68,11 @@ func (v *LokiStackValidator) validate(ctx context.Context, obj runtime.Object) e
 		allErrs = append(allErrs, errors...)
 	}
 
+	errors = v.validateHashRingSpec(stack.Spec)
+	if len(errors) != 0 {
+		allErrs = append(allErrs, errors...)
+	}
+
 	if v.ExtendedValidator != nil {
 		allErrs = append(allErrs, v.ExtendedValidator(ctx, stack)...)
 	}
@@ -81,6 +86,28 @@ func (v *LokiStackValidator) validate(ctx context.Context, obj runtime.Object) e
 		stack.Name,
 		allErrs,
 	)
+}
+
+func (v *LokiStackValidator) validateHashRingSpec(s lokiv1.LokiStackSpec) field.ErrorList {
+	if s.HashRing == nil {
+		return nil
+	}
+
+	if s.HashRing.MemberList == nil {
+		return nil
+	}
+
+	if s.HashRing.MemberList.EnableIPv6 && s.HashRing.MemberList.InstanceAddrType == lokiv1.InstanceAddrDefault {
+		return field.ErrorList{
+			field.Invalid(
+				field.NewPath("spec", "hashRing", "memberlist", "instanceAddrType"),
+				s.HashRing.MemberList.InstanceAddrType,
+				lokiv1.ErrIPv6InstanceAddrTypeNotAllowed.Error(),
+			),
+		}
+	}
+
+	return nil
 }
 
 // ValidateSchemas ensures that the schemas are in a valid format
