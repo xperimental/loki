@@ -147,6 +147,10 @@ func (r *LokiStack) validate(old *LokiStack) error {
 		allErrs = append(allErrs, errors...)
 	}
 
+	errors = r.Spec.validateHashRingSpec()
+	if len(errors) != 0 {
+		allErrs = append(allErrs, errors...)
+	}
 	if len(allErrs) == 0 {
 		return nil
 	}
@@ -156,6 +160,28 @@ func (r *LokiStack) validate(old *LokiStack) error {
 		r.Name,
 		allErrs,
 	)
+}
+
+func (s *LokiStackSpec) validateHashRingSpec() field.ErrorList {
+	if s.HashRing == nil {
+		return nil
+	}
+
+	if s.HashRing.MemberList == nil {
+		return nil
+	}
+
+	if s.HashRing.MemberList.EnableIPv6 && s.HashRing.MemberList.InstanceAddrType == InstanceAddrDefault {
+		return field.ErrorList{
+			field.Invalid(
+				field.NewPath("spec", "hashRing", "memberlist", "instanceAddrType"),
+				s.HashRing.MemberList.InstanceAddrType,
+				ErrIPv6InstanceAddrTypeNotAllowed.Error(),
+			),
+		}
+	}
+
+	return nil
 }
 
 // buildAppliedSchemaMap creates a map of schemas which occur before the given time

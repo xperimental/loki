@@ -2,6 +2,7 @@
 
 ## Release 5.6.12
 
+- [10562](https://github.com/grafana/loki/pull/10562) **periklis**: Add memberlist IPv6 support
 - [10600](https://github.com/grafana/loki/pull/10600) **periklis**: Update Loki operand to v2.9.1
 
 ## Release 5.6.11
