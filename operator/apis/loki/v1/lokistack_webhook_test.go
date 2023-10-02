@@ -283,6 +283,39 @@ var ltt = []struct {
 			},
 		),
 	},
+	{
+		desc: "using default InstanceAddrType and enableIPv6",
+		spec: v1.LokiStack{
+			Spec: v1.LokiStackSpec{
+				HashRing: &v1.HashRingSpec{
+					Type: v1.HashRingMemberList,
+					MemberList: &v1.MemberListSpec{
+						EnableIPv6:       true,
+						InstanceAddrType: v1.InstanceAddrDefault,
+					},
+				},
+				Storage: v1.ObjectStorageSpec{
+					Schemas: []v1.ObjectStorageSchema{
+						{
+							Version:       v1.ObjectStorageSchemaV12,
+							EffectiveDate: "2020-10-11",
+						},
+					},
+				},
+			},
+		},
+		err: apierrors.NewInvalid(
+			schema.GroupKind{Group: "loki.grafana.com", Kind: "LokiStack"},
+			"testing-stack",
+			field.ErrorList{
+				field.Invalid(
+					field.NewPath("spec", "hashRing", "memberlist", "instanceAddrType"),
+					v1.InstanceAddrDefault,
+					v1.ErrIPv6InstanceAddrTypeNotAllowed.Error(),
+				),
+			},
+		),
+	},
 }
 
 func TestLokiStackValidationWebhook_ValidateCreate(t *testing.T) {
