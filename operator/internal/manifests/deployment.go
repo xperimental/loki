@@ -58,7 +58,7 @@ func deploymentResources(requirements internal.ComponentResources, componentName
 	}
 }
 
-func newDeployment(opts Options, componentName string) *appsv1.Deployment {
+func newDeployment(opts Options, componentName string, hasGossipPort bool) *appsv1.Deployment {
 	componentSpec := extractComponentSpec(opts.Stack.Template, componentName)
 	resourceRequirements := deploymentResources(opts.ResourceRequirements, componentName)
 
@@ -106,11 +106,6 @@ func newDeployment(opts Options, componentName string) *appsv1.Deployment {
 						ContainerPort: grpcPort,
 						Protocol:      protocolTCP,
 					},
-					{
-						Name:          lokiGossipPortName,
-						ContainerPort: gossipPort,
-						Protocol:      protocolTCP,
-					},
 				},
 				VolumeMounts: []corev1.VolumeMount{
 					{
@@ -124,6 +119,14 @@ func newDeployment(opts Options, componentName string) *appsv1.Deployment {
 				ImagePullPolicy:          "IfNotPresent",
 			},
 		},
+	}
+
+	if hasGossipPort {
+		podSpec.Containers[0].Ports = append(podSpec.Containers[0].Ports, corev1.ContainerPort{
+			Name:          lokiGossipPortName,
+			ContainerPort: gossipPort,
+			Protocol:      protocolTCP,
+		})
 	}
 
 	if opts.Stack.Template != nil && componentSpec != nil {

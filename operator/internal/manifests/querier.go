@@ -66,7 +66,7 @@ func BuildQuerier(opts Options) ([]client.Object, error) {
 
 // NewQuerierDeployment creates a deployment object for a querier
 func NewQuerierDeployment(opts Options) *appsv1.Deployment {
-	return newDeployment(opts, LabelQuerierComponent)
+	return newDeployment(opts, LabelQuerierComponent, true)
 }
 
 // NewQuerierGRPCService creates a k8s service for the querier GRPC endpoint

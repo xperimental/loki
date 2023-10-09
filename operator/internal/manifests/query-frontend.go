@@ -59,7 +59,15 @@ func BuildQueryFrontend(opts Options) ([]client.Object, error) {
 
 // NewQueryFrontendDeployment creates a deployment object for a query-frontend
 func NewQueryFrontendDeployment(opts Options) *appsv1.Deployment {
-	return newDeployment(opts, LabelQueryFrontendComponent)
+	deployment := newDeployment(opts, LabelQueryFrontendComponent, false)
+
+	// The frontend will only return ready once a querier has connected to it.
+	// Because the service used for connecting the querier to the frontend only lists ready
+	// instances there's sequencing issue. For now, we re-use the liveness-probe path
+	// for the readiness-probe as a workaround.
+	deployment.Spec.Template.Spec.Containers[0].ReadinessProbe.HTTPGet.Path = lokiLivenessPath
+
+	return deployment
 }
 
 // NewQueryFrontendGRPCService creates a k8s service for the query-frontend GRPC endpoint

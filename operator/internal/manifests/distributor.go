@@ -59,7 +59,7 @@ func BuildDistributor(opts Options) ([]client.Object, error) {
 
 // NewDistributorDeployment creates a deployment object for a distributor
 func NewDistributorDeployment(opts Options) *appsv1.Deployment {
-	return newDeployment(opts, LabelDistributorComponent)
+	return newDeployment(opts, LabelDistributorComponent, true)
 }
 
 // NewDistributorGRPCService creates a k8s service for the distributor GRPC endpoint
