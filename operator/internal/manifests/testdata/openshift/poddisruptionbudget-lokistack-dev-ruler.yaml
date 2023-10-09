@@ -1,0 +1,26 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: ruler
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-ruler
+  namespace: openshift-logging
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ruler
+      app.kubernetes.io/created-by: lokistack-controller
+      app.kubernetes.io/instance: lokistack-dev
+      app.kubernetes.io/managed-by: lokistack-controller
+      app.kubernetes.io/name: lokistack
+status:
+  currentHealthy: 0
+  desiredHealthy: 0
+  disruptionsAllowed: 0
+  expectedPods: 0

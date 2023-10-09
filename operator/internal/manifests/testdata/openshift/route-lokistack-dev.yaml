@@ -1,0 +1,25 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    haproxy.router.openshift.io/timeout: 375s
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: lokistack-gateway
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev
+  namespace: openshift-logging
+spec:
+  port:
+    targetPort: public
+  tls:
+    termination: reencrypt
+  to:
+    kind: Service
+    name: lokistack-dev-gateway-http
+    weight: 100
+  wildcardPolicy: None
+status: {}

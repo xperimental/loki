@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: ingester
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-ingester-grpc
+spec:
+  clusterIP: None
+  ports:
+  - name: grpclb
+    port: 9095
+    protocol: TCP
+    targetPort: 9095
+  selector:
+    app.kubernetes.io/component: ingester
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+status:
+  loadBalancer: {}

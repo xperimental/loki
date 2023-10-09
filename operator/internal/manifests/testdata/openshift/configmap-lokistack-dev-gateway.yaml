@@ -1,0 +1,13 @@
+apiVersion: v1
+binaryData:
+  lokistack-gateway.rego: null
+  rbac.yaml: ""
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-gateway

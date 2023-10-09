@@ -1,0 +1,221 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: lokistack-gateway
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: lokistack-gateway
+      app.kubernetes.io/created-by: lokistack-controller
+      app.kubernetes.io/instance: lokistack-dev
+      app.kubernetes.io/managed-by: lokistack-controller
+      app.kubernetes.io/name: lokistack
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        loki.grafana.com/certRotationRequiredAt: ""
+        loki.grafana.com/config-hash: 380f4fc09d34c84412fc319bd8feb0ae6cbb42a9
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: lokistack-gateway
+        app.kubernetes.io/created-by: lokistack-controller
+        app.kubernetes.io/instance: lokistack-dev
+        app.kubernetes.io/managed-by: lokistack-controller
+        app.kubernetes.io/name: lokistack
+      name: lokistack-dev-gateway
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: lokistack-gateway
+                  app.kubernetes.io/instance: lokistack-dev
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - --debug.name=lokistack-gateway
+        - --web.listen=0.0.0.0:8080
+        - --web.internal.listen=0.0.0.0:8081
+        - --web.healthchecks.url=https://localhost:8080
+        - --log.level=warn
+        - --logs.read.endpoint=https://lokistack-dev-query-frontend-http.openshift-logging.svc.cluster.local:3100
+        - --logs.tail.endpoint=https://lokistack-dev-query-frontend-http.openshift-logging.svc.cluster.local:3100
+        - --logs.write.endpoint=https://lokistack-dev-distributor-http.openshift-logging.svc.cluster.local:3100
+        - --logs.write-timeout=4m0s
+        - --rbac.config=/etc/lokistack-gateway/rbac.yaml
+        - --tenants.config=/etc/lokistack-gateway/tenants.yaml
+        - --server.read-timeout=48s
+        - --server.write-timeout=6m0s
+        - --logs.rules.endpoint=https://lokistack-dev-ruler-http.openshift-logging.svc.cluster.local:3100
+        - --logs.rules.read-only=true
+        - --logs.rules.label-filters=application:kubernetes_namespace_name
+        - --tls.client-auth-type=NoClientCert
+        - --tls.min-version=VersionTLS12
+        - --tls.server.cert-file=/var/run/tls/http/server/tls.crt
+        - --tls.server.key-file=/var/run/tls/http/server/tls.key
+        - --tls.healthchecks.server-ca-file=/var/run/ca/server/service-ca.crt
+        - --tls.healthchecks.server-name=lokistack-dev-gateway-http.openshift-logging.svc.cluster.local
+        - --tls.internal.server.cert-file=/var/run/tls/http/server/tls.crt
+        - --tls.internal.server.key-file=/var/run/tls/http/server/tls.key
+        - --tls.min-version=VersionTLS12
+        - --tls.cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+        - --logs.tls.ca-file=/var/run/ca/upstream/service-ca.crt
+        - --logs.tls.cert-file=/var/run/tls/http/upstream/tls.crt
+        - --logs.tls.key-file=/var/run/tls/http/upstream/tls.key
+        - --logs.auth.extract-selectors=kubernetes_namespace_name
+        image: quay.io/observatorium/api:latest
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /live
+            port: 8081
+            scheme: HTTPS
+          periodSeconds: 30
+          timeoutSeconds: 2
+        name: gateway
+        ports:
+        - containerPort: 8081
+          name: metrics
+        - containerPort: 8080
+          name: public
+        readinessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /ready
+            port: 8081
+            scheme: HTTPS
+          periodSeconds: 5
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - mountPath: /etc/lokistack-gateway/rbac.yaml
+          name: rbac
+          readOnly: true
+          subPath: rbac.yaml
+        - mountPath: /etc/lokistack-gateway/tenants.yaml
+          name: tenants
+          readOnly: true
+          subPath: tenants.yaml
+        - mountPath: /etc/lokistack-gateway/lokistack-gateway.rego
+          name: lokistack-gateway
+          readOnly: true
+          subPath: lokistack-gateway.rego
+        - mountPath: /var/run/tls/http/server
+          name: tls-secret
+          readOnly: true
+        - mountPath: /var/run/tls/http/upstream
+          name: lokistack-dev-gateway-client-http
+          readOnly: true
+        - mountPath: /var/run/ca/upstream
+          name: lokistack-dev-ca-bundle
+          readOnly: true
+        - mountPath: /var/run/ca/server
+          name: lokistack-dev-gateway-ca-bundle
+          readOnly: true
+      - args:
+        - --log.level=warn
+        - --web.listen=:8082
+        - --web.internal.listen=:8083
+        - --web.healthchecks.url=http://localhost:8082
+        - --opa.skip-tenants=audit,infrastructure
+        - --opa.package=lokistack
+        - --opa.admin-groups=system:cluster-admins,cluster-admin,dedicated-admin
+        - --opa.matcher=kubernetes_namespace_name
+        - --tls.internal.server.cert-file=/var/run/tls/http/server/tls.crt
+        - --tls.internal.server.key-file=/var/run/tls/http/server/tls.key
+        - --tls.min-version=VersionTLS12
+        - --tls.cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+        - --openshift.mappings=application=loki.grafana.com
+        - --openshift.mappings=infrastructure=loki.grafana.com
+        - --openshift.mappings=audit=loki.grafana.com
+        image: quay.io/observatorium/opa-openshift:latest
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /live
+            port: 8083
+            scheme: HTTPS
+          periodSeconds: 30
+          timeoutSeconds: 2
+        name: opa
+        ports:
+        - containerPort: 8082
+          name: public
+          protocol: TCP
+        - containerPort: 8083
+          name: opa-metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 12
+          httpGet:
+            path: /ready
+            port: 8083
+            scheme: HTTPS
+          periodSeconds: 5
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - mountPath: /var/run/tls/http/server
+          name: tls-secret
+          readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: lokistack-dev-gateway
+      volumes:
+      - configMap:
+          name: lokistack-dev-gateway
+        name: rbac
+      - name: tenants
+        secret:
+          secretName: lokistack-dev-gateway
+      - configMap:
+          name: lokistack-dev-gateway
+        name: lokistack-gateway
+      - name: tls-secret
+        secret:
+          secretName: lokistack-dev-gateway-http
+      - name: lokistack-dev-gateway-client-http
+        secret:
+          secretName: lokistack-dev-gateway-client-http
+      - configMap:
+          defaultMode: 420
+          name: lokistack-dev-ca-bundle
+        name: lokistack-dev-ca-bundle
+      - configMap:
+          defaultMode: 420
+          name: lokistack-dev-gateway-ca-bundle
+        name: lokistack-dev-gateway-ca-bundle
+status: {}

@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: query-frontend
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-query-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: query-frontend
+      app.kubernetes.io/created-by: lokistack-controller
+      app.kubernetes.io/instance: lokistack-dev
+      app.kubernetes.io/managed-by: lokistack-controller
+      app.kubernetes.io/name: lokistack
+      loki.grafana.com/gossip: "true"
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        loki.grafana.com/certRotationRequiredAt: ""
+        loki.grafana.com/config-hash: 7620d4bb4bebd3b60c1a3c12b8530a8fc9c82b1b
+        loki.grafana.com/object-store-hash: test-secret-sha1
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: query-frontend
+        app.kubernetes.io/created-by: lokistack-controller
+        app.kubernetes.io/instance: lokistack-dev
+        app.kubernetes.io/managed-by: lokistack-controller
+        app.kubernetes.io/name: lokistack
+        loki.grafana.com/gossip: "true"
+      name: loki-query-frontend-lokistack-dev
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: query-frontend
+                  app.kubernetes.io/instance: lokistack-dev
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - -target=query-frontend
+        - -config.file=/etc/loki/config/config.yaml
+        - -runtime-config.file=/etc/loki/config/runtime-config.yaml
+        - -config.expand-env=true
+        image: docker.io/grafana/loki:2.9.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /loki/api/v1/status/buildinfo
+            port: 3101
+            scheme: HTTPS
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 2
+        name: loki-query-frontend
+        ports:
+        - containerPort: 3100
+          name: metrics
+          protocol: TCP
+        - containerPort: 9095
+          name: grpclb
+          protocol: TCP
+        - containerPort: 3101
+          name: healthchecks
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /loki/api/v1/status/buildinfo
+            port: 3101
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/loki/config
+          name: config
+        - mountPath: /var/run/tls/http/server
+          name: lokistack-dev-query-frontend-http
+        - mountPath: /var/run/tls/grpc/server
+          name: lokistack-dev-query-frontend-grpc
+        - mountPath: /var/run/ca
+          name: lokistack-dev-ca-bundle
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: lokistack-dev-config
+        name: config
+      - name: lokistack-dev-query-frontend-http
+        secret:
+          secretName: lokistack-dev-query-frontend-http
+      - name: lokistack-dev-query-frontend-grpc
+        secret:
+          secretName: lokistack-dev-query-frontend-grpc
+      - configMap:
+          name: lokistack-dev-ca-bundle
+        name: lokistack-dev-ca-bundle
+status: {}

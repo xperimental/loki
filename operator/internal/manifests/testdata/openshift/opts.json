@@ -1,0 +1,286 @@
+{
+  "Name": "lokistack-dev",
+  "Namespace": "openshift-logging",
+  "Image": "docker.io/grafana/loki:2.9.1",
+  "GatewayImage": "quay.io/observatorium/api:latest",
+  "GatewayBaseDomain": "cluster.example.com",
+  "ConfigSHA1": "",
+  "CertRotationRequiredAt": "",
+  "Gates": {
+    "serviceMonitors": true,
+    "serviceMonitorTlsEndpoints": true,
+    "lokiStackAlerts": true,
+    "httpEncryption": true,
+    "grpcEncryption": true,
+    "builtInCertManagement": {
+      "enabled": true,
+      "caValidity": "43830h",
+      "caRefresh": "35064h",
+      "certValidity": "2160h",
+      "certRefresh": "1728h"
+    },
+    "lokiStackGateway": true,
+    "restrictedPodSecurityStandard": true,
+    "defaultNodeAffinity": true,
+    "openshift": {
+      "enabled": true,
+      "servingCertsService": true,
+      "ruleExtendedValidation": true,
+      "clusterTLSPolicy": true,
+      "clusterProxy": true,
+      "dashboards": true
+    }
+  },
+  "Stack": {
+    "managementState": "Managed",
+    "size": "1x.demo",
+    "storage": {
+      "schemas": [
+        {
+          "version": "v12",
+          "effectiveDate": "2022-06-01"
+        }
+      ],
+      "secret": {
+        "type": "s3",
+        "name": "test"
+      }
+    },
+    "storageClassName": "gp3-csi",
+    "replication": {
+      "factor": 1
+    },
+    "rules": {
+      "enabled": true,
+      "selector": {
+        "matchLabels": {
+          "openshift.io/cluster-monitoring": "true"
+        }
+      },
+      "namespaceSelector": {
+        "matchLabels": {
+          "openshift.io/cluster-monitoring": "true"
+        }
+      }
+    },
+    "limits": {
+      "global": {
+        "ingestion": {
+          "ingestionRate": 4,
+          "ingestionBurstSize": 6,
+          "maxLabelNameLength": 1024,
+          "maxLabelValueLength": 2048,
+          "maxLabelNamesPerSeries": 30,
+          "maxLineSize": 256000,
+          "perStreamRateLimit": 3,
+          "perStreamRateLimitBurst": 15
+        },
+        "queries": {
+          "maxEntriesLimitPerQuery": 5000,
+          "maxChunksPerQuery": 2000000,
+          "maxQuerySeries": 500,
+          "queryTimeout": "3m",
+          "cardinalityLimit": 100000
+        }
+      }
+    },
+    "template": {
+      "compactor": {
+        "replicas": 1
+      },
+      "distributor": {
+        "replicas": 1
+      },
+      "ingester": {
+        "replicas": 1
+      },
+      "querier": {
+        "replicas": 1
+      },
+      "queryFrontend": {
+        "replicas": 1
+      },
+      "gateway": {
+        "replicas": 2
+      },
+      "indexGateway": {
+        "replicas": 1
+      },
+      "ruler": {
+        "replicas": 1
+      }
+    },
+    "tenants": {
+      "mode": "openshift-logging"
+    }
+  },
+  "ResourceRequirements": {
+    "IndexGateway": {
+      "Limits": null,
+      "Requests": null,
+      "PVCSize": "10Gi",
+      "PDBMinAvailable": 0
+    },
+    "Ingester": {
+      "Limits": null,
+      "Requests": null,
+      "PVCSize": "10Gi",
+      "PDBMinAvailable": 0
+    },
+    "Compactor": {
+      "Limits": null,
+      "Requests": null,
+      "PVCSize": "10Gi",
+      "PDBMinAvailable": 0
+    },
+    "Ruler": {
+      "Limits": null,
+      "Requests": null,
+      "PVCSize": "10Gi",
+      "PDBMinAvailable": 0
+    },
+    "WALStorage": {
+      "Limits": null,
+      "Requests": null,
+      "PVCSize": "10Gi",
+      "PDBMinAvailable": 0
+    },
+    "Querier": {},
+    "Distributor": {},
+    "QueryFrontend": {},
+    "Gateway": {}
+  },
+  "AlertingRules": null,
+  "RecordingRules": null,
+  "RulesConfigMapNames": null,
+  "Ruler": {
+    "Spec": null,
+    "Secret": null
+  },
+  "ObjectStorage": {
+    "Schemas": [
+      {
+        "version": "v12",
+        "effectiveDate": "2022-06-01"
+      }
+    ],
+    "SharedStore": "s3",
+    "Azure": null,
+    "GCS": null,
+    "S3": {
+      "Endpoint": "https://s3.eu-central-1.amazonaws.com",
+      "Region": "eu-central-1",
+      "Buckets": "example-bucket",
+      "AccessKeyID": "example-key-id",
+      "AccessKeySecret": "example-key-secret",
+      "SSE": {
+        "Type": "",
+        "KMSKeyID": "",
+        "KMSEncryptionContext": ""
+      }
+    },
+    "Swift": null,
+    "AlibabaCloud": null,
+    "SecretName": "test",
+    "SecretSHA1": "test-secret-sha1",
+    "TLS": null
+  },
+  "OpenShiftOptions": {
+    "BuildOpts": {
+      "LokiStackName": "lokistack-dev",
+      "LokiStackNamespace": "openshift-logging",
+      "GatewayName": "lokistack-dev-gateway",
+      "GatewaySvcName": "lokistack-dev-gateway-http",
+      "GatewaySvcTargetPort": "public",
+      "GatewayRouteTimeout": 375000000000,
+      "RulerName": "lokistack-dev-ruler",
+      "Labels": {
+        "app.kubernetes.io/component": "lokistack-gateway",
+        "app.kubernetes.io/created-by": "lokistack-controller",
+        "app.kubernetes.io/instance": "lokistack-dev",
+        "app.kubernetes.io/managed-by": "lokistack-controller",
+        "app.kubernetes.io/name": "lokistack"
+      },
+      "AlertManagerEnabled": true,
+      "UserWorkloadAlertManagerEnabled": true
+    },
+    "Authentication": [
+      {
+        "TenantName": "application",
+        "TenantID": "application",
+        "ServiceAccount": "lokistack-dev-gateway",
+        "RedirectURL": "https://lokistack-dev-openshift-logging.apps.cluster.example.com/openshift/application/callback",
+        "CookieSecret": "cookie-application"
+      },
+      {
+        "TenantName": "infrastructure",
+        "TenantID": "infrastructure",
+        "ServiceAccount": "lokistack-dev-gateway",
+        "RedirectURL": "https://lokistack-dev-openshift-logging.apps.cluster.example.com/openshift/infrastructure/callback",
+        "CookieSecret": "cookie-infrastructure"
+      },
+      {
+        "TenantName": "audit",
+        "TenantID": "audit",
+        "ServiceAccount": "lokistack-dev-gateway",
+        "RedirectURL": "https://lokistack-dev-openshift-logging.apps.cluster.example.com/openshift/audit/callback",
+        "CookieSecret": "cookie-audit"
+      }
+    ],
+    "Authorization": {
+      "OPAUrl": "http://localhost:8082/v1/data/lokistack/allow"
+    }
+  },
+  "Timeouts": {
+    "Loki": {
+      "IdleTimeout": 30000000000,
+      "ReadTimeout": 18000000000,
+      "WriteTimeout": 240000000000
+    },
+    "Gateway": {
+      "ReadTimeout": 48000000000,
+      "WriteTimeout": 360000000000,
+      "UpstreamWriteTimeout": 240000000000
+    }
+  },
+  "Tenants": {
+    "Secrets": null,
+    "Configs": {
+      "application": {
+        "OIDC": null,
+        "OPA": null,
+        "OpenShift": {
+          "CookieSecret": "s2dgbFNbmhrr2br8CYwLzZOPARfOYyuv"
+        },
+        "RuleFiles": null
+      },
+      "audit": {
+        "OIDC": null,
+        "OPA": null,
+        "OpenShift": {
+          "CookieSecret": "phAfg9GmwXq6koZtpcEnwmzIbl045pcZ"
+        },
+        "RuleFiles": null
+      },
+      "infrastructure": {
+        "OIDC": null,
+        "OPA": null,
+        "OpenShift": {
+          "CookieSecret": "bVI6NI3v6wstC3bmZBceADlUZMwHMezX"
+        },
+        "RuleFiles": null
+      }
+    }
+  },
+  "TLSProfile": {
+    "Ciphers": [
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"
+    ],
+    "MinTLSVersion": "VersionTLS12"
+  }
+}

@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: ingester
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-ingester-monitor
+  namespace: openshift-logging
+spec:
+  endpoints:
+  - bearerTokenSecret:
+      key: ""
+    path: /metrics
+    port: metrics
+    scheme: https
+    tlsConfig:
+      ca:
+        configMap:
+          key: service-ca.crt
+          name: lokistack-dev-ca-bundle
+      cert:
+        secret:
+          key: tls.crt
+          name: lokistack-dev-ingester-http
+      keySecret:
+        key: tls.key
+        name: lokistack-dev-ingester-http
+      serverName: lokistack-dev-ingester-http.openshift-logging.svc.cluster.local
+  jobLabel: loki.grafana.com/component
+  namespaceSelector:
+    matchNames:
+    - openshift-logging
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ingester
+      app.kubernetes.io/created-by: lokistack-controller
+      app.kubernetes.io/instance: lokistack-dev
+      app.kubernetes.io/managed-by: lokistack-controller
+      app.kubernetes.io/name: lokistack

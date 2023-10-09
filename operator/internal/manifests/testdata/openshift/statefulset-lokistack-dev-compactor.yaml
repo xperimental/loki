@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: compactor
+    app.kubernetes.io/created-by: lokistack-controller
+    app.kubernetes.io/instance: lokistack-dev
+    app.kubernetes.io/managed-by: lokistack-controller
+    app.kubernetes.io/name: lokistack
+  name: lokistack-dev-compactor
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: compactor
+      app.kubernetes.io/created-by: lokistack-controller
+      app.kubernetes.io/instance: lokistack-dev
+      app.kubernetes.io/managed-by: lokistack-controller
+      app.kubernetes.io/name: lokistack
+      loki.grafana.com/gossip: "true"
+  serviceName: ""
+  template:
+    metadata:
+      annotations:
+        loki.grafana.com/certRotationRequiredAt: ""
+        loki.grafana.com/config-hash: 7620d4bb4bebd3b60c1a3c12b8530a8fc9c82b1b
+        loki.grafana.com/object-store-hash: test-secret-sha1
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: compactor
+        app.kubernetes.io/created-by: lokistack-controller
+        app.kubernetes.io/instance: lokistack-dev
+        app.kubernetes.io/managed-by: lokistack-controller
+        app.kubernetes.io/name: lokistack
+        loki.grafana.com/gossip: "true"
+      name: loki-compactor-lokistack-dev
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: compactor
+                  app.kubernetes.io/instance: lokistack-dev
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - -target=compactor
+        - -config.file=/etc/loki/config/config.yaml
+        - -runtime-config.file=/etc/loki/config/runtime-config.yaml
+        - -config.expand-env=true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: access_key_id
+              name: test
+        - name: AWS_ACCESS_KEY_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: access_key_secret
+              name: test
+        image: docker.io/grafana/loki:2.9.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /loki/api/v1/status/buildinfo
+            port: 3101
+            scheme: HTTPS
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 2
+        name: loki-compactor
+        ports:
+        - containerPort: 3100
+          name: metrics
+          protocol: TCP
+        - containerPort: 9095
+          name: grpclb
+          protocol: TCP
+        - containerPort: 3101
+          name: healthchecks
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: 3101
+            scheme: HTTPS
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/loki/config
+          name: config
+        - mountPath: /tmp/loki
+          name: storage
+        - mountPath: /var/run/tls/http/server
+          name: lokistack-dev-compactor-http
+        - mountPath: /etc/storage/secrets
+          name: test
+        - mountPath: /var/run/tls/grpc/server
+          name: lokistack-dev-compactor-grpc
+        - mountPath: /var/run/ca
+          name: lokistack-dev-ca-bundle
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: lokistack-dev-config
+        name: config
+      - name: lokistack-dev-compactor-http
+        secret:
+          secretName: lokistack-dev-compactor-http
+      - name: test
+        secret:
+          secretName: test
+      - name: lokistack-dev-compactor-grpc
+        secret:
+          secretName: lokistack-dev-compactor-grpc
+      - configMap:
+          name: lokistack-dev-ca-bundle
+        name: lokistack-dev-ca-bundle
+  updateStrategy: {}
+  volumeClaimTemplates:
+  - metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: compactor
+        app.kubernetes.io/created-by: lokistack-controller
+        app.kubernetes.io/instance: lokistack-dev
+        app.kubernetes.io/managed-by: lokistack-controller
+        app.kubernetes.io/name: lokistack
+      name: storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: gp3-csi
+      volumeMode: Filesystem
+    status: {}
+status:
+  availableReplicas: 0
+  replicas: 0
