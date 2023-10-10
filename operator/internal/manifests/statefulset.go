@@ -2,65 +2,35 @@ package manifests
 
 import (
 	"fmt"
-	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/manifests/internal"
 	"github.com/grafana/loki/operator/internal/manifests/internal/config"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/utils/pointer"
 	"path"
 )
 
-func extractComponentSpec(opts *lokiv1.LokiTemplateSpec, componentName string) *lokiv1.LokiComponentSpec {
-	var componentSpec *lokiv1.LokiComponentSpec
-	if opts != nil {
-		switch componentName {
-		case LabelCompactorComponent:
-			componentSpec = opts.Compactor
-		case LabelDistributorComponent:
-			componentSpec = opts.Distributor
-		case LabelIngesterComponent:
-			componentSpec = opts.Ingester
-		case LabelQuerierComponent:
-			componentSpec = opts.Querier
-		case LabelQueryFrontendComponent:
-			componentSpec = opts.QueryFrontend
-		case LabelIndexGatewayComponent:
-			componentSpec = opts.IndexGateway
-		case LabelRulerComponent:
-			componentSpec = opts.Ruler
-		case LabelGatewayComponent:
-			componentSpec = opts.Gateway
-		default:
-			panic(fmt.Sprintf("extractComponentSpec: unknown componentName: %s", componentName))
-		}
-	}
-
-	if componentSpec == nil {
-		return &lokiv1.LokiComponentSpec{}
-	}
-
-	return componentSpec
-}
-
-func deploymentResources(requirements internal.ComponentResources, componentName string) corev1.ResourceRequirements {
+func statefulSetResources(requirements internal.ComponentResources, componentName string) internal.ResourceRequirements {
 	switch componentName {
-	case LabelQuerierComponent:
-		return requirements.Querier
-	case LabelDistributorComponent:
-		return requirements.Distributor
-	case LabelQueryFrontendComponent:
-		return requirements.QueryFrontend
+	case LabelIndexGatewayComponent:
+		return requirements.IndexGateway
+	case LabelIngesterComponent:
+		return requirements.Ingester
+	case LabelCompactorComponent:
+		return requirements.Compactor
+	case LabelRulerComponent:
+		return requirements.Ruler
 	default:
-		panic(fmt.Sprintf("deploymentResources: unknown component name: %s", componentName))
+		panic(fmt.Sprintf("statefulSetResources: unknown component name: %s", componentName))
 	}
 }
 
-func newDeployment(opts Options, componentName string, hasGossipPort bool) *appsv1.Deployment {
+func newStatefulSet(opts Options, componentName string) *appsv1.StatefulSet {
 	componentSpec := extractComponentSpec(opts.Stack.Template, componentName)
-	resourceRequirements := deploymentResources(opts.ResourceRequirements, componentName)
+	resourceRequirements := statefulSetResources(opts.ResourceRequirements, componentName)
 
 	l := ComponentLabels(componentName, opts.Name)
 	a := commonAnnotations(opts.ConfigSHA1, opts.ObjectStorage.SecretSHA1, opts.CertRotationRequiredAt)
@@ -108,12 +78,27 @@ func newDeployment(opts Options, componentName string, hasGossipPort bool) *apps
 						ContainerPort: grpcPort,
 						Protocol:      protocolTCP,
 					},
+					{
+						Name:          lokiGossipPortName,
+						ContainerPort: gossipPort,
+						Protocol:      protocolTCP,
+					},
 				},
 				VolumeMounts: []corev1.VolumeMount{
 					{
 						Name:      configVolumeName,
 						ReadOnly:  false,
 						MountPath: config.LokiConfigMountDir,
+					},
+					{
+						Name:      storageVolumeName,
+						ReadOnly:  false,
+						MountPath: dataDirectory,
+					},
+					{
+						Name:      walVolumeName,
+						ReadOnly:  false,
+						MountPath: walDirectory,
 					},
 				},
 				TerminationMessagePath:   "/dev/termination-log",
@@ -123,25 +108,19 @@ func newDeployment(opts Options, componentName string, hasGossipPort bool) *apps
 		},
 	}
 
-	if hasGossipPort {
-		podSpec.Containers[0].Ports = append(podSpec.Containers[0].Ports, corev1.ContainerPort{
-			Name:          lokiGossipPortName,
-			ContainerPort: gossipPort,
-			Protocol:      protocolTCP,
-		})
-	}
-
-	return &appsv1.Deployment{
+	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "Deployment",
+			Kind:       "StatefulSet",
 			APIVersion: appsv1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   fmt.Sprintf("%s-%s", opts.Name, componentName),
 			Labels: l,
 		},
-		Spec: appsv1.DeploymentSpec{
-			Replicas: pointer.Int32(componentSpec.Replicas),
+		Spec: appsv1.StatefulSetSpec{
+			PodManagementPolicy:  appsv1.OrderedReadyPodManagement,
+			RevisionHistoryLimit: pointer.Int32(10),
+			Replicas:             pointer.Int32(componentSpec.Replicas),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: labels.Merge(l, GossipLabels()),
 			},
@@ -153,8 +132,45 @@ func newDeployment(opts Options, componentName string, hasGossipPort bool) *apps
 				},
 				Spec: podSpec,
 			},
-			Strategy: appsv1.DeploymentStrategy{
-				Type: appsv1.RollingUpdateDeploymentStrategyType,
+			VolumeClaimTemplates: []corev1.PersistentVolumeClaim{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: l,
+						Name:   storageVolumeName,
+					},
+					Spec: corev1.PersistentVolumeClaimSpec{
+						AccessModes: []corev1.PersistentVolumeAccessMode{
+							// TODO: should we verify that this is possible with the given storage class first?
+							corev1.ReadWriteOnce,
+						},
+						Resources: corev1.ResourceRequirements{
+							Requests: map[corev1.ResourceName]resource.Quantity{
+								corev1.ResourceStorage: resourceRequirements.PVCSize,
+							},
+						},
+						StorageClassName: pointer.String(opts.Stack.StorageClassName),
+						VolumeMode:       &volumeFileSystemMode,
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Labels: l,
+						Name:   walVolumeName,
+					},
+					Spec: corev1.PersistentVolumeClaimSpec{
+						AccessModes: []corev1.PersistentVolumeAccessMode{
+							// TODO: should we verify that this is possible with the given storage class first?
+							corev1.ReadWriteOnce,
+						},
+						Resources: corev1.ResourceRequirements{
+							Requests: map[corev1.ResourceName]resource.Quantity{
+								corev1.ResourceStorage: opts.ResourceRequirements.WALStorage.PVCSize,
+							},
+						},
+						StorageClassName: pointer.String(opts.Stack.StorageClassName),
+						VolumeMode:       &volumeFileSystemMode,
+					},
+				},
 			},
 		},
 	}
