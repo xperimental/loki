@@ -65,7 +65,9 @@ func newDeployment(opts Options, componentName string, hasGossipPort bool) *apps
 	l := ComponentLabels(componentName, opts.Name)
 	a := commonAnnotations(opts.ConfigSHA1, opts.ObjectStorage.SecretSHA1, opts.CertRotationRequiredAt)
 	podSpec := corev1.PodSpec{
-		Affinity: configureAffinity(componentName, opts.Name, opts.Gates.DefaultNodeAffinity, componentSpec),
+		Tolerations:  componentSpec.Tolerations,
+		NodeSelector: componentSpec.NodeSelector,
+		Affinity:     configureAffinity(componentName, opts.Name, opts.Gates.DefaultNodeAffinity, componentSpec),
 		Volumes: []corev1.Volume{
 			{
 				Name: configVolumeName,
@@ -127,11 +129,6 @@ func newDeployment(opts Options, componentName string, hasGossipPort bool) *apps
 			ContainerPort: gossipPort,
 			Protocol:      protocolTCP,
 		})
-	}
-
-	if opts.Stack.Template != nil && componentSpec != nil {
-		podSpec.Tolerations = componentSpec.Tolerations
-		podSpec.NodeSelector = componentSpec.NodeSelector
 	}
 
 	return &appsv1.Deployment{
