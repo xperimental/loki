@@ -28,7 +28,7 @@ func statefulSetResources(requirements internal.ComponentResources, componentNam
 	}
 }
 
-func newStatefulSet(opts Options, componentName string) *appsv1.StatefulSet {
+func newStatefulSet(opts Options, componentName string, hasGossipPort, hasWalVolume bool) *appsv1.StatefulSet {
 	componentSpec := extractComponentSpec(opts.Stack.Template, componentName)
 	resourceRequirements := statefulSetResources(opts.ResourceRequirements, componentName)
 
@@ -78,11 +78,6 @@ func newStatefulSet(opts Options, componentName string) *appsv1.StatefulSet {
 						ContainerPort: grpcPort,
 						Protocol:      protocolTCP,
 					},
-					{
-						Name:          lokiGossipPortName,
-						ContainerPort: gossipPort,
-						Protocol:      protocolTCP,
-					},
 				},
 				VolumeMounts: []corev1.VolumeMount{
 					{
@@ -95,11 +90,6 @@ func newStatefulSet(opts Options, componentName string) *appsv1.StatefulSet {
 						ReadOnly:  false,
 						MountPath: dataDirectory,
 					},
-					{
-						Name:      walVolumeName,
-						ReadOnly:  false,
-						MountPath: walDirectory,
-					},
 				},
 				TerminationMessagePath:   "/dev/termination-log",
 				TerminationMessagePolicy: "File",
@@ -108,7 +98,15 @@ func newStatefulSet(opts Options, componentName string) *appsv1.StatefulSet {
 		},
 	}
 
-	return &appsv1.StatefulSet{
+	if hasGossipPort {
+		podSpec.Containers[0].Ports = append(podSpec.Containers[0].Ports, corev1.ContainerPort{
+			Name:          lokiGossipPortName,
+			ContainerPort: gossipPort,
+			Protocol:      protocolTCP,
+		})
+	}
+
+	stateFulSet := &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "StatefulSet",
 			APIVersion: appsv1.SchemeGroupVersion.String(),
@@ -152,26 +150,37 @@ func newStatefulSet(opts Options, componentName string) *appsv1.StatefulSet {
 						VolumeMode:       &volumeFileSystemMode,
 					},
 				},
-				{
-					ObjectMeta: metav1.ObjectMeta{
-						Labels: l,
-						Name:   walVolumeName,
-					},
-					Spec: corev1.PersistentVolumeClaimSpec{
-						AccessModes: []corev1.PersistentVolumeAccessMode{
-							// TODO: should we verify that this is possible with the given storage class first?
-							corev1.ReadWriteOnce,
-						},
-						Resources: corev1.ResourceRequirements{
-							Requests: map[corev1.ResourceName]resource.Quantity{
-								corev1.ResourceStorage: opts.ResourceRequirements.WALStorage.PVCSize,
-							},
-						},
-						StorageClassName: pointer.String(opts.Stack.StorageClassName),
-						VolumeMode:       &volumeFileSystemMode,
-					},
-				},
 			},
 		},
 	}
+
+	if hasWalVolume {
+		stateFulSet.Spec.Template.Spec.Containers[0].VolumeMounts = append(stateFulSet.Spec.Template.Spec.Containers[0].VolumeMounts, corev1.VolumeMount{
+			Name:      walVolumeName,
+			ReadOnly:  false,
+			MountPath: walDirectory,
+		})
+
+		stateFulSet.Spec.VolumeClaimTemplates = append(stateFulSet.Spec.VolumeClaimTemplates, corev1.PersistentVolumeClaim{
+			ObjectMeta: metav1.ObjectMeta{
+				Labels: l,
+				Name:   walVolumeName,
+			},
+			Spec: corev1.PersistentVolumeClaimSpec{
+				AccessModes: []corev1.PersistentVolumeAccessMode{
+					// TODO: should we verify that this is possible with the given storage class first?
+					corev1.ReadWriteOnce,
+				},
+				Resources: corev1.ResourceRequirements{
+					Requests: map[corev1.ResourceName]resource.Quantity{
+						corev1.ResourceStorage: opts.ResourceRequirements.WALStorage.PVCSize,
+					},
+				},
+				StorageClassName: pointer.String(opts.Stack.StorageClassName),
+				VolumeMode:       &volumeFileSystemMode,
+			},
+		})
+	}
+
+	return stateFulSet
 }

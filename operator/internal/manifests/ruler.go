@@ -77,7 +77,7 @@ func BuildRuler(opts Options) ([]client.Object, error) {
 
 // NewRulerStatefulSet creates a StatefulSet object for a ruler
 func NewRulerStatefulSet(opts Options) *appsv1.StatefulSet {
-	statefulSet := newStatefulSet(opts, LabelRulerComponent)
+	statefulSet := newStatefulSet(opts, LabelRulerComponent, true, true)
 
 	var volumeProjections []corev1.VolumeProjection
 	for _, name := range opts.RulesConfigMapNames {

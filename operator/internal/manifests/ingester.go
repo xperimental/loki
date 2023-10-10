@@ -65,7 +65,7 @@ func BuildIngester(opts Options) ([]client.Object, error) {
 
 // NewIngesterStatefulSet creates a deployment object for an ingester
 func NewIngesterStatefulSet(opts Options) *appsv1.StatefulSet {
-	return newStatefulSet(opts, LabelIngesterComponent)
+	return newStatefulSet(opts, LabelIngesterComponent, true, true)
 }
 
 // NewIngesterGRPCService creates a k8s service for the ingester GRPC endpoint
