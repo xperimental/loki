@@ -198,10 +198,7 @@ func NewRulerStatefulSet(opts Options) *appsv1.StatefulSet {
 			Labels: l,
 		},
 		Spec: appsv1.StatefulSetSpec{
-			PodManagementPolicy: appsv1.ParallelPodManagement,
-			UpdateStrategy: appsv1.StatefulSetUpdateStrategy{
-				Type: appsv1.RollingUpdateStatefulSetStrategyType,
-			},
+			PodManagementPolicy:  appsv1.OrderedReadyPodManagement,
 			RevisionHistoryLimit: pointer.Int32(10),
 			Replicas:             pointer.Int32(opts.Stack.Template.Ruler.Replicas),
 			Selector: &metav1.LabelSelector{
