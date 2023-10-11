@@ -161,14 +161,14 @@ func NewRulerStatefulSet(opts Options) *appsv1.StatefulSet {
 						MountPath: config.LokiConfigMountDir,
 					},
 					{
-						Name:      walVolumeName,
-						ReadOnly:  false,
-						MountPath: walDirectory,
-					},
-					{
 						Name:      storageVolumeName,
 						ReadOnly:  false,
 						MountPath: dataDirectory,
+					},
+					{
+						Name:      walVolumeName,
+						ReadOnly:  false,
+						MountPath: walDirectory,
 					},
 					{
 						Name:      rulesStorageVolumeName,
