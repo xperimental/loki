@@ -122,10 +122,10 @@ spec:
         volumeMounts:
         - mountPath: /etc/loki/config
           name: config
-        - mountPath: /tmp/wal
-          name: wal
         - mountPath: /tmp/loki
           name: storage
+        - mountPath: /tmp/wal
+          name: wal
         - mountPath: /tmp/rules
           name: rules
         - mountPath: /var/run/tls/http/server
