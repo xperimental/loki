@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: lokistack
   name: lokistack-dev-ruler
 spec:
-  podManagementPolicy: Parallel
+  podManagementPolicy: OrderedReady
   replicas: 1
   revisionHistoryLimit: 10
   selector:
@@ -170,8 +170,7 @@ spec:
           defaultMode: 420
           name: lokistack-dev-ruler-ca-bundle
         name: lokistack-dev-ruler-ca-bundle
-  updateStrategy:
-    type: RollingUpdate
+  updateStrategy: {}
   volumeClaimTemplates:
   - metadata:
       creationTimestamp: null
