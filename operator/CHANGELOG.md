@@ -2,6 +2,7 @@
 
 ## Release 5.7.7
 
+- [10874](https://github.com/grafana/loki/pull/10874) **periklis**: Bump deps to address CVE-2023-39325 and CVE-2023-44487
 - [10562](https://github.com/grafana/loki/pull/10562) **periklis**: Add memberlist IPv6 support
 - [10600](https://github.com/grafana/loki/pull/10600) **periklis**: Update Loki operand to v2.9.1
 
