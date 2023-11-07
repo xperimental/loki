@@ -4046,6 +4046,10 @@ spec:
                 description: Storage provides summary of all changes that have occurred
                   to the storage configuration.
                 properties:
+                  schemaStatus:
+                    description: SchemaStatus conveys any warnings/messages that apply
+                      to the currently applied schemas
+                    type: string
                   schemas:
                     description: Schemas is a list of schemas which have been applied
                       to the LokiStack.

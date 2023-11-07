@@ -2137,6 +2137,19 @@ the Loki storage configuration.</p>
 to the LokiStack.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>schemaStatus</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>SchemaStatus conveys any warnings/messages that apply
+to the currently applied schemas</p>
+</td>
+</tr>
 </tbody>
 </table>
 

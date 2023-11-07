@@ -1171,6 +1171,12 @@ type LokiStackStorageStatus struct {
 	// +optional
 	// +kubebuilder:validation:Optional
 	Schemas []ObjectStorageSchema `json:"schemas,omitempty"`
+	// SchemaStatus conveys any warnings/messages that apply
+	// to the currently applied schemas
+	//
+	// +optional
+	// +kubebuilder:validation:Optional
+	SchemaStatus string `json:"schemaStatus,omitempty"`
 }
 
 // LokiStackStatus defines the observed state of LokiStack
