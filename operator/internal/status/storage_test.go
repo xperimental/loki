@@ -149,21 +149,26 @@ func TestSetStorageSchemaStatus_WhenStorageSchemaOutOfRetention(t *testing.T) {
 		},
 	}
 
-	expected := []lokiv1.ObjectStorageSchema{
-		{
-			Version:       lokiv1.ObjectStorageSchemaV11,
-			EffectiveDate: "2020-10-11",
-		},
-		{
-			Version:       lokiv1.ObjectStorageSchemaV13,
-			EffectiveDate: "2023-10-11",
+	expected := lokiv1.LokiStackStatus{
+		Storage: lokiv1.LokiStackStorageStatus{
+			Schemas: []lokiv1.ObjectStorageSchema{
+				{
+					Version:       lokiv1.ObjectStorageSchemaV11,
+					EffectiveDate: "2020-10-11",
+				},
+				{
+					Version:       lokiv1.ObjectStorageSchemaV13,
+					EffectiveDate: "2023-10-11",
+				},
+			},
+			SchemaStatus: status.StorageSchemaOutOfRetention,
 		},
 	}
 
 	sw.UpdateStub = func(_ context.Context, obj client.Object, _ ...client.SubResourceUpdateOption) error {
 		stack := obj.(*lokiv1.LokiStack)
-		require.Equal(t, expected, stack.Status.Storage.Schemas)
-		require.Equal(t, status.StorageSchemaOutOfRetention, stack.Status.Storage.SchemaStatus)
+		require.Equal(t, expected.Storage.Schemas, stack.Status.Storage.Schemas)
+		require.Equal(t, expected.Storage.SchemaStatus, stack.Status.Storage.SchemaStatus)
 		return nil
 	}
 
