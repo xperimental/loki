@@ -124,3 +124,51 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 	require.NotZero(t, k.StatusCallCount())
 	require.NotZero(t, sw.UpdateCallCount())
 }
+
+func TestSetStorageSchemaStatus_WhenStorageSchemaOutOfRetention(t *testing.T) {
+	sw := &k8sfakes.FakeStatusWriter{}
+	k := &k8sfakes.FakeClient{}
+
+	k.StatusStub = func() client.StatusWriter { return sw }
+
+	r := ctrl.Request{
+		NamespacedName: types.NamespacedName{
+			Name:      "my-stack",
+			Namespace: "some-ns",
+		},
+	}
+
+	schemas := []lokiv1.ObjectStorageSchema{
+		{
+			Version:       lokiv1.ObjectStorageSchemaV11,
+			EffectiveDate: "2020-10-11",
+		},
+		{
+			Version:       lokiv1.ObjectStorageSchemaV13,
+			EffectiveDate: "2023-10-11",
+		},
+	}
+
+	expected := []lokiv1.ObjectStorageSchema{
+		{
+			Version:       lokiv1.ObjectStorageSchemaV11,
+			EffectiveDate: "2020-10-11",
+		},
+		{
+			Version:       lokiv1.ObjectStorageSchemaV13,
+			EffectiveDate: "2023-10-11",
+		},
+	}
+
+	sw.UpdateStub = func(_ context.Context, obj client.Object, _ ...client.SubResourceUpdateOption) error {
+		stack := obj.(*lokiv1.LokiStack)
+		require.Equal(t, expected, stack.Status.Storage.Schemas)
+		require.Equal(t, status.StorageSchemaOutOfRetention, stack.Status.Storage.SchemaStatus)
+		return nil
+	}
+
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, schemas)
+	require.NoError(t, err)
+	require.NotZero(t, k.StatusCallCount())
+	require.NotZero(t, sw.UpdateCallCount())
+}
