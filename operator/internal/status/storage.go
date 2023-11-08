@@ -20,6 +20,10 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 	utcTime := time.Now()
 	cutoff := utcTime.Add(lokiv1.StorageSchemaUpdateBuffer)
 
+	// schemaVersionMap maps the existing schema versions to a boolean value
+	// that flags whether there is an applied v13 schema or not
+	schemaVersionMap := make(map[lokiv1.ObjectStorageSchemaVersion]bool)
+
 	var oldSchemas []lokiv1.ObjectStorageSchema
 
 	if err := k.Get(ctx, req.NamespacedName, &s); err != nil {
@@ -39,13 +43,16 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 			return kverrors.Wrap(err, "failed to parse effective date")
 		}
 		if sc.Version == lokiv1.ObjectStorageSchemaV13 && date.Before(cutoff) {
+			schemaVersionMap[sc.Version] = true
 			continue
 		} else {
+			schemaVersionMap[sc.Version] = false
 			oldSchemas = append(oldSchemas, sc)
 		}
 	}
 
-	if len(oldSchemas) > 0 {
+	// TODO: refactor schemaVersionMap to a slice once we upgrade to go 1.21 and use the slices package
+	if schemaVersionMap[lokiv1.ObjectStorageSchemaV13] && len(oldSchemas) > 0 {
 		s.Status.Storage.SchemaStatus = StorageSchemaOutOfRetention
 	}
 
