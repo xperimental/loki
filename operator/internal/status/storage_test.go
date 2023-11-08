@@ -120,7 +120,7 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 	}
 
 	err := status.SetStorageSchemaStatus(context.TODO(), k, r, schemas)
-	require.NoError(t, err)
+	require.ErrorIs(t, err, status.WarningError)
 	require.NotZero(t, k.StatusCallCount())
 	require.NotZero(t, sw.UpdateCallCount())
 }

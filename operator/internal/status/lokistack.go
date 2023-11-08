@@ -17,11 +17,12 @@ import (
 )
 
 const (
-	messageReady                  = "All components ready"
-	messageFailed                 = "Some LokiStack components failed"
-	messagePending                = "Some LokiStack components pending on dependencies"
-	messageDegradedMissingNodes   = "Cluster contains no nodes matching the labels used for zone-awareness"
-	messageDegradedEmptyNodeLabel = "No value for the labels used for zone-awareness"
+	messageReady                       = "All components ready"
+	messageFailed                      = "Some LokiStack components failed"
+	messagePending                     = "Some LokiStack components pending on dependencies"
+	messageDegradedMissingNodes        = "Cluster contains no nodes matching the labels used for zone-awareness"
+	messageDegradedEmptyNodeLabel      = "No value for the labels used for zone-awareness"
+	messageStorageSchemaUpgradeWarning = "Consider upgrading object storage schema to V13"
 )
 
 var (
@@ -74,7 +75,17 @@ func SetDegradedCondition(ctx context.Context, k k8s.Client, req ctrl.Request, m
 	return updateCondition(ctx, k, req, degraded)
 }
 
-func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack) (metav1.Condition, error) {
+func SetWarningCondition(ctx context.Context, k k8s.Client, req ctrl.Request, msg string, reason lokiv1.LokiStackConditionReason) error {
+	warning := metav1.Condition{
+		Type:    string(lokiv1.ConditionWarning),
+		Message: msg,
+		Reason:  string(reason),
+	}
+
+	return updateCondition(ctx, k, req, warning)
+}
+
+func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k client.Client, req ctrl.Request, stack *lokiv1.LokiStack) (metav1.Condition, error) {
 	// Check for failed pods first
 	failed := len(cs.Compactor[corev1.PodFailed]) +
 		len(cs.Distributor[corev1.PodFailed]) +

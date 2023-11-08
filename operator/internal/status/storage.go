@@ -2,6 +2,7 @@ package status
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/ViaQ/logerr/v2/kverrors"
@@ -12,7 +13,11 @@ import (
 	"github.com/grafana/loki/operator/internal/external/k8s"
 )
 
-var StorageSchemaOutOfRetention = "Old object storage schema v11/v12 is out of retention"
+var (
+	StorageSchemaOutOfRetention = "Old object storage schema V11/V12 is out of retention"
+	StorageSchemaNeedsUpgrade   = "Consider upgrading to schema V13 to use TSDB shipper"
+	WarningError                = errors.New(string(lokiv1.ConditionWarning))
+)
 
 // SetStorageSchemaStatus updates the storage status component
 func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request, schemas []lokiv1.ObjectStorageSchema) error {
@@ -52,8 +57,17 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 	}
 
 	// TODO: refactor schemaVersionMap to a slice once we upgrade to go 1.21 and use the slices package
-	if schemaVersionMap[lokiv1.ObjectStorageSchemaV13] && len(oldSchemas) > 0 {
-		s.Status.Storage.SchemaStatus = StorageSchemaOutOfRetention
+	if len(oldSchemas) > 0 {
+		if schemaVersionMap[lokiv1.ObjectStorageSchemaV13] {
+			s.Status.Storage.SchemaStatus = StorageSchemaOutOfRetention
+		} else {
+			s.Status.Storage.SchemaStatus = StorageSchemaNeedsUpgrade
+			if err := k.Status().Update(ctx, &s); err != nil {
+				return err
+			}
+
+			return WarningError
+		}
 	}
 
 	return k.Status().Update(ctx, &s)

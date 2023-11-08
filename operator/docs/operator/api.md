@@ -1771,6 +1771,9 @@ storage is missing.</p>
 <td><p>ReasonMissingRulerSecret when the required secret to authorization remote write connections
 for the ruler is missing.</p>
 </td>
+</tr><tr><td><p>&#34;ReasonObjectStorageSchemaShouldBeUpgraded&#34;</p></td>
+<td><p>ReasonObjectStorageSchemaShouldBeUpgraded when the object storage schema should be upgraded to the newest version V13</p>
+</td>
 </tr><tr><td><p>&#34;PendingComponents&#34;</p></td>
 <td><p>ReasonPendingComponents when all/some LokiStack components pending dependencies</p>
 </td>
@@ -1813,6 +1816,9 @@ are degraded or the cluster cannot connect to object storage.</p>
 </td>
 </tr><tr><td><p>&#34;Ready&#34;</p></td>
 <td><p>ConditionReady defines the condition that all components in the Loki deployment are ready.</p>
+</td>
+</tr><tr><td><p>&#34;Warning&#34;</p></td>
+<td><p>ConditionWarning defines the condition that some components in the LokiStack need user intervention</p>
 </td>
 </tr></tbody>
 </table>
