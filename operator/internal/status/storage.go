@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	StorageSchemaOutOfRetention = "Old object storage schema V11/V12 is out of retention"
+	StorageSchemaOutOfRetention = "Old object storage schema is out of retention"
 	StorageSchemaNeedsUpgrade   = "Consider upgrading to schema V13 to use TSDB shipper"
 	WarningError                = errors.New(string(lokiv1.ConditionWarning))
 )
@@ -56,19 +56,33 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 		}
 	}
 
-	// TODO: refactor schemaVersionMap to a slice once we upgrade to go 1.21 and use the slices package
 	if len(oldSchemas) > 0 {
 		if schemaVersionMap[lokiv1.ObjectStorageSchemaV13] {
-			s.Status.Storage.SchemaStatus = StorageSchemaOutOfRetention
+			//s.Status.Storage.Schemas[] = StorageSchemaOutOfRetention
+			if err := updateSchemaStatus(s.Status.Storage.Schemas, StorageSchemaOutOfRetention); err != nil {
+				return kverrors.Wrap(err, "error updating schema status")
+			}
 		} else {
-			s.Status.Storage.SchemaStatus = StorageSchemaNeedsUpgrade
-			if err := k.Status().Update(ctx, &s); err != nil {
-				return err
+			//s.Status.Storage.SchemaStatus = StorageSchemaNeedsUpgrade
+			if err := updateSchemaStatus(s.Status.Storage.Schemas, StorageSchemaNeedsUpgrade); err != nil {
+				return kverrors.Wrap(err, "error updating schema status")
 			}
 
-			return WarningError
+			if err := SetWarningCondition(ctx, k, req, StorageSchemaNeedsUpgrade, lokiv1.ReasonObjectStorageSchemaShouldBeUpgraded); err != nil {
+				return kverrors.Wrap(err, "error setting warning condition")
+			}
 		}
 	}
 
 	return k.Status().Update(ctx, &s)
+}
+
+func updateSchemaStatus(schemas []lokiv1.ObjectStorageSchema, message string) error {
+
+	for i, sc := range schemas {
+		if sc.Version != lokiv1.ObjectStorageSchemaV13 {
+			schemas[i].SchemaStatus = message
+		}
+	}
+	return nil
 }

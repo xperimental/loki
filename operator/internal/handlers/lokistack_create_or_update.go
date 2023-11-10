@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -355,14 +354,8 @@ func CreateOrUpdateLokiStack(
 	// be possibly misaligned with the configmap, which could lead to
 	// a user possibly being unable to read logs.
 	if err := status.SetStorageSchemaStatus(ctx, k, req, storageSchemas); err != nil {
-		if errors.Is(err, status.WarningError) {
-			if er := status.SetWarningCondition(ctx, k, req, status.StorageSchemaNeedsUpgrade, lokiv1.ReasonObjectStorageSchemaShouldBeUpgraded); er != nil {
-				return kverrors.Wrap(er, "error setting warning condition")
-			}
-		} else {
-			ll.Error(err, "failed to set storage schema status")
-			return err
-		}
+		ll.Error(err, "failed to set storage schema status")
+		return err
 	}
 
 	var errCount int32
