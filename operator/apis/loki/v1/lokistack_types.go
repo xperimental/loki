@@ -565,6 +565,25 @@ type ObjectStorageSchema struct {
 	// +required
 	// +kubebuilder:validation:Required
 	EffectiveDate StorageSchemaEffectiveDate `json:"effectiveDate"`
+}
+
+// ObjectStorageStatusSchema defines the requirements needed to configure a new
+// storage schema status.
+type ObjectStorageStatusSchema struct {
+	// Version for writing and reading logs.
+	//
+	// +required
+	// +kubebuilder:validation:Required
+	// +operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:select:v11","urn:alm:descriptor:com.tectonic.ui:select:v12","urn:alm:descriptor:com.tectonic.ui:select:v13"},displayName="Version"
+	Version ObjectStorageSchemaVersion `json:"version"`
+
+	// EffectiveDate is the date in UTC that the schema will be applied on.
+	// To ensure readibility of logs, this date should be before the current
+	// date in UTC.
+	//
+	// +required
+	// +kubebuilder:validation:Required
+	EffectiveDate StorageSchemaEffectiveDate `json:"effectiveDate"`
 
 	// SchemaStatus conveys any warnings/messages that apply
 	// to the currently applied schema
@@ -1107,8 +1126,10 @@ const (
 	ReasonZoneAwareNodesMissing LokiStackConditionReason = "ReasonZoneAwareNodesMissing"
 	// ReasonZoneAwareEmptyLabel when the node-label used for zone-awareness has an empty value.
 	ReasonZoneAwareEmptyLabel LokiStackConditionReason = "ReasonZoneAwareEmptyLabel"
-	// ReasonObjectStorageSchemaShouldBeUpgraded when the object storage schema should be upgraded to the newest version V13
-	ReasonObjectStorageSchemaShouldBeUpgraded LokiStackConditionReason = "ReasonObjectStorageSchemaShouldBeUpgraded"
+	// ReasonSchemaUpgradeRecommended when the object storage schema should be upgraded to the newest version V13
+	ReasonSchemaUpgradeRecommended LokiStackConditionReason = "ReasonSchemaUpgradeRecommended"
+	// ReasonSchemaOutOfRetention when the object storage schema falls out of the retention period
+	ReasonSchemaOutOfRetention LokiStackConditionReason = "ReasonSchemaOutOfRetention"
 )
 
 // PodStatusMap defines the type for mapping pod status to pod name.
@@ -1182,7 +1203,7 @@ type LokiStackStorageStatus struct {
 	//
 	// +optional
 	// +kubebuilder:validation:Optional
-	Schemas []ObjectStorageSchema `json:"schemas,omitempty"`
+	Schemas []ObjectStorageStatusSchema `json:"schemas,omitempty"`
 }
 
 // LokiStackStatus defines the observed state of LokiStack

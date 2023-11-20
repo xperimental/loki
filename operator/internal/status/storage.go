@@ -2,7 +2,6 @@ package status
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/ViaQ/logerr/v2/kverrors"
@@ -16,7 +15,6 @@ import (
 var (
 	StorageSchemaOutOfRetention = "Old object storage schema is out of retention"
 	StorageSchemaNeedsUpgrade   = "Consider upgrading to schema V13 to use TSDB shipper"
-	WarningError                = errors.New(string(lokiv1.ConditionWarning))
 )
 
 // SetStorageSchemaStatus updates the storage status component
@@ -29,7 +27,7 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 	// that flags whether there is an applied v13 schema or not
 	schemaVersionMap := make(map[lokiv1.ObjectStorageSchemaVersion]bool)
 
-	var oldSchemas []lokiv1.ObjectStorageSchema
+	var oldSchemas []lokiv1.ObjectStorageStatusSchema
 
 	if err := k.Get(ctx, req.NamespacedName, &s); err != nil {
 		if apierrors.IsNotFound(err) {
@@ -38,11 +36,12 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 		return kverrors.Wrap(err, "failed to lookup lokistack", "name", req.NamespacedName)
 	}
 
+	statusSchemas := storageSchemaToStatusSchema(schemas)
 	s.Status.Storage = lokiv1.LokiStackStorageStatus{
-		Schemas: schemas,
+		Schemas: statusSchemas,
 	}
 
-	for _, sc := range schemas {
+	for _, sc := range statusSchemas {
 		date, err := sc.EffectiveDate.UTCTime()
 		if err != nil {
 			return kverrors.Wrap(err, "failed to parse effective date")
@@ -58,27 +57,39 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 
 	if len(oldSchemas) > 0 {
 		if schemaVersionMap[lokiv1.ObjectStorageSchemaV13] {
-			//s.Status.Storage.Schemas[] = StorageSchemaOutOfRetention
 			if err := updateSchemaStatus(s.Status.Storage.Schemas, StorageSchemaOutOfRetention); err != nil {
 				return kverrors.Wrap(err, "error updating schema status")
 			}
+			/* if err := SetWarningCondition(ctx, k, req, StorageSchemaOutOfRetention, lokiv1.ReasonSchemaOutOfRetention); err != nil {
+				return kverrors.Wrap(err, "error setting warning condition")
+			} */
 		} else {
-			//s.Status.Storage.SchemaStatus = StorageSchemaNeedsUpgrade
 			if err := updateSchemaStatus(s.Status.Storage.Schemas, StorageSchemaNeedsUpgrade); err != nil {
 				return kverrors.Wrap(err, "error updating schema status")
 			}
-
-			if err := SetWarningCondition(ctx, k, req, StorageSchemaNeedsUpgrade, lokiv1.ReasonObjectStorageSchemaShouldBeUpgraded); err != nil {
+			/* if err := SetWarningCondition(ctx, k, req, StorageSchemaNeedsUpgrade, lokiv1.ReasonSchemaUpgradeRecommended); err != nil {
 				return kverrors.Wrap(err, "error setting warning condition")
-			}
+			} */
 		}
 	}
 
 	return k.Status().Update(ctx, &s)
 }
 
-func updateSchemaStatus(schemas []lokiv1.ObjectStorageSchema, message string) error {
+func storageSchemaToStatusSchema(schemas []lokiv1.ObjectStorageSchema) []lokiv1.ObjectStorageStatusSchema {
+	var statusSchemas []lokiv1.ObjectStorageStatusSchema
 
+	for _, sc := range schemas {
+		statusSchemas = append(statusSchemas, lokiv1.ObjectStorageStatusSchema{
+			Version:       sc.Version,
+			EffectiveDate: sc.EffectiveDate,
+		})
+	}
+
+	return statusSchemas
+}
+
+func updateSchemaStatus(schemas []lokiv1.ObjectStorageStatusSchema, message string) error {
 	for i, sc := range schemas {
 		if sc.Version != lokiv1.ObjectStorageSchemaV13 {
 			schemas[i].SchemaStatus = message

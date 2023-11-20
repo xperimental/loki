@@ -1783,6 +1783,9 @@ for the ruler is missing.</p>
 </tr><tr><td><p>&#34;ReadyComponents&#34;</p></td>
 <td><p>ReasonReadyComponents when all LokiStack components are ready to serve traffic.</p>
 </td>
+</tr><tr><td><p>&#34;ReasonSchemaUpgradeRecommended&#34;</p></td>
+<td><p>ReasonSchemaUpgradeRecommended when the object storage schema falls out of the retention period</p>
+</td>
 </tr><tr><td><p>&#34;ReasonZoneAwareEmptyLabel&#34;</p></td>
 <td><p>ReasonZoneAwareEmptyLabel when the node-label used for zone-awareness has an empty value.</p>
 </td>
@@ -2132,8 +2135,8 @@ the Loki storage configuration.</p>
 <td>
 <code>schemas</code><br/>
 <em>
-<a href="#loki-grafana-com-v1-ObjectStorageSchema">
-[]ObjectStorageSchema
+<a href="#loki-grafana-com-v1-ObjectStorageStatusSchema">
+[]ObjectStorageStatusSchema
 </a>
 </em>
 </td>
@@ -2537,7 +2540,7 @@ string
 
 ## ObjectStorageSchema { #loki-grafana-com-v1-ObjectStorageSchema }
 <p>
-(<em>Appears on:</em><a href="#loki-grafana-com-v1-LokiStackStorageStatus">LokiStackStorageStatus</a>, <a href="#loki-grafana-com-v1-ObjectStorageSpec">ObjectStorageSpec</a>)
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSpec">ObjectStorageSpec</a>)
 </p>
 <div>
 <p>ObjectStorageSchema defines the requirements needed to configure a new
@@ -2579,26 +2582,13 @@ To ensure readibility of logs, this date should be before the current
 date in UTC.</p>
 </td>
 </tr>
-<tr>
-<td>
-<code>schemaStatus</code><br/>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>SchemaStatus conveys any warnings/messages that apply
-to the currently applied schema</p>
-</td>
-</tr>
 </tbody>
 </table>
 
 ## ObjectStorageSchemaVersion { #loki-grafana-com-v1-ObjectStorageSchemaVersion }
 (<code>string</code> alias)
 <p>
-(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSchema">ObjectStorageSchema</a>)
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSchema">ObjectStorageSchema</a>, <a href="#loki-grafana-com-v1-ObjectStorageStatusSchema">ObjectStorageStatusSchema</a>)
 </p>
 <div>
 <p>ObjectStorageSchemaVersion defines the storage schema version which will be
@@ -2754,6 +2744,66 @@ ObjectStorageTLSSpec
 <td>
 <em>(Optional)</em>
 <p>TLS configuration for reaching the object storage endpoint.</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+## ObjectStorageStatusSchema { #loki-grafana-com-v1-ObjectStorageStatusSchema }
+<p>
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-LokiStackStorageStatus">LokiStackStorageStatus</a>)
+</p>
+<div>
+<p>ObjectStorageStatusSchema defines the requirements needed to configure a new
+storage schema status.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>version</code><br/>
+<em>
+<a href="#loki-grafana-com-v1-ObjectStorageSchemaVersion">
+ObjectStorageSchemaVersion
+</a>
+</em>
+</td>
+<td>
+<p>Version for writing and reading logs.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>effectiveDate</code><br/>
+<em>
+<a href="#loki-grafana-com-v1-StorageSchemaEffectiveDate">
+StorageSchemaEffectiveDate
+</a>
+</em>
+</td>
+<td>
+<p>EffectiveDate is the date in UTC that the schema will be applied on.
+To ensure readibility of logs, this date should be before the current
+date in UTC.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>schemaStatus</code><br/>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>SchemaStatus conveys any warnings/messages that apply
+to the currently applied schema</p>
 </td>
 </tr>
 </tbody>
@@ -4282,7 +4332,7 @@ the same namespace as the LokiStack object is in is used.</p>
 ## StorageSchemaEffectiveDate { #loki-grafana-com-v1-StorageSchemaEffectiveDate }
 (<code>string</code> alias)
 <p>
-(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSchema">ObjectStorageSchema</a>)
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSchema">ObjectStorageSchema</a>, <a href="#loki-grafana-com-v1-ObjectStorageStatusSchema">ObjectStorageStatusSchema</a>)
 </p>
 <div>
 <p>StorageSchemaEffectiveDate defines the type for the Storage Schema Effect Date</p>

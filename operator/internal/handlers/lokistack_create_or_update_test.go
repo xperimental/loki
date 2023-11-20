@@ -867,7 +867,7 @@ func TestCreateOrUpdateLokiStack_WithInvalidStorageSchema_SetDegraded(t *testing
 		},
 		Status: lokiv1.LokiStackStatus{
 			Storage: lokiv1.LokiStackStorageStatus{
-				Schemas: []lokiv1.ObjectStorageSchema{
+				Schemas: []lokiv1.ObjectStorageStatusSchema{
 					{
 						Version:       lokiv1.ObjectStorageSchemaV11,
 						EffectiveDate: "2020-10-11",

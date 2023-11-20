@@ -846,9 +846,9 @@ func (src *LokiStack) ConvertTo(dstRaw conversion.Hub) error {
 		Gateway:       v1.PodStatusMap(src.Status.Components.Gateway),
 	}
 
-	var statusSchemas []v1.ObjectStorageSchema
+	var statusSchemas []v1.ObjectStorageStatusSchema
 	for _, s := range src.Status.Storage.Schemas {
-		statusSchemas = append(statusSchemas, v1.ObjectStorageSchema{
+		statusSchemas = append(statusSchemas, v1.ObjectStorageStatusSchema{
 			Version:       v1.ObjectStorageSchemaVersion(s.Version),
 			EffectiveDate: v1.StorageSchemaEffectiveDate(s.EffectiveDate),
 		})
