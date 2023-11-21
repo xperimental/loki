@@ -5543,7 +5543,7 @@ limits_config:
   max_chunks_per_query: 2000000
   max_query_length: 721h
   max_query_parallelism: 32
-  ${TSDB_LIMIT}
+  tsdb_max_query_parallelism: 512
   max_query_series: 500
   cardinality_limit: 100000
   max_streams_matchers_per_query: 1000
@@ -5552,6 +5552,7 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  allow_structured_metadata: true
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -5610,7 +5611,6 @@ storage_config:
     index_gateway_client:
       server_address: dns:///loki-index-gateway-grpc-lokistack-dev.default.svc.cluster.local:9095
   ${TSDB_SHIPPER_STORAGE_CONFIG}
-  
 tracing:
   enabled: false
 analytics:
@@ -5692,6 +5692,7 @@ analytics:
 				},
 			},
 		},
+		Shippers:              []string{"boltdb"},
 		EnableRemoteReporting: true,
 		HTTPTimeouts: HTTPTimeoutConfig{
 			IdleTimeout:  30 * time.Second,
@@ -5736,6 +5737,7 @@ analytics:
 	expCfg = strings.Replace(expCfg, "${TSDB_SHIPPER_STORAGE_CONFIG}", tsdb_shipper_config, -1)
 
 	opts.ObjectStorage.Schemas = append(opts.ObjectStorage.Schemas, v13schema)
+	opts.Shippers = append(opts.Shippers, "tsdb")
 
 	cfg, _, err = Build(opts)
 
