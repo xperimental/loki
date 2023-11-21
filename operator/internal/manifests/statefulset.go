@@ -2,15 +2,17 @@ package manifests
 
 import (
 	"fmt"
-	"github.com/grafana/loki/operator/internal/manifests/internal"
-	"github.com/grafana/loki/operator/internal/manifests/internal/config"
+	"path"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/utils/pointer"
-	"path"
+
+	"github.com/grafana/loki/operator/internal/manifests/internal"
+	"github.com/grafana/loki/operator/internal/manifests/internal/config"
 )
 
 func statefulSetResources(requirements internal.ComponentResources, componentName string) internal.ResourceRequirements {

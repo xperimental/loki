@@ -33,8 +33,6 @@ const (
 	lokiLivenessPath  = "/loki/api/v1/status/buildinfo"
 	lokiReadinessPath = "/ready"
 
-	lokiFrontendContainerName = "loki-query-frontend"
-
 	gatewayContainerName    = "gateway"
 	gatewayHTTPPort         = 8080
 	gatewayInternalPort     = 8081
