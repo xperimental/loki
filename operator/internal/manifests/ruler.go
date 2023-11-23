@@ -7,6 +7,7 @@ import (
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/manifests/internal/config"
 	"github.com/grafana/loki/operator/internal/manifests/openshift"
+	"github.com/grafana/loki/operator/internal/manifests/storage"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -25,6 +26,10 @@ func BuildRuler(opts Options) ([]client.Object, error) {
 		if err := configureRulerHTTPServicePKI(statefulSet, opts); err != nil {
 			return nil, err
 		}
+	}
+
+	if err := storage.ConfigureStatefulSet(statefulSet, opts.ObjectStorage); err != nil {
+		return nil, err
 	}
 
 	if opts.Gates.GRPCEncryption {
