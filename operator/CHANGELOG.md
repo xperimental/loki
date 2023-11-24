@@ -1,5 +1,13 @@
 ## Main
 
+## Release 5.6.14
+
+- [11288](https://github.com/grafana/loki/pull/11288) **periklis**: Fix custom CA for object-store in ruler component
+
+## Release 5.6.13
+
+No changes.
+
 ## Release 5.6.12
 
 - [10924](https://github.com/grafana/loki/pull/10924) **periklis**: Update Loki operand to v2.9.2
