@@ -1169,6 +1169,35 @@ type LokiStackComponentStatus struct {
 	Ruler PodStatusMap `json:"ruler,omitempty"`
 }
 
+// ObjectStorageSchemaStatusType identifies what status a storage schema has.
+//
+// +kubebuilder:validation:Enum=obsolete;inuse;future;proposed
+type ObjectStorageSchemaStatusType string
+
+const (
+	// SchemaStatusObsolete is used, when a schema configuration has fallen out of retention and thus is no longer used.
+	SchemaStatusObsolete ObjectStorageSchemaStatusType = "obsolete"
+	// SchemaStatusInUse is used for schema configurations that are currently in use
+	// (current day or past and still in retention).
+	SchemaStatusInUse ObjectStorageSchemaStatusType = "inuse"
+	// SchemaStatusFuture is used for schema configurations that have not been applied yet (start is in the future).
+	SchemaStatusFuture ObjectStorageSchemaStatusType = "future"
+	// SchemaStatusProposed is used for schema configurations that are not part of the configuration yet
+	// but proposed by the automatic upgrade routine.
+	SchemaStatusProposed ObjectStorageSchemaStatusType = "proposed"
+)
+
+// ObjectStorageSchemaStatus contains information about the status of a storage schema.
+type ObjectStorageSchemaStatus struct {
+	ObjectStorageSchema `json:",inline"`
+
+	// Status contains the observed status of this storage schema.
+	//
+	// +required
+	// +kubebuilder:validation:Required
+	Status ObjectStorageSchemaStatusType `json:"status,omitempty"`
+}
+
 // LokiStackStorageStatus defines the observed state of
 // the Loki storage configuration.
 type LokiStackStorageStatus struct {
@@ -1177,7 +1206,7 @@ type LokiStackStorageStatus struct {
 	//
 	// +optional
 	// +kubebuilder:validation:Optional
-	Schemas []ObjectStorageSchema `json:"schemas,omitempty"`
+	Schemas []ObjectStorageSchemaStatus `json:"schemas,omitempty"`
 }
 
 // LokiStackStatus defines the observed state of LokiStack

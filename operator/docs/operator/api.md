@@ -2126,8 +2126,8 @@ the Loki storage configuration.</p>
 <td>
 <code>schemas</code><br/>
 <em>
-<a href="#loki-grafana-com-v1-ObjectStorageSchema">
-[]ObjectStorageSchema
+<a href="#loki-grafana-com-v1-ObjectStorageSchemaStatus">
+[]ObjectStorageSchemaStatus
 </a>
 </em>
 </td>
@@ -2531,7 +2531,7 @@ string
 
 ## ObjectStorageSchema { #loki-grafana-com-v1-ObjectStorageSchema }
 <p>
-(<em>Appears on:</em><a href="#loki-grafana-com-v1-LokiStackStorageStatus">LokiStackStorageStatus</a>, <a href="#loki-grafana-com-v1-ObjectStorageSpec">ObjectStorageSpec</a>)
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSchemaStatus">ObjectStorageSchemaStatus</a>, <a href="#loki-grafana-com-v1-ObjectStorageSpec">ObjectStorageSpec</a>)
 </p>
 <div>
 <p>ObjectStorageSchema defines the requirements needed to configure a new
@@ -2574,6 +2574,97 @@ date in UTC.</p>
 </td>
 </tr>
 </tbody>
+</table>
+
+## ObjectStorageSchemaStatus { #loki-grafana-com-v1-ObjectStorageSchemaStatus }
+<p>
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-LokiStackStorageStatus">LokiStackStorageStatus</a>)
+</p>
+<div>
+<p>ObjectStorageSchemaStatus contains information about the status of a storage schema.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>version</code><br/>
+<em>
+<a href="#loki-grafana-com-v1-ObjectStorageSchemaVersion">
+ObjectStorageSchemaVersion
+</a>
+</em>
+</td>
+<td>
+<p>Version for writing and reading logs.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>effectiveDate</code><br/>
+<em>
+<a href="#loki-grafana-com-v1-StorageSchemaEffectiveDate">
+StorageSchemaEffectiveDate
+</a>
+</em>
+</td>
+<td>
+<p>EffectiveDate is the date in UTC that the schema will be applied on.
+To ensure readibility of logs, this date should be before the current
+date in UTC.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code><br/>
+<em>
+<a href="#loki-grafana-com-v1-ObjectStorageSchemaStatusType">
+ObjectStorageSchemaStatusType
+</a>
+</em>
+</td>
+<td>
+<p>Status contains the observed status of this storage schema.</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+## ObjectStorageSchemaStatusType { #loki-grafana-com-v1-ObjectStorageSchemaStatusType }
+(<code>string</code> alias)
+<p>
+(<em>Appears on:</em><a href="#loki-grafana-com-v1-ObjectStorageSchemaStatus">ObjectStorageSchemaStatus</a>)
+</p>
+<div>
+<p>ObjectStorageSchemaStatusType identifies what status a storage schema has.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;future&#34;</p></td>
+<td><p>SchemaStatusFuture is used for schema configurations that have not been applied yet (start is in the future).</p>
+</td>
+</tr><tr><td><p>&#34;inuse&#34;</p></td>
+<td><p>SchemaStatusInUse is used for schema configurations that are currently in use
+(current day or past and still in retention).</p>
+</td>
+</tr><tr><td><p>&#34;obsolete&#34;</p></td>
+<td><p>SchemaStatusObsolete is used, when a schema configuration has fallen out of retention and thus is no longer used.</p>
+</td>
+</tr><tr><td><p>&#34;proposed&#34;</p></td>
+<td><p>SchemaStatusProposed is used for schema configurations that are not part of the configuration yet
+but proposed by the automatic upgrade routine.</p>
+</td>
+</tr></tbody>
 </table>
 
 ## ObjectStorageSchemaVersion { #loki-grafana-com-v1-ObjectStorageSchemaVersion }
@@ -2695,6 +2786,19 @@ storage bucket to persist logs by the ingester component.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>allowAutomaticUpgrade</code><br/>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>AllowUpgrade controls whether the operator should be able to automatically append new schema configurations
+when there is potential to upgrade.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>schemas</code><br/>
