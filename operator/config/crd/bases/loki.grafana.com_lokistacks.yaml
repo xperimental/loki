@@ -556,6 +556,11 @@ spec:
                 description: Storage defines the spec for the object storage endpoint
                   to store logs.
                 properties:
+                  allowAutomaticUpgrade:
+                    description: AllowUpgrade controls whether the operator should
+                      be able to automatically append new schema configurations when
+                      there is potential to upgrade.
+                    type: boolean
                   schemas:
                     default:
                     - effectiveDate: "2020-10-11"

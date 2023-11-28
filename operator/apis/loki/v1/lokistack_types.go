@@ -570,6 +570,13 @@ type ObjectStorageSchema struct {
 // ObjectStorageSpec defines the requirements to access the object
 // storage bucket to persist logs by the ingester component.
 type ObjectStorageSpec struct {
+	// AllowUpgrade controls whether the operator should be able to automatically append new schema configurations
+	// when there is potential to upgrade.
+	//
+	// +optional
+	// +kubebuilder:validation:Optional
+	AllowAutomaticUpgrade bool `json:"allowAutomaticUpgrade"`
+
 	// Schemas for reading and writing logs.
 	//
 	// +optional
