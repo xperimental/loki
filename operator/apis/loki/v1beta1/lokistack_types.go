@@ -1,10 +1,11 @@
 package v1beta1
 
 import (
-	v1 "github.com/grafana/loki/operator/apis/loki/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/conversion"
+
+	v1 "github.com/grafana/loki/operator/apis/loki/v1"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -846,11 +847,14 @@ func (src *LokiStack) ConvertTo(dstRaw conversion.Hub) error {
 		Gateway:       v1.PodStatusMap(src.Status.Components.Gateway),
 	}
 
-	var statusSchemas []v1.ObjectStorageSchema
+	var statusSchemas []v1.ObjectStorageSchemaStatus
 	for _, s := range src.Status.Storage.Schemas {
-		statusSchemas = append(statusSchemas, v1.ObjectStorageSchema{
-			Version:       v1.ObjectStorageSchemaVersion(s.Version),
-			EffectiveDate: v1.StorageSchemaEffectiveDate(s.EffectiveDate),
+		statusSchemas = append(statusSchemas, v1.ObjectStorageSchemaStatus{
+			ObjectStorageSchema: v1.ObjectStorageSchema{
+				Version:       v1.ObjectStorageSchemaVersion(s.Version),
+				EffectiveDate: v1.StorageSchemaEffectiveDate(s.EffectiveDate),
+			},
+			Status: v1.SchemaStatusInUse,
 		})
 	}
 	dst.Status.Storage = v1.LokiStackStorageStatus{Schemas: statusSchemas}

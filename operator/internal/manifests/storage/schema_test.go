@@ -57,10 +57,13 @@ func TestBuildSchemaConfig_AddSchema_WithStatuses_WithValidDate(t *testing.T) {
 		},
 	}
 	status := lokiv1.LokiStackStorageStatus{
-		Schemas: []lokiv1.ObjectStorageSchema{
+		Schemas: []lokiv1.ObjectStorageSchemaStatus{
 			{
-				Version:       lokiv1.ObjectStorageSchemaV11,
-				EffectiveDate: "2020-10-01",
+				ObjectStorageSchema: lokiv1.ObjectStorageSchema{
+					Version:       lokiv1.ObjectStorageSchemaV11,
+					EffectiveDate: "2020-10-01",
+				},
+				Status: lokiv1.SchemaStatusInUse,
 			},
 		},
 	}
@@ -97,10 +100,13 @@ func TestBuildSchemaConfig_AddSchema_WithStatuses_WithInvalidDate(t *testing.T) 
 		},
 	}
 	status := lokiv1.LokiStackStorageStatus{
-		Schemas: []lokiv1.ObjectStorageSchema{
+		Schemas: []lokiv1.ObjectStorageSchemaStatus{
 			{
-				Version:       lokiv1.ObjectStorageSchemaV11,
-				EffectiveDate: "2020-10-01",
+				ObjectStorageSchema: lokiv1.ObjectStorageSchema{
+					Version:       lokiv1.ObjectStorageSchemaV11,
+					EffectiveDate: "2020-10-01",
+				},
+				Status: lokiv1.SchemaStatusInUse,
 			},
 		},
 	}

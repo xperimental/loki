@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
 	"github.com/grafana/loki/operator/internal/status"
-	"github.com/stretchr/testify/require"
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -66,10 +67,13 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 		},
 		Status: lokiv1.LokiStackStatus{
 			Storage: lokiv1.LokiStackStorageStatus{
-				Schemas: []lokiv1.ObjectStorageSchema{
+				Schemas: []lokiv1.ObjectStorageSchemaStatus{
 					{
-						Version:       lokiv1.ObjectStorageSchemaV11,
-						EffectiveDate: "2020-10-11",
+						ObjectStorageSchema: lokiv1.ObjectStorageSchema{
+							Version:       lokiv1.ObjectStorageSchemaV11,
+							EffectiveDate: "2020-10-11",
+						},
+						Status: lokiv1.SchemaStatusInUse,
 					},
 				},
 			},
@@ -94,14 +98,20 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 		},
 	}
 
-	expected := []lokiv1.ObjectStorageSchema{
+	expected := []lokiv1.ObjectStorageSchemaStatus{
 		{
-			Version:       lokiv1.ObjectStorageSchemaV11,
-			EffectiveDate: "2020-10-11",
+			ObjectStorageSchema: lokiv1.ObjectStorageSchema{
+				Version:       lokiv1.ObjectStorageSchemaV11,
+				EffectiveDate: "2020-10-11",
+			},
+			Status: lokiv1.SchemaStatusInUse,
 		},
 		{
-			Version:       lokiv1.ObjectStorageSchemaV12,
-			EffectiveDate: "2021-10-11",
+			ObjectStorageSchema: lokiv1.ObjectStorageSchema{
+				Version:       lokiv1.ObjectStorageSchemaV12,
+				EffectiveDate: "2021-10-11",
+			},
+			Status: lokiv1.SchemaStatusInUse,
 		},
 	}
 

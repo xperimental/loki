@@ -22,8 +22,19 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 	}
 
 	s.Status.Storage = lokiv1.LokiStackStorageStatus{
-		Schemas: schemas,
+		Schemas: convertToSchemaStatus(schemas),
 	}
 
 	return k.Status().Update(ctx, &s)
+}
+
+func convertToSchemaStatus(schemas []lokiv1.ObjectStorageSchema) []lokiv1.ObjectStorageSchemaStatus {
+	statuses := make([]lokiv1.ObjectStorageSchemaStatus, 0, len(schemas))
+	for _, s := range schemas {
+		statuses = append(statuses, lokiv1.ObjectStorageSchemaStatus{
+			ObjectStorageSchema: s,
+			Status:              lokiv1.SchemaStatusInUse,
+		})
+	}
+	return statuses
 }
