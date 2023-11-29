@@ -63,18 +63,15 @@ func (e *DegradedError) Error() string {
 	return fmt.Sprintf("cluster degraded: %s", e.Message)
 }
 
-// SetDegradedCondition appends the condition Degraded to the lokistack status conditions.
-func SetDegradedCondition(ctx context.Context, k k8s.Client, req ctrl.Request, msg string, reason lokiv1.LokiStackConditionReason) error {
-	degraded := metav1.Condition{
-		Type:    string(lokiv1.ConditionDegraded),
-		Message: msg,
-		Reason:  string(reason),
+func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack, degradedErr *DegradedError) (metav1.Condition, error) {
+	if degradedErr != nil {
+		return metav1.Condition{
+			Type:    string(lokiv1.ConditionDegraded),
+			Message: degradedErr.Message,
+			Reason:  string(degradedErr.Reason),
+		}, nil
 	}
 
-	return updateCondition(ctx, k, req, degraded)
-}
-
-func generateCondition(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack) (metav1.Condition, error) {
 	// Check for failed pods first
 	failed := len(cs.Compactor[corev1.PodFailed]) +
 		len(cs.Distributor[corev1.PodFailed]) +
