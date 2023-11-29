@@ -3,6 +3,7 @@ package status
 import (
 	"context"
 	"fmt"
+	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -60,8 +61,8 @@ func (e *DegradedError) Error() string {
 	return fmt.Sprintf("cluster degraded: %s", e.Message)
 }
 
-func generateConditions(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack, degradedErr *DegradedError) ([]metav1.Condition, error) {
-	conditions, err := generateWarnings(ctx, cs, k, req, stack)
+func generateConditions(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack, now time.Time, degradedErr *DegradedError) ([]metav1.Condition, error) {
+	conditions, err := generateWarnings(ctx, cs, k, req, stack, now)
 	if err != nil {
 		return nil, err
 	}
@@ -156,8 +157,4 @@ func checkForZoneawareNodes(ctx context.Context, k client.Client, zones []lokiv1
 	}
 
 	return true, true, nil
-}
-
-func generateWarnings(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack) ([]metav1.Condition, error) {
-	return []metav1.Condition{}, nil
 }
