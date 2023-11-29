@@ -89,8 +89,9 @@ func CreateOrUpdateLokiStack(
 		}
 	}
 
+	now := time.Now()
 	storageSchemas, err := storageoptions.BuildSchemaConfig(
-		time.Now().UTC(),
+		now,
 		stack.Spec.Storage,
 		stack.Status.Storage,
 	)
@@ -353,7 +354,7 @@ func CreateOrUpdateLokiStack(
 	// updated and another resource is not. This would cause the status to
 	// be possibly misaligned with the configmap, which could lead to
 	// a user possibly being unable to read logs.
-	if err := status.SetStorageSchemaStatus(ctx, k, req, storageSchemas); err != nil {
+	if err := status.SetStorageSchemaStatus(ctx, k, req, storageSchemas, now); err != nil {
 		ll.Error(err, "failed to set storage schema status")
 		return err
 	}

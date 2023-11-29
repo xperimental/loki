@@ -3,6 +3,7 @@ package status_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -32,7 +33,8 @@ func TestSetStorageSchemaStatus_WhenGetLokiStackReturnsError_ReturnError(t *test
 		return apierrors.NewBadRequest("something wasn't found")
 	}
 
-	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{})
+	now := time.Unix(0, 0)
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{}, now)
 	require.Error(t, err)
 }
 
@@ -50,7 +52,8 @@ func TestSetStorageSchemaStatus_WhenGetLokiStackReturnsNotFound_DoNothing(t *tes
 		return apierrors.NewNotFound(schema.GroupResource{}, "something wasn't found")
 	}
 
-	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{})
+	now := time.Unix(0, 0)
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{}, now)
 	require.NoError(t, err)
 }
 
@@ -111,7 +114,7 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 				Version:       lokiv1.ObjectStorageSchemaV12,
 				EffectiveDate: "2021-10-11",
 			},
-			Status: lokiv1.SchemaStatusInUse,
+			Status: lokiv1.SchemaStatusFuture,
 		},
 	}
 
@@ -129,7 +132,9 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 		return nil
 	}
 
-	err := status.SetStorageSchemaStatus(context.TODO(), k, r, schemas)
+	now := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, schemas, now)
 	require.NoError(t, err)
 	require.NotZero(t, k.StatusCallCount())
 	require.NotZero(t, sw.UpdateCallCount())
