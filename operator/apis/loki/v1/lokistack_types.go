@@ -575,7 +575,7 @@ type ObjectStorageSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:Optional
-	AllowAutomaticUpgrade bool `json:"allowAutomaticUpgrade"`
+	AllowAutomaticUpgrade bool `json:"allowAutomaticUpgrade,omitempty"`
 
 	// Schemas for reading and writing logs.
 	//

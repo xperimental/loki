@@ -42,9 +42,18 @@ func Refresh(ctx context.Context, k k8s.Client, req ctrl.Request, now time.Time,
 		c.Status = metav1.ConditionTrue
 	}
 
+	var proposedUpgrade *lokiv1.ProposedSchemaUpdate
+	if stack.Spec.Storage.AllowAutomaticUpgrade {
+		proposedUpgrade, err = generateSchemaUpgrade(ctx, &stack, now)
+		if err != nil {
+			return err
+		}
+	}
+
 	statusUpdater := func(stack *lokiv1.LokiStack) {
 		stack.Status.Components = *cs
 		stack.Status.Conditions = mergeConditions(stack.Status.Conditions, activeConditions, metaTime)
+		stack.Status.Storage.AutomaticUpgrade = proposedUpgrade
 	}
 
 	statusUpdater(&stack)
