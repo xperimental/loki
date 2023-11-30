@@ -1222,6 +1222,22 @@ type ObjectStorageSchemaStatus struct {
 	Status ObjectStorageSchemaStatusType `json:"status,omitempty"`
 }
 
+// ProposedSchemaUpdate contains the proposed storage schemas from the automatic update routine
+// and information on when this proposal will be applied.
+type ProposedSchemaUpdate struct {
+	// UpgradeTime contains the time when the automatic upgrade will apply the new configuration.
+	//
+	// +required
+	// +kubebuilder:validation:Required
+	UpgradeTime metav1.Time `json:"upgradeTime,omitempty"`
+
+	// Schemas contains the proposed schema configuration that will be applied by the updater.
+	//
+	// +required
+	// +kubebuilder:validation:Required
+	Schemas []ObjectStorageSchema `json:"schemas,omitempty"`
+}
+
 // LokiStackStorageStatus defines the observed state of
 // the Loki storage configuration.
 type LokiStackStorageStatus struct {
@@ -1231,6 +1247,13 @@ type LokiStackStorageStatus struct {
 	// +optional
 	// +kubebuilder:validation:Optional
 	Schemas []ObjectStorageSchemaStatus `json:"schemas,omitempty"`
+
+	// AutomaticUpgrade contains the proposed schema update, if the automatic updater is enabled
+	// and it deems an upgrade necessary.
+	//
+	// +optional
+	// +kubebuilder:validation:Optional
+	AutomaticUpgrade *ProposedSchemaUpdate `json:"automaticUpgrade,omitempty"`
 }
 
 // LokiStackStatus defines the observed state of LokiStack

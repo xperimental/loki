@@ -4069,6 +4069,43 @@ spec:
                 description: Storage provides summary of all changes that have occurred
                   to the storage configuration.
                 properties:
+                  automaticUpgrade:
+                    description: AutomaticUpgrade contains the proposed schema update,
+                      if the automatic updater is enabled and it deems an upgrade
+                      necessary.
+                    properties:
+                      schemas:
+                        description: Schemas contains the proposed schema configuration
+                          that will be applied by the updater.
+                        items:
+                          description: ObjectStorageSchema defines the requirements
+                            needed to configure a new storage schema.
+                          properties:
+                            effectiveDate:
+                              description: EffectiveDate is the date in UTC that the
+                                schema will be applied on. To ensure readibility of
+                                logs, this date should be before the current date
+                                in UTC.
+                              pattern: ^([0-9]{4,})([-]([0-9]{2})){2}$
+                              type: string
+                            version:
+                              description: Version for writing and reading logs.
+                              enum:
+                              - v11
+                              - v12
+                              - v13
+                              type: string
+                          required:
+                          - effectiveDate
+                          - version
+                          type: object
+                        type: array
+                      upgradeTime:
+                        description: UpgradeTime contains the time when the automatic
+                          upgrade will apply the new configuration.
+                        format: date-time
+                        type: string
+                    type: object
                   schemas:
                     description: Schemas is a list of schemas which have been applied
                       to the LokiStack.
