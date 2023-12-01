@@ -149,8 +149,10 @@ func (r *LokiStackReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, nil
 	}
 
+	now := time.Now()
+
 	var degraded *status.DegradedError
-	err = r.updateResources(ctx, req)
+	err = r.updateResources(ctx, req, now)
 	switch {
 	case errors.As(err, &degraded):
 	// degraded errors are handled by status.Refresh below
@@ -158,7 +160,7 @@ func (r *LokiStackReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	err = status.Refresh(ctx, r.Client, req, time.Now(), degraded)
+	err = status.Refresh(ctx, r.Client, req, now, degraded)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -172,7 +174,11 @@ func (r *LokiStackReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	return ctrl.Result{}, nil
 }
 
-func (r *LokiStackReconciler) updateResources(ctx context.Context, req ctrl.Request) error {
+func (r *LokiStackReconciler) updateResources(ctx context.Context, req ctrl.Request, now time.Time) error {
+	if err := handlers.UpgradeStorageSchema(ctx, r.Log, req, r.Client, now); err != nil {
+		return err
+	}
+
 	if r.FeatureGates.BuiltInCertManagement.Enabled {
 		if err := handlers.CreateOrRotateCertificates(ctx, r.Log, req, r.Client, r.Scheme, r.FeatureGates); err != nil {
 			return err
