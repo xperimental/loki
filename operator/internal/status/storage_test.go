@@ -34,7 +34,7 @@ func TestSetStorageSchemaStatus_WhenGetLokiStackReturnsError_ReturnError(t *test
 	}
 
 	now := time.Unix(0, 0)
-	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{}, now)
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{}, now, 0)
 	require.Error(t, err)
 }
 
@@ -53,7 +53,7 @@ func TestSetStorageSchemaStatus_WhenGetLokiStackReturnsNotFound_DoNothing(t *tes
 	}
 
 	now := time.Unix(0, 0)
-	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{}, now)
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, []lokiv1.ObjectStorageSchema{}, now, 0)
 	require.NoError(t, err)
 }
 
@@ -134,7 +134,7 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 
 	now := time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	err := status.SetStorageSchemaStatus(context.TODO(), k, r, schemas, now)
+	err := status.SetStorageSchemaStatus(context.TODO(), k, r, schemas, now, 0)
 	require.NoError(t, err)
 	require.NotZero(t, k.StatusCallCount())
 	require.NotZero(t, sw.UpdateCallCount())

@@ -349,12 +349,14 @@ func CreateOrUpdateLokiStack(
 
 	ll.Info("manifests built", "count", len(objects))
 
+	retentionMaxDays := calculateMaximumRetentionDays(stack.Spec.Limits)
+
 	// The status is updated before the objects are actually created to
 	// avoid the scenario in which the configmap is successfully created or
 	// updated and another resource is not. This would cause the status to
 	// be possibly misaligned with the configmap, which could lead to
 	// a user possibly being unable to read logs.
-	if err := status.SetStorageSchemaStatus(ctx, k, req, storageSchemas, now); err != nil {
+	if err := status.SetStorageSchemaStatus(ctx, k, req, storageSchemas, now, retentionMaxDays); err != nil {
 		ll.Error(err, "failed to set storage schema status")
 		return err
 	}
@@ -441,4 +443,32 @@ func isNamespacedResource(obj client.Object) bool {
 	default:
 		return true
 	}
+}
+
+func calculateMaximumRetentionDays(limits *lokiv1.LimitsSpec) int {
+	if limits == nil {
+		return 0
+	}
+
+	maxRetention := 0
+	if limits.Global != nil && limits.Global.Retention != nil {
+		maxRetention = int(limits.Global.Retention.Days)
+	}
+
+	for _, t := range limits.Tenants {
+		tenant := calculateMaximumRetentionTenant(t.Retention)
+		if tenant > maxRetention {
+			maxRetention = tenant
+		}
+	}
+
+	return maxRetention
+}
+
+func calculateMaximumRetentionTenant(retention *lokiv1.RetentionLimitSpec) int {
+	if retention == nil {
+		return 0
+	}
+
+	return int(retention.Days)
 }
