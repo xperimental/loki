@@ -59,6 +59,25 @@ func Refresh(ctx context.Context, k k8s.Client, req ctrl.Request, now time.Time)
 		} else {
 			stack.Status.Conditions[index] = condition
 		}
+
+		for _, sc := range stack.Status.Storage.Schemas {
+			var reason lokiv1.LokiStackConditionReason
+			switch sc.SchemaStatus {
+			case StorageSchemaOutOfRetention:
+				reason = lokiv1.ReasonSchemaOutOfRetention
+			case StorageSchemaNeedsUpgrade:
+				reason = lokiv1.ReasonSchemaUpgradeRecommended
+			}
+			warning := metav1.Condition{
+				Type:               string(lokiv1.ConditionWarning),
+				Message:            sc.SchemaStatus,
+				Reason:             string(reason),
+				Status:             metav1.ConditionTrue,
+				LastTransitionTime: metav1.Now(),
+			}
+
+			stack.Status.Conditions = append(stack.Status.Conditions, warning)
+		}
 	}
 
 	statusUpdater(&stack)

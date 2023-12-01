@@ -1771,9 +1771,6 @@ storage is missing.</p>
 <td><p>ReasonMissingRulerSecret when the required secret to authorization remote write connections
 for the ruler is missing.</p>
 </td>
-</tr><tr><td><p>&#34;ReasonObjectStorageSchemaShouldBeUpgraded&#34;</p></td>
-<td><p>ReasonObjectStorageSchemaShouldBeUpgraded when the object storage schema should be upgraded to the newest version V13</p>
-</td>
 </tr><tr><td><p>&#34;PendingComponents&#34;</p></td>
 <td><p>ReasonPendingComponents when all/some LokiStack components pending dependencies</p>
 </td>
@@ -1783,8 +1780,11 @@ for the ruler is missing.</p>
 </tr><tr><td><p>&#34;ReadyComponents&#34;</p></td>
 <td><p>ReasonReadyComponents when all LokiStack components are ready to serve traffic.</p>
 </td>
+</tr><tr><td><p>&#34;ReasonSchemaOutOfRetention&#34;</p></td>
+<td><p>ReasonSchemaOutOfRetention when the object storage schema falls out of the retention period</p>
+</td>
 </tr><tr><td><p>&#34;ReasonSchemaUpgradeRecommended&#34;</p></td>
-<td><p>ReasonSchemaUpgradeRecommended when the object storage schema falls out of the retention period</p>
+<td><p>ReasonSchemaUpgradeRecommended when the object storage schema should be upgraded to the newest version V13</p>
 </td>
 </tr><tr><td><p>&#34;ReasonZoneAwareEmptyLabel&#34;</p></td>
 <td><p>ReasonZoneAwareEmptyLabel when the node-label used for zone-awareness has an empty value.</p>
