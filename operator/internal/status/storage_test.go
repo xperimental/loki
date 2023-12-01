@@ -141,7 +141,7 @@ func TestSetStorageSchemaStatus_WhenStorageStatusExists_OverwriteStorageStatus(t
 			return kverrors.Wrap(err, "error unmarshalling patch")
 		}
 		s = stack
-		//require.Equal(t, expected.Storage.Schemas, stack.Status.Storage.Schemas)
+		require.Equal(t, expected, stack.Status.Storage.Schemas)
 		return nil
 	}
 
