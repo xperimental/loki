@@ -2,7 +2,6 @@ package status
 
 import (
 	"context"
-	"sort"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -11,65 +10,84 @@ import (
 )
 
 const (
-	dayDuration = 24 * time.Hour
+	dayDuration          = 24 * time.Hour
+	futureSchemaDuration = 5 * dayDuration
+	applySchemaDuration  = 3 * dayDuration
+
+	upgradeSchemaVersion = lokiv1.ObjectStorageSchemaV13
 )
 
 func generateSchemaUpgrade(ctx context.Context, stack *lokiv1.LokiStack, now time.Time) (*lokiv1.ProposedSchemaUpdate, error) {
-	futureSchemaTime := now.Add(5 * dayDuration)
-	applyTime := now.Add(3 * dayDuration)
+	futureSchemaTime := now.Add(futureSchemaDuration)
+	applyTime := now.Add(applySchemaDuration)
 	existingUpgrade := stack.Status.Storage.AutomaticUpgrade
 	if existingUpgrade != nil && now.Before(existingUpgrade.UpgradeTime.Time) {
 		// if existing upgrade is still in the future, return the same
 		return existingUpgrade, nil
 	}
 
-	specSchemas := stack.Spec.Storage.Schemas
-	sort.Slice(specSchemas, func(i, j int) bool {
-		iDate, _ := specSchemas[i].EffectiveDate.UTCTime()
-		jDate, _ := specSchemas[j].EffectiveDate.UTCTime()
-
-		return iDate.Before(jDate)
-	})
+	statusSchemas := stack.Status.Storage.Schemas
+	proposedSchemas := []lokiv1.ObjectStorageSchema{}
 
 	futureIdx := -1
-	for i, s := range specSchemas {
-		date, _ := s.EffectiveDate.UTCTime()
-		if now.Before(date) {
+	skipped := 0
+	for i, s := range statusSchemas {
+		if s.Status == lokiv1.SchemaStatusObsolete {
+			// remove obsolete schema configurations
+			skipped++
+			continue
+		}
+
+		proposedSchemas = append(proposedSchemas, s.ObjectStorageSchema)
+
+		if s.Status == lokiv1.SchemaStatusFuture && futureIdx == -1 {
 			futureIdx = i
-			break
 		}
 	}
 
 	if futureIdx == -1 {
 		// the current configuration has no future configurations
-		specSchemas = append(specSchemas, lokiv1.ObjectStorageSchema{
-			Version:       lokiv1.ObjectStorageSchemaV13,
+		if proposedSchemas[len(proposedSchemas)-1].Version == upgradeSchemaVersion {
+			// last schema has the latest version, check for removed schemas
+			if len(proposedSchemas) != len(statusSchemas) {
+				return &lokiv1.ProposedSchemaUpdate{
+					UpgradeTime: metav1.NewTime(applyTime),
+					Schemas:     proposedSchemas,
+				}, nil
+			}
+
+			// no schemas removed and current one is latest version, all fine
+			return nil, nil
+		}
+
+		proposedSchemas = append(proposedSchemas, lokiv1.ObjectStorageSchema{
+			Version:       upgradeSchemaVersion,
 			EffectiveDate: lokiv1.StorageSchemaEffectiveDate(futureSchemaTime.UTC().Format(lokiv1.StorageSchemaEffectiveDateFormat)),
 		})
 
 		return &lokiv1.ProposedSchemaUpdate{
 			UpgradeTime: metav1.NewTime(applyTime),
-			Schemas:     specSchemas,
+			Schemas:     proposedSchemas,
 		}, nil
 	}
 
-	if specSchemas[futureIdx].Version == lokiv1.ObjectStorageSchemaV13 {
+	if statusSchemas[futureIdx].Version == upgradeSchemaVersion {
 		// First future spec is already current version
-		if futureIdx+1 == len(specSchemas) {
+		if futureIdx+1 == len(statusSchemas) {
 			// no further specs are present -> everything is fine
 			return nil, nil
 		}
 	}
 
 	// there are future specs, but they do not update to the latest version -> cut them off and apply a new one
-	specSchemas = specSchemas[:futureIdx]
-	specSchemas = append(specSchemas, lokiv1.ObjectStorageSchema{
-		Version:       lokiv1.ObjectStorageSchemaV13,
+	proposedSchemas = proposedSchemas[:futureIdx-skipped]
+	proposedSchemas = append(proposedSchemas, lokiv1.ObjectStorageSchema{
+		Version:       upgradeSchemaVersion,
 		EffectiveDate: lokiv1.StorageSchemaEffectiveDate(futureSchemaTime.UTC().Format(lokiv1.StorageSchemaEffectiveDateFormat)),
 	})
 
 	return &lokiv1.ProposedSchemaUpdate{
 		UpgradeTime: metav1.NewTime(applyTime),
-		Schemas:     specSchemas,
+		Schemas:     proposedSchemas,
 	}, nil
 }
