@@ -12,6 +12,9 @@ import (
 )
 
 const (
+	warningObsoleteSchemaReason  = "WarningObsoleteSchema"
+	warningObsoleteSchemaMessage = "The schema configuration contains one or more schemas that are not in use anymore due to retention settings."
+
 	warningOldSchemaVersionReason  = "WarningOldSchemaVersion"
 	warningOldSchemaVersionMessage = "The schema configuration contains one or more schemas that do not use the most recent version."
 
@@ -28,20 +31,31 @@ func createWarning(reason, message string) metav1.Condition {
 }
 
 func generateWarnings(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, req ctrl.Request, stack *lokiv1.LokiStack, now time.Time) ([]metav1.Condition, error) {
+	hasObsoleteSchema := false
 	hasOldSchemaVersion := false
 	hasFutureOldSchemaVersion := false
-	for _, schema := range stack.Spec.Storage.Schemas {
+	for _, schema := range stack.Status.Storage.Schemas {
+		if schema.Status == lokiv1.SchemaStatusObsolete {
+			hasObsoleteSchema = true
+		}
+
 		if schema.Version != lokiv1.ObjectStorageSchemaV13 {
 			hasOldSchemaVersion = true
 
-			effectiveTime, _ := schema.EffectiveDate.UTCTime()
-			if now.Before(effectiveTime) {
+			if schema.Status == lokiv1.SchemaStatusFuture {
 				hasFutureOldSchemaVersion = true
 			}
 		}
 	}
 
 	warnings := make([]metav1.Condition, 0)
+	if hasObsoleteSchema {
+		warnings = append(warnings, createWarning(
+			warningObsoleteSchemaReason,
+			warningObsoleteSchemaMessage,
+		))
+	}
+
 	if hasOldSchemaVersion {
 		warnings = append(warnings, createWarning(
 			warningOldSchemaVersionReason,
