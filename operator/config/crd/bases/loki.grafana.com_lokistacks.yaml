@@ -4101,6 +4101,12 @@ spec:
                             date should be before the current date in UTC.
                           pattern: ^([0-9]{4,})([-]([0-9]{2})){2}$
                           type: string
+                        endDate:
+                          description: EndDate contains the last day this schema was
+                            active or will be active. This is only empty for the last
+                            schema.
+                          pattern: ^([0-9]{4,})([-]([0-9]{2})){2}$
+                          type: string
                         status:
                           description: Status contains the observed status of this
                             storage schema.

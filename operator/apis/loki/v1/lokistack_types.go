@@ -1215,6 +1215,13 @@ const (
 type ObjectStorageSchemaStatus struct {
 	ObjectStorageSchema `json:",inline"`
 
+	// EndDate contains the last day this schema was active or will be active.
+	// This is only empty for the last schema.
+	//
+	// +optional
+	// +kubebuilder:validation:Optional
+	EndDate StorageSchemaEffectiveDate `json:"endDate,omitempty"`
+
 	// Status contains the observed status of this storage schema.
 	//
 	// +required
