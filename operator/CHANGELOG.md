@@ -1,10 +1,10 @@
 ## Main
 
+- [11158](https://github.com/grafana/loki/pull/11158) **btaani**: operator: Add support to add additional storage schema V13
 - [11094](https://github.com/grafana/loki/pull/11094) **periklis**: Add support for blocking queries per tenant
 - [11288](https://github.com/grafana/loki/pull/11288) **periklis**: Fix custom CA for object-store in ruler component
 - [11091](https://github.com/grafana/loki/pull/11091) **periklis**: Add automatic stream sharding support
 - [11022](https://github.com/grafana/loki/pull/11022) **JoaoBraveCoding**: Remove outdated BoltDB dashboards 
-- [11158](https://github.com/grafana/loki/pull/11158) **btaani**: operator: Add support to add additional storage schema V13
 - [10932](https://github.com/grafana/loki/pull/10932) **JoaoBraveCoding**: Adds new value v13 to schema
 - [11232](https://github.com/grafana/loki/pull/11232) **periklis**: Update dependencies and dev tools
 - [11129](https://github.com/grafana/loki/pull/11129) **periklis**: Update deps to secure webhooks for CVE-2023-44487
