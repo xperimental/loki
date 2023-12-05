@@ -19,6 +19,7 @@ package bigtable
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	btpb "google.golang.org/genproto/googleapis/bigtable/v2"
 )
@@ -43,6 +44,7 @@ type ReadItem struct {
 	Row, Column string
 	Timestamp   Timestamp
 	Value       []byte
+	Labels      []string
 }
 
 // The current state of the read rows state machine.
@@ -57,19 +59,25 @@ const (
 // chunkReader handles cell chunks from the read rows response and combines
 // them into full Rows.
 type chunkReader struct {
-	state   rrState
-	curKey  []byte
-	curFam  string
-	curQual []byte
-	curTS   int64
-	curVal  []byte
-	curRow  Row
-	lastKey string
+	reversed  bool
+	state     rrState
+	curKey    []byte
+	curLabels []string
+	curFam    string
+	curQual   []byte
+	curTS     int64
+	curVal    []byte
+	curRow    Row
+	lastKey   string
 }
 
 // newChunkReader returns a new chunkReader for handling read rows responses.
 func newChunkReader() *chunkReader {
-	return &chunkReader{state: newRow}
+	return &chunkReader{reversed: false, state: newRow}
+}
+
+func newReverseChunkReader() *chunkReader {
+	return &chunkReader{reversed: true, state: newRow}
 }
 
 // Process takes a cell chunk and returns a new Row if the given chunk
@@ -138,6 +146,7 @@ func (cr *chunkReader) handleCellValue(cc *btpb.ReadRowsResponse_CellChunk) Row 
 		// ValueSize is specified so expect a split value of ValueSize bytes
 		if cr.curVal == nil {
 			cr.curVal = make([]byte, 0, cc.ValueSize)
+			cr.curLabels = cc.Labels
 		}
 		cr.curVal = append(cr.curVal, cc.Value...)
 		cr.state = cellInProgress
@@ -145,6 +154,7 @@ func (cr *chunkReader) handleCellValue(cc *btpb.ReadRowsResponse_CellChunk) Row 
 		// This cell is either the complete value or the last chunk of a split
 		if cr.curVal == nil {
 			cr.curVal = cc.Value
+			cr.curLabels = cc.Labels
 		} else {
 			cr.curVal = append(cr.curVal, cc.Value...)
 		}
@@ -165,9 +175,11 @@ func (cr *chunkReader) finishCell() {
 		Column:    string(cr.curFam) + ":" + string(cr.curQual),
 		Timestamp: Timestamp(cr.curTS),
 		Value:     cr.curVal,
+		Labels:    cr.curLabels,
 	}
 	cr.curRow[cr.curFam] = append(cr.curRow[cr.curFam], ri)
 	cr.curVal = nil
+	cr.curLabels = nil
 }
 
 func (cr *chunkReader) commitRow() Row {
@@ -194,9 +206,19 @@ func (cr *chunkReader) validateNewRow(cc *btpb.ReadRowsResponse_CellChunk) error
 	if cc.RowKey == nil || cc.FamilyName == nil || cc.Qualifier == nil {
 		return fmt.Errorf("missing key field for new row %v", cc)
 	}
-	if cr.lastKey != "" && cr.lastKey >= string(cc.RowKey) {
-		return fmt.Errorf("out of order row key: %q, %q", cr.lastKey, string(cc.RowKey))
+
+	if cr.lastKey != "" {
+		r := strings.Compare(string(cc.RowKey), cr.lastKey)
+		direction := "increasing"
+		if cr.reversed {
+			r *= -1
+			direction = "decreasing"
+		}
+		if r <= 0 {
+			return fmt.Errorf("out of order row key, must be strictly %s. new key: %q prev row: %q", direction, cc.RowKey, cr.lastKey)
+		}
 	}
+
 	return nil
 }
 
