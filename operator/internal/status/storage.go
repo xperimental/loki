@@ -2,14 +2,11 @@ package status
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/ViaQ/logerr/v2/kverrors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/external/k8s"
@@ -39,6 +36,9 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 		return kverrors.Wrap(err, "failed to lookup lokistack", "name", req.NamespacedName)
 	}
 	statusSchemas := storageSchemaToStatusSchema(schemas)
+	s.Status.Storage = lokiv1.LokiStackStorageStatus{
+		Schemas: statusSchemas,
+	}
 
 	for _, sc := range statusSchemas {
 		date, err := sc.EffectiveDate.UTCTime()
@@ -56,43 +56,17 @@ func SetStorageSchemaStatus(ctx context.Context, k k8s.Client, req ctrl.Request,
 
 	if len(oldSchemas) > 0 {
 		if schemaVersionMap[lokiv1.ObjectStorageSchemaV13] {
-			if err := updateSchemaStatus(statusSchemas, StorageSchemaOutOfRetention); err != nil {
+			if err := updateSchemaStatus(s.Status.Storage.Schemas, StorageSchemaOutOfRetention); err != nil {
 				return kverrors.Wrap(err, "error updating schema status")
 			}
 		} else {
-			if err := updateSchemaStatus(statusSchemas, StorageSchemaNeedsUpgrade); err != nil {
+			if err := updateSchemaStatus(s.Status.Storage.Schemas, StorageSchemaNeedsUpgrade); err != nil {
 				return kverrors.Wrap(err, "error updating schema status")
 			}
 		}
 	}
 
-	schemasMap := []map[string]string{}
-	for _, schema := range statusSchemas {
-		schemaMap := map[string]string{
-			"version":       string(schema.Version),
-			"effectiveDate": string(schema.EffectiveDate),
-			"schemaStatus":  schema.SchemaStatus,
-		}
-		schemasMap = append(schemasMap, schemaMap)
-	}
-
-	patchBytes, err := json.Marshal(map[string]interface{}{
-		"status": map[string]interface{}{
-			"storage": map[string]interface{}{
-				"schemas": schemasMap,
-			},
-		},
-	})
-	if err != nil {
-		return kverrors.Wrap(err, "could not format status patch")
-	}
-
-	err = k.Status().Patch(ctx, &s, client.RawPatch(types.StrategicMergePatchType, patchBytes))
-	if err != nil {
-		return kverrors.Wrap(err, "error patching status field")
-	}
-
-	return Refresh(ctx, k, req, utcTime)
+	return k.Status().Update(ctx, &s)
 }
 
 func storageSchemaToStatusSchema(schemas []lokiv1.ObjectStorageSchema) []lokiv1.ObjectStorageStatusSchema {
@@ -108,10 +82,10 @@ func storageSchemaToStatusSchema(schemas []lokiv1.ObjectStorageSchema) []lokiv1.
 	return statusSchemas
 }
 
-func updateSchemaStatus(statusSchemas []lokiv1.ObjectStorageStatusSchema, message string) error {
-	for i, sc := range statusSchemas {
+func updateSchemaStatus(schemas []lokiv1.ObjectStorageStatusSchema, message string) error {
+	for i, sc := range schemas {
 		if sc.Version != lokiv1.ObjectStorageSchemaV13 {
-			statusSchemas[i].SchemaStatus = message
+			schemas[i].SchemaStatus = message
 		}
 	}
 	return nil

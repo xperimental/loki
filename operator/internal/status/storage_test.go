@@ -204,30 +204,8 @@ func TestSetStorageSchemaStatus_WhenStorageSchemaOutOfRetention(t *testing.T) {
 	}
 	sw.UpdateStub = func(_ context.Context, obj client.Object, _ ...client.SubResourceUpdateOption) error {
 		stack := obj.(*lokiv1.LokiStack)
-		s.Status.Conditions = stack.Status.Conditions
-		require.NotEmpty(t, stack.Status.Storage.Schemas)
 		require.Equal(t, expected.Storage.Schemas, stack.Status.Storage.Schemas)
-		return nil
-	}
-	sw.PatchStub = func(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.SubResourcePatchOption) error {
-		stack := obj.(*lokiv1.LokiStack)
-		originalObjBytes, err := json.Marshal(obj)
-		if err != nil {
-			return kverrors.Wrap(err, "error marshalling object")
-		}
-		patchBytes, err := patch.Data(obj)
-		if err != nil {
-			return kverrors.Wrap(err, "error marshalling patch")
-		}
-		patchedObj, err := strategicpatch.StrategicMergePatch(originalObjBytes, patchBytes, stack)
-		if err != nil {
-			return kverrors.Wrap(err, "error applying merge patch")
-		}
-		if err := json.Unmarshal(patchedObj, &stack); err != nil {
-			return kverrors.Wrap(err, "error unmarshalling patch")
-		}
 		s = stack
-		require.Equal(t, expected.Storage.Schemas, stack.Status.Storage.Schemas)
 		return nil
 	}
 
@@ -236,8 +214,6 @@ func TestSetStorageSchemaStatus_WhenStorageSchemaOutOfRetention(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, s.Status.Storage.Schemas)
 
-	_, stack, _, _ := sw.PatchArgsForCall(0)
-	require.Equal(t, stack, s)
 	require.NotZero(t, k.StatusCallCount())
-	require.NotZero(t, sw.PatchCallCount())
+	require.NotZero(t, sw.UpdateCallCount())
 }
