@@ -79,6 +79,9 @@ func Refresh(ctx context.Context, k k8s.Client, req ctrl.Request, now time.Time)
 				LastTransitionTime: metav1.Now(),
 			}
 
+			if warningExists(warning, stack.Status.Conditions) {
+				continue
+			}
 			stack.Status.Conditions = append(stack.Status.Conditions, warning)
 		}
 	}
@@ -104,4 +107,13 @@ func Refresh(ctx context.Context, k k8s.Client, req ctrl.Request, now time.Time)
 		statusUpdater(&stack)
 		return k.Status().Update(ctx, &stack)
 	})
+}
+
+func warningExists(warning metav1.Condition, conditions []metav1.Condition) bool {
+	for _, c := range conditions {
+		if c.Reason == warning.Reason {
+			return true
+		}
+	}
+	return false
 }
