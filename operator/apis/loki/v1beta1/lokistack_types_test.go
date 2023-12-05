@@ -615,7 +615,7 @@ func TestConvertToV1_LokiStack(t *testing.T) {
 						},
 					},
 					Storage: v1.LokiStackStorageStatus{
-						Schemas: []v1.ObjectStorageSchema{
+						Schemas: []v1.ObjectStorageStatusSchema{
 							{
 								Version:       v1.ObjectStorageSchemaV11,
 								EffectiveDate: "2020-06-01",
@@ -946,7 +946,7 @@ func TestConvertFromV1_LokiStack(t *testing.T) {
 						},
 					},
 					Storage: v1.LokiStackStorageStatus{
-						Schemas: []v1.ObjectStorageSchema{
+						Schemas: []v1.ObjectStorageStatusSchema{
 							{
 								Version:       v1.ObjectStorageSchemaV11,
 								EffectiveDate: "2020-06-01",
