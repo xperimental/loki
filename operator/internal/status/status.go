@@ -61,6 +61,9 @@ func Refresh(ctx context.Context, k k8s.Client, req ctrl.Request, now time.Time)
 		}
 
 		for _, sc := range stack.Status.Storage.Schemas {
+			if sc.SchemaStatus == "" {
+				continue
+			}
 			var reason lokiv1.LokiStackConditionReason
 			switch sc.SchemaStatus {
 			case StorageSchemaOutOfRetention:
