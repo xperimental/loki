@@ -557,9 +557,9 @@ spec:
                   to store logs.
                 properties:
                   allowAutomaticUpgrade:
-                    description: AllowUpgrade controls whether the operator should
-                      be able to automatically append new schema configurations when
-                      there is potential to upgrade.
+                    description: AllowAutomaticUpgrade controls whether the operator
+                      should be able to automatically append new schema configurations
+                      when there is potential to upgrade.
                     type: boolean
                   schemas:
                     default:
@@ -4114,7 +4114,6 @@ spec:
                           - obsolete
                           - inuse
                           - future
-                          - proposed
                           type: string
                         version:
                           description: Version for writing and reading logs.

@@ -570,7 +570,8 @@ type ObjectStorageSchema struct {
 // ObjectStorageSpec defines the requirements to access the object
 // storage bucket to persist logs by the ingester component.
 type ObjectStorageSpec struct {
-	// AllowUpgrade controls whether the operator should be able to automatically append new schema configurations
+	// AllowAutomaticUpgrade controls whether the operator should
+	// be able to automatically append new schema configurations
 	// when there is potential to upgrade.
 	//
 	// +optional
@@ -1195,20 +1196,19 @@ type LokiStackComponentStatus struct {
 
 // ObjectStorageSchemaStatusType identifies what status a storage schema has.
 //
-// +kubebuilder:validation:Enum=obsolete;inuse;future;proposed
+// +kubebuilder:validation:Enum=obsolete;inuse;future
 type ObjectStorageSchemaStatusType string
 
 const (
-	// SchemaStatusObsolete is used, when a schema configuration has fallen out of retention and thus is no longer used.
+	// SchemaStatusObsolete is used, when a schema configuration has fallen out
+	// of retention and thus is no longer used.
 	SchemaStatusObsolete ObjectStorageSchemaStatusType = "obsolete"
-	// SchemaStatusInUse is used for schema configurations that are currently in use
-	// (current day or past and still in retention).
+	// SchemaStatusInUse is used for schema configurations that are currently in
+	// use (current day or past and still in retention).
 	SchemaStatusInUse ObjectStorageSchemaStatusType = "inuse"
-	// SchemaStatusFuture is used for schema configurations that have not been applied yet (start is in the future).
+	// SchemaStatusFuture is used for schema configurations that have not been
+	// applied yet (start is in the future).
 	SchemaStatusFuture ObjectStorageSchemaStatusType = "future"
-	// SchemaStatusProposed is used for schema configurations that are not part of the configuration yet
-	// but proposed by the automatic upgrade routine.
-	SchemaStatusProposed ObjectStorageSchemaStatusType = "proposed"
 )
 
 // ObjectStorageSchemaStatus contains information about the status of a storage schema.
