@@ -2,6 +2,7 @@
 
 ## Release 5.8.1
 
+- [11393](https://github.com/grafana/loki/pull/11393) **periklis**: Add infra annotations for OpenShift based deployments
 - [11288](https://github.com/grafana/loki/pull/11288) **periklis**: Fix custom CA for object-store in ruler component
 - [11022](https://github.com/grafana/loki/pull/11022) **JoaoBraveCoding**: Remove outdated BoltDB dashboards
 
