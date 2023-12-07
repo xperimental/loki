@@ -2,6 +2,7 @@
 
 ## Release 5.7.9
 
+- [11393](https://github.com/grafana/loki/pull/11393) **periklis**: Add infra annotations for OpenShift based deployments
 - [11288](https://github.com/grafana/loki/pull/11288) **periklis**: Fix custom CA for object-store in ruler component
 
 ## Release 5.7.8
