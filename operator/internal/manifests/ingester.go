@@ -140,7 +140,7 @@ func NewIngesterStatefulSet(opts Options) *appsv1.StatefulSet {
 	}
 
 	l := ComponentLabels(LabelIngesterComponent, opts.Name)
-	a := commonAnnotations(opts.ConfigSHA1, opts.CertRotationRequiredAt)
+	a := commonAnnotations(opts.ConfigSHA1, opts.ObjectStorage.SecretSHA1, opts.CertRotationRequiredAt)
 	return &appsv1.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "StatefulSet",

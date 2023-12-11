@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
+	"github.com/grafana/loki/operator/internal/manifests/storage"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,10 +23,31 @@ func TestNewIngesterStatefulSet_HasTemplateConfigHashAnnotation(t *testing.T) {
 		},
 	})
 
-	expected := "loki.grafana.com/config-hash"
 	annotations := ss.Spec.Template.Annotations
-	require.Contains(t, annotations, expected)
-	require.Equal(t, annotations[expected], "deadbeef")
+	require.Contains(t, annotations, AnnotationLokiConfigHash)
+	require.Equal(t, annotations[AnnotationLokiConfigHash], "deadbeef")
+}
+
+func TestNewIngesterStatefulSet_HasTemplateObjectStoreHashAnnotation(t *testing.T) {
+	ss := NewIngesterStatefulSet(Options{
+		Name:      "abcd",
+		Namespace: "efgh",
+		ObjectStorage: storage.Options{
+			SecretSHA1: "deadbeef",
+		},
+		Stack: lokiv1.LokiStackSpec{
+			StorageClassName: "standard",
+			Template: &lokiv1.LokiTemplateSpec{
+				Ingester: &lokiv1.LokiComponentSpec{
+					Replicas: 1,
+				},
+			},
+		},
+	})
+
+	annotations := ss.Spec.Template.Annotations
+	require.Contains(t, annotations, AnnotationLokiObjectStoreHash)
+	require.Equal(t, annotations[AnnotationLokiObjectStoreHash], "deadbeef")
 }
 
 func TestNewIngesterStatefulSet_HasTemplateCertRotationRequiredAtAnnotation(t *testing.T) {
@@ -42,10 +64,10 @@ func TestNewIngesterStatefulSet_HasTemplateCertRotationRequiredAtAnnotation(t *t
 			},
 		},
 	})
-	expected := "loki.grafana.com/certRotationRequiredAt"
+
 	annotations := ss.Spec.Template.Annotations
-	require.Contains(t, annotations, expected)
-	require.Equal(t, annotations[expected], "deadbeef")
+	require.Contains(t, annotations, AnnotationCertRotationRequiredAt)
+	require.Equal(t, annotations[AnnotationCertRotationRequiredAt], "deadbeef")
 }
 
 func TestNewIngesterStatefulSet_SelectorMatchesLabels(t *testing.T) {
