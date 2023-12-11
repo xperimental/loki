@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.6.15
+
+- [11357](https://github.com/grafana/loki/pull/11357) **periklis**: Fix storing authentication credentials in the Loki ConfigMap
+
 ## Release 5.6.14
 
 - [11393](https://github.com/grafana/loki/pull/11393) **periklis**: Add infra annotations for OpenShift based deployments

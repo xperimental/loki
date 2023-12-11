@@ -207,7 +207,7 @@ func NewGatewayDeployment(opts Options, sha1C string) *appsv1.Deployment {
 	}
 
 	l := ComponentLabels(LabelGatewayComponent, opts.Name)
-	a := commonAnnotations(sha1C, opts.CertRotationRequiredAt)
+	a := commonAnnotations(sha1C, "", opts.CertRotationRequiredAt)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{

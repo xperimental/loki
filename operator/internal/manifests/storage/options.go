@@ -16,15 +16,14 @@ type Options struct {
 	Swift *SwiftStorageConfig
 
 	SecretName string
+	SecretSHA1 string
 	TLS        *TLSConfig
 }
 
 // AzureStorageConfig for Azure storage config
 type AzureStorageConfig struct {
-	Env         string
-	Container   string
-	AccountName string
-	AccountKey  string
+	Env       string
+	Container string
 }
 
 // GCSStorageConfig for GCS storage config
@@ -34,21 +33,17 @@ type GCSStorageConfig struct {
 
 // S3StorageConfig for S3 storage config
 type S3StorageConfig struct {
-	Endpoint        string
-	Region          string
-	Buckets         string
-	AccessKeyID     string
-	AccessKeySecret string
+	Endpoint string
+	Region   string
+	Buckets  string
 }
 
 // SwiftStorageConfig for Swift storage config
 type SwiftStorageConfig struct {
 	AuthURL           string
-	Username          string
 	UserDomainName    string
 	UserDomainID      string
 	UserID            string
-	Password          string
 	DomainID          string
 	DomainName        string
 	ProjectID         string

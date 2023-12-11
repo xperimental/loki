@@ -136,7 +136,7 @@ func NewQueryFrontendDeployment(opts Options) *appsv1.Deployment {
 	}
 
 	l := ComponentLabels(LabelQueryFrontendComponent, opts.Name)
-	a := commonAnnotations(opts.ConfigSHA1, opts.CertRotationRequiredAt)
+	a := commonAnnotations(opts.ConfigSHA1, opts.ObjectStorage.SecretSHA1, opts.CertRotationRequiredAt)
 
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
