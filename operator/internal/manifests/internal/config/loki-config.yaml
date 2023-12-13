@@ -12,8 +12,8 @@ common:
     azure:
       environment: {{ .Env }}
       container_name: {{ .Container }}
-      account_name: {{ .AccountName }}
-      account_key: {{ .AccountKey }}
+      account_name: ${AZURE_STORAGE_ACCOUNT_NAME}
+      account_key: ${AZURE_STORAGE_ACCOUNT_KEY}
     {{- end }}
     {{- with .ObjectStorage.GCS }}
     gcs:
@@ -24,18 +24,18 @@ common:
       s3: {{ .Endpoint }}
       bucketnames: {{ .Buckets }}
       region: {{ .Region }}
-      access_key_id: {{ .AccessKeyID }}
-      secret_access_key: {{ .AccessKeySecret }}
+      access_key_id: ${AWS_ACCESS_KEY_ID}
+      secret_access_key: ${AWS_ACCESS_KEY_SECRET}
       s3forcepathstyle: true
     {{- end }}
     {{- with .ObjectStorage.Swift }}
     swift:
       auth_url: {{ .AuthURL }}
-      username: {{ .Username }}
+      username: ${SWIFT_USERNAME}
       user_domain_name: {{ .UserDomainName }}
       user_domain_id: {{ .UserDomainID }}
       user_id: {{ .UserID }}
-      password: {{ .Password }}
+      password: ${SWIFT_PASSWORD}
       domain_id: {{ .DomainID }}
       domain_name: {{ .DomainName }}
       project_id: {{ .ProjectID }}
