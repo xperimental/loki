@@ -2,6 +2,7 @@
 
 ## Release 5.6.15
 
+- [11448](https://github.com/grafana/loki/pull/11448) **periklis**: Update Loki operand to v2.9.3
 - [11357](https://github.com/grafana/loki/pull/11357) **periklis**: Fix storing authentication credentials in the Loki ConfigMap
 
 ## Release 5.6.14
