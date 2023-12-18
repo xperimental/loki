@@ -7,14 +7,15 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
-	"github.com/grafana/loki/operator/apis/loki/v1beta1"
-	"github.com/grafana/loki/operator/internal/manifests/internal/config"
-	"github.com/grafana/loki/operator/internal/manifests/openshift"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/utils/pointer"
+
+	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
+	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
+	"github.com/grafana/loki/operator/internal/manifests/internal/config"
+	"github.com/grafana/loki/operator/internal/manifests/openshift"
 )
 
 func TestConfigMap_ReturnsSHA1OfBinaryContents(t *testing.T) {
@@ -114,7 +115,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -129,7 +130,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -144,7 +145,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -159,7 +160,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -174,7 +175,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -189,7 +190,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -554,10 +555,10 @@ func TestConfigOptions_RulerAlertManager_UserOverride(t *testing.T) {
 				},
 				Timeouts: testTimeoutConfig(),
 				Ruler: Ruler{
-					Spec: &v1beta1.RulerConfigSpec{
-						AlertManagerSpec: &v1beta1.AlertManagerSpec{
+					Spec: &lokiv1beta1.RulerConfigSpec{
+						AlertManagerSpec: &lokiv1beta1.AlertManagerSpec{
 							EnableV2: false,
-							DiscoverySpec: &v1beta1.AlertManagerDiscoverySpec{
+							DiscoverySpec: &lokiv1beta1.AlertManagerDiscoverySpec{
 								EnableSRV:       false,
 								RefreshInterval: "2m",
 							},
@@ -591,10 +592,10 @@ func TestConfigOptions_RulerAlertManager_UserOverride(t *testing.T) {
 				},
 				Timeouts: testTimeoutConfig(),
 				Ruler: Ruler{
-					Spec: &v1beta1.RulerConfigSpec{
-						AlertManagerSpec: &v1beta1.AlertManagerSpec{
+					Spec: &lokiv1beta1.RulerConfigSpec{
+						AlertManagerSpec: &lokiv1beta1.AlertManagerSpec{
 							EnableV2: false,
-							DiscoverySpec: &v1beta1.AlertManagerDiscoverySpec{
+							DiscoverySpec: &lokiv1beta1.AlertManagerDiscoverySpec{
 								EnableSRV:       false,
 								RefreshInterval: "2m",
 							},

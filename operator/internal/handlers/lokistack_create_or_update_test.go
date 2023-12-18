@@ -8,12 +8,6 @@ import (
 	"os"
 	"testing"
 
-	configv1 "github.com/grafana/loki/operator/apis/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
-	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
-	"github.com/grafana/loki/operator/internal/handlers"
-	"github.com/grafana/loki/operator/internal/status"
-
 	"github.com/ViaQ/logerr/v2/log"
 	"github.com/go-logr/logr"
 	routev1 "github.com/openshift/api/route/v1"
@@ -30,6 +24,12 @@ import (
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	configv1 "github.com/grafana/loki/operator/apis/config/v1"
+	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
+	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
+	"github.com/grafana/loki/operator/internal/handlers"
+	"github.com/grafana/loki/operator/internal/status"
 )
 
 var (
@@ -319,8 +319,8 @@ func TestCreateOrUpdateLokiStack_SetsOwnerRefOnAllObjects(t *testing.T) {
 		Kind:               stack.Kind,
 		Name:               stack.Name,
 		UID:                stack.UID,
-		Controller:         pointer.BoolPtr(true),
-		BlockOwnerDeletion: pointer.BoolPtr(true),
+		Controller:         pointer.Bool(true),
+		BlockOwnerDeletion: pointer.Bool(true),
 	}
 
 	k.CreateStub = func(_ context.Context, o client.Object, _ ...client.CreateOption) error {
@@ -465,8 +465,8 @@ func TestCreateOrUpdateLokiStack_WhenGetReturnsNoError_UpdateObjects(t *testing.
 					Kind:               "LokiStack",
 					Name:               "my-stack",
 					UID:                "b23f9a38-9672-499f-8c29-15ede74d3ece",
-					Controller:         pointer.BoolPtr(true),
-					BlockOwnerDeletion: pointer.BoolPtr(true),
+					Controller:         pointer.Bool(true),
+					BlockOwnerDeletion: pointer.Bool(true),
 				},
 			},
 		},
@@ -634,8 +634,8 @@ func TestCreateOrUpdateLokiStack_WhenUpdateReturnsError_ContinueWithOtherObjects
 					Kind:               "LokiStack",
 					Name:               "someStack",
 					UID:                "b23f9a38-9672-499f-8c29-15ede74d3ece",
-					Controller:         pointer.BoolPtr(true),
-					BlockOwnerDeletion: pointer.BoolPtr(true),
+					Controller:         pointer.Bool(true),
+					BlockOwnerDeletion: pointer.Bool(true),
 				},
 			},
 		},
