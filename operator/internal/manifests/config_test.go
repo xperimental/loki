@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -117,7 +116,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -132,7 +131,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -147,7 +146,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -162,7 +161,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -177,7 +176,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
@@ -192,7 +191,7 @@ func randomConfigOptions() Options {
 							Operator:          corev1.TolerationOpEqual,
 							Value:             uuid.New().String(),
 							Effect:            corev1.TaintEffectNoExecute,
-							TolerationSeconds: pointer.Int64Ptr(rand.Int63()),
+							TolerationSeconds: pointer.Int64(rand.Int63()),
 						},
 					},
 				},
