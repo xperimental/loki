@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
-
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/utils/strings/slices"
+
+	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
 )
 
 // RecordingRuleValidator does extended-validation of RecordingRule resources for Openshift-based deployments.

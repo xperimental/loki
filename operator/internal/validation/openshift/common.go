@@ -3,10 +3,10 @@ package openshift
 import (
 	"strings"
 
-	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
-
 	"github.com/grafana/loki/pkg/logql/syntax"
 	"github.com/prometheus/prometheus/model/labels"
+
+	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
 )
 
 const (
