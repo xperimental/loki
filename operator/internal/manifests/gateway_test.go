@@ -6,18 +6,17 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/google/uuid"
+	routev1 "github.com/openshift/api/route/v1"
+	"github.com/stretchr/testify/require"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+
 	configv1 "github.com/grafana/loki/operator/apis/config/v1"
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 	"github.com/grafana/loki/operator/internal/manifests/internal/gateway"
 	"github.com/grafana/loki/operator/internal/manifests/openshift"
 	"github.com/grafana/loki/operator/internal/manifests/storage"
-
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/require"
-
-	routev1 "github.com/openshift/api/route/v1"
-	appsv1 "k8s.io/api/apps/v1"
-	corev1 "k8s.io/api/core/v1"
 )
 
 func TestNewGatewayDeployment_HasTemplateConfigHashAnnotation(t *testing.T) {

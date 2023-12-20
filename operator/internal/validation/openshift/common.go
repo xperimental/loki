@@ -4,10 +4,10 @@ import (
 	"regexp"
 	"strings"
 
-	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
-
 	"github.com/grafana/loki/pkg/logql/syntax"
 	"github.com/prometheus/prometheus/model/labels"
+
+	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 )
 
 const (
