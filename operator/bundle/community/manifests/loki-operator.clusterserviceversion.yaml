@@ -150,7 +150,7 @@ metadata:
     categories: OpenShift Optional, Logging & Tracing
     certified: "false"
     containerImage: docker.io/grafana/loki-operator:0.4.0
-    createdAt: "2023-12-13T20:24:24Z"
+    createdAt: "2024-01-11T09:08:07Z"
     description: The Community Loki Operator provides Kubernetes native deployment
       and management of Loki and related logging components.
     operators.operatorframework.io/builder: operator-sdk-unknown
@@ -1537,6 +1537,12 @@ spec:
           - alertmanagers
           verbs:
           - patch
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - alertmanagers/api
+          verbs:
+          - create
         - apiGroups:
           - monitoring.coreos.com
           resources:
