@@ -27,6 +27,10 @@ import (
 	"github.com/grafana/loki/operator/internal/status"
 )
 
+const (
+	annotationDebugOverrideLokiImage = "debug.loki.grafana.com/override-loki-image"
+)
+
 // CreateOrUpdateLokiStack handles LokiStack create and update events.
 func CreateOrUpdateLokiStack(
 	ctx context.Context,
@@ -51,6 +55,10 @@ func CreateOrUpdateLokiStack(
 	img := os.Getenv(manifests.EnvRelatedImageLoki)
 	if img == "" {
 		img = manifests.DefaultContainerImage
+	}
+
+	if debugImage, ok := stack.Annotations[annotationDebugOverrideLokiImage]; ok {
+		img = debugImage
 	}
 
 	gwImg := os.Getenv(manifests.EnvRelatedImageGateway)
