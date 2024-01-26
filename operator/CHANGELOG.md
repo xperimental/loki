@@ -2,6 +2,7 @@
 
 ## Release 5.7.11
 
+- [11778](https://github.com/grafana/loki/pull/11778) **periklis**: Update Loki operand to v2.9.4
 - [11624](https://github.com/grafana/loki/pull/11624) **xperimental**: React to changes in ConfigMap used for storage CA
 
 ## Release 5.7.10
