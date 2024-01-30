@@ -20,7 +20,6 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	configv1 "github.com/grafana/loki/operator/apis/config/v1"
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
@@ -198,12 +197,12 @@ func TestLokiStackController_RegisterWatchedResources(t *testing.T) {
 		index             int
 		watchesCallsCount int
 		featureGates      configv1.FeatureGates
-		src               source.Source
+		src               client.Object
 		pred              builder.OwnsOption
 	}
 	table := []test{
 		{
-			src:               &source.Kind{Type: &openshiftconfigv1.APIServer{}},
+			src:               &openshiftconfigv1.APIServer{},
 			index:             3,
 			watchesCallsCount: 4,
 			featureGates: configv1.FeatureGates{
@@ -214,7 +213,7 @@ func TestLokiStackController_RegisterWatchedResources(t *testing.T) {
 			pred: updateOrDeleteOnlyPred,
 		},
 		{
-			src:               &source.Kind{Type: &openshiftconfigv1.Proxy{}},
+			src:               &openshiftconfigv1.Proxy{},
 			index:             3,
 			watchesCallsCount: 4,
 			featureGates: configv1.FeatureGates{
@@ -225,21 +224,21 @@ func TestLokiStackController_RegisterWatchedResources(t *testing.T) {
 			pred: updateOrDeleteOnlyPred,
 		},
 		{
-			src:               &source.Kind{Type: &corev1.Service{}},
+			src:               &corev1.Service{},
 			index:             0,
 			watchesCallsCount: 3,
 			featureGates:      configv1.FeatureGates{},
 			pred:              createUpdateOrDeletePred,
 		},
 		{
-			src:               &source.Kind{Type: &corev1.Secret{}},
+			src:               &corev1.Secret{},
 			index:             1,
 			watchesCallsCount: 3,
 			featureGates:      configv1.FeatureGates{},
 			pred:              createUpdateOrDeletePred,
 		},
 		{
-			src:               &source.Kind{Type: &corev1.ConfigMap{}},
+			src:               &corev1.ConfigMap{},
 			index:             2,
 			watchesCallsCount: 3,
 			featureGates:      configv1.FeatureGates{},
