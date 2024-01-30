@@ -4,6 +4,7 @@
 
 - [11232](https://github.com/grafana/loki/pull/11232) **periklis**: Update dependencies and dev tools
 - [11129](https://github.com/grafana/loki/pull/11129) **periklis**: Update deps to secure webhooks for CVE-2023-44487
+- [11778](https://github.com/grafana/loki/pull/11778) **periklis**: Update Loki operand to v2.9.4
 - [11624](https://github.com/grafana/loki/pull/11624) **xperimental**: React to changes in ConfigMap used for storage CA
 
 ## Release 5.8.2
