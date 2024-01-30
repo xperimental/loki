@@ -15,6 +15,7 @@ require (
 	k8s.io/api v0.25.15
 	k8s.io/apimachinery v0.25.15
 	k8s.io/client-go v0.25.15
+	k8s.io/component-base v0.25.15
 	k8s.io/utils v0.0.0-20220728103510-ee6ede2d64ed
 	sigs.k8s.io/controller-runtime v0.13.2
 	sigs.k8s.io/yaml v1.3.0
@@ -166,7 +167,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6 // indirect
 	k8s.io/apiextensions-apiserver v0.25.15 // indirect
-	k8s.io/component-base v0.25.15 // indirect
 	k8s.io/klog/v2 v2.70.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220803162953-67bda5d908f1 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
