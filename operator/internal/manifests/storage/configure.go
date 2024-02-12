@@ -13,17 +13,10 @@ import (
 	lokiv1 "github.com/grafana/loki/operator/apis/loki/v1"
 )
 
-var (
-	managedAuthConfigVolumeMount = corev1.VolumeMount{
-		Name:      managedAuthConfigVolumeName,
-		MountPath: managedAuthConfigDirectory,
-	}
-
-	saTokenVolumeMount = corev1.VolumeMount{
-		Name:      saTokenVolumeName,
-		MountPath: saTokenVolumeMountPath,
-	}
-)
+var saTokenVolumeMount = corev1.VolumeMount{
+	Name:      saTokenVolumeName,
+	MountPath: saTokenVolumeMountPath,
+}
 
 // ConfigureDeployment appends additional pod volumes and container env vars, args, volume mounts
 // based on the object storage type. Currently supported amendments:
@@ -140,11 +133,6 @@ func ensureObjectStoreCredentials(p *corev1.PodSpec, opts Options) corev1.PodSpe
 		container.Env = append(container.Env, managedAuthCredentials(opts)...)
 		volumes = append(volumes, saTokenVolume(opts))
 		container.VolumeMounts = append(container.VolumeMounts, saTokenVolumeMount)
-
-		if opts.OpenShift.ManagedAuthEnabled() && opts.S3 != nil && opts.S3.STS {
-			volumes = append(volumes, managedAuthConfigVolume(opts))
-			container.VolumeMounts = append(container.VolumeMounts, managedAuthConfigVolumeMount)
-		}
 	} else {
 		container.Env = append(container.Env, staticAuthCredentials(opts)...)
 	}
@@ -195,8 +183,8 @@ func managedAuthCredentials(opts Options) []corev1.EnvVar {
 	case lokiv1.ObjectStorageSecretS3:
 		if opts.OpenShift.ManagedAuthEnabled() {
 			return []corev1.EnvVar{
-				envVarFromValue(EnvAWSCredentialsFile, path.Join(managedAuthConfigDirectory, KeyAWSCredentialsFilename)),
-				envVarFromValue(EnvAWSSdkLoadConfig, "true"),
+				envVarFromSecret(EnvAWSRoleArn, opts.OpenShift.CloudCredentials.SecretName, KeyAWSRoleArn),
+				envVarFromValue(EnvAWSWebIdentityTokenFile, ServiceAccountTokenFilePath),
 			}
 		} else {
 			return []corev1.EnvVar{
@@ -343,17 +331,6 @@ func saTokenVolume(opts Options) corev1.Volume {
 						},
 					},
 				},
-			},
-		},
-	}
-}
-
-func managedAuthConfigVolume(opts Options) corev1.Volume {
-	return corev1.Volume{
-		Name: managedAuthConfigVolumeName,
-		VolumeSource: corev1.VolumeSource{
-			Secret: &corev1.SecretVolumeSource{
-				SecretName: opts.OpenShift.CloudCredentials.SecretName,
 			},
 		},
 	}

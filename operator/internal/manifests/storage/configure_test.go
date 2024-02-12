@@ -898,16 +898,22 @@ func TestConfigureDeploymentForStorageType(t *testing.T) {
 											ReadOnly:  false,
 											MountPath: saTokenVolumeMountPath,
 										},
-										managedAuthConfigVolumeMount,
 									},
 									Env: []corev1.EnvVar{
 										{
-											Name:  "AWS_SHARED_CREDENTIALS_FILE",
-											Value: "/etc/storage/managed-auth/credentials",
+											Name: EnvAWSRoleArn,
+											ValueFrom: &corev1.EnvVarSource{
+												SecretKeyRef: &corev1.SecretKeySelector{
+													LocalObjectReference: corev1.LocalObjectReference{
+														Name: "cloud-credentials",
+													},
+													Key: KeyAWSRoleArn,
+												},
+											},
 										},
 										{
-											Name:  "AWS_SDK_LOAD_CONFIG",
-											Value: "true",
+											Name:  EnvAWSWebIdentityTokenFile,
+											Value: "/var/run/secrets/storage/serviceaccount/token",
 										},
 									},
 								},
@@ -934,14 +940,6 @@ func TestConfigureDeploymentForStorageType(t *testing.T) {
 													},
 												},
 											},
-										},
-									},
-								},
-								{
-									Name: managedAuthConfigVolumeName,
-									VolumeSource: corev1.VolumeSource{
-										Secret: &corev1.SecretVolumeSource{
-											SecretName: "cloud-credentials",
 										},
 									},
 								},
@@ -1924,16 +1922,22 @@ func TestConfigureStatefulSetForStorageType(t *testing.T) {
 											ReadOnly:  false,
 											MountPath: saTokenVolumeMountPath,
 										},
-										managedAuthConfigVolumeMount,
 									},
 									Env: []corev1.EnvVar{
 										{
-											Name:  "AWS_SHARED_CREDENTIALS_FILE",
-											Value: "/etc/storage/managed-auth/credentials",
+											Name: EnvAWSRoleArn,
+											ValueFrom: &corev1.EnvVarSource{
+												SecretKeyRef: &corev1.SecretKeySelector{
+													LocalObjectReference: corev1.LocalObjectReference{
+														Name: "cloud-credentials",
+													},
+													Key: KeyAWSRoleArn,
+												},
+											},
 										},
 										{
-											Name:  "AWS_SDK_LOAD_CONFIG",
-											Value: "true",
+											Name:  EnvAWSWebIdentityTokenFile,
+											Value: "/var/run/secrets/storage/serviceaccount/token",
 										},
 									},
 								},
@@ -1960,14 +1964,6 @@ func TestConfigureStatefulSetForStorageType(t *testing.T) {
 													},
 												},
 											},
-										},
-									},
-								},
-								{
-									Name: managedAuthConfigVolumeName,
-									VolumeSource: corev1.VolumeSource{
-										Secret: &corev1.SecretVolumeSource{
-											SecretName: "cloud-credentials",
 										},
 									},
 								},
