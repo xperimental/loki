@@ -126,7 +126,10 @@ func newPodMonitor(namespace, monitorName string, labels labels.Set, endpoint mo
 			Labels:    labels,
 		},
 		Spec: monitoringv1.PodMonitorSpec{
-			JobLabel: labelJobComponent,
+			PodTargetLabels: []string{
+				kubernetesInstanceLabel,
+				kubernetesComponentLabel,
+			},
 			PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 				endpoint,
 			},

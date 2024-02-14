@@ -201,8 +201,9 @@ func mutatePodMonitor(existing, desired *monitoringv1.PodMonitor) {
 	// a new object is going to be created
 	existing.Annotations = desired.Annotations
 	existing.Labels = desired.Labels
-	existing.Spec.PodMetricsEndpoints = desired.Spec.PodMetricsEndpoints
 	existing.Spec.JobLabel = desired.Spec.JobLabel
+	existing.Spec.PodTargetLabels = desired.Spec.PodTargetLabels
+	existing.Spec.PodMetricsEndpoints = desired.Spec.PodMetricsEndpoints
 }
 
 func mutateIngress(existing, desired *networkingv1.Ingress) {

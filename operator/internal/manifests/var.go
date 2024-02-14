@@ -69,9 +69,6 @@ const (
 	// BearerTokenFile declares the path for bearer token file for service monitors.
 	BearerTokenFile string = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-	// labelJobComponent is a PodMonitor.Spec.JobLabel.
-	labelJobComponent string = "loki.grafana.com/component"
-
 	// AnnotationCertRotationRequiredAt stores the point in time the last cert rotation happened
 	AnnotationCertRotationRequiredAt string = "loki.grafana.com/certRotationRequiredAt"
 	// AnnotationLokiConfigHash stores the last SHA1 hash of the loki configuration
