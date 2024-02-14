@@ -159,12 +159,12 @@ func configureGatewayObjsForMode(objs []client.Object, opts Options) []client.Ob
 	return objs
 }
 
-func configureGatewayServiceMonitorForMode(sm *monitoringv1.ServiceMonitor, opts Options) error {
+func configureGatewayPodMonitorForMode(monitor *monitoringv1.PodMonitor, opts Options) error {
 	switch opts.Stack.Tenants.Mode {
 	case lokiv1.Static, lokiv1.Dynamic:
 		return nil // nothing to configure
 	case lokiv1.OpenshiftLogging, lokiv1.OpenshiftNetwork:
-		return openshift.ConfigureGatewayServiceMonitor(sm, opts.Gates.ServiceMonitorTLSEndpoints)
+		return openshift.ConfigureGatewayPodMonitor(monitor, opts.Gates.ServiceMonitorTLSEndpoints)
 	}
 
 	return nil

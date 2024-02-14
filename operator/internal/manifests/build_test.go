@@ -2,6 +2,7 @@ package manifests
 
 import (
 	"fmt"
+	monitoringv1 "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"testing"
 
 	"github.com/ViaQ/logerr/v2/kverrors"
@@ -206,7 +207,7 @@ func TestApplyTLSSettings_OverrideDefaults(t *testing.T) {
 	}
 }
 
-func TestBuildAll_WithFeatureGates_ServiceMonitors(t *testing.T) {
+func TestBuildAll_WithFeatureGates_PodMonitors(t *testing.T) {
 	type test struct {
 		desc         string
 		MonitorCount int
@@ -215,7 +216,7 @@ func TestBuildAll_WithFeatureGates_ServiceMonitors(t *testing.T) {
 
 	table := []test{
 		{
-			desc:         "no service monitors created",
+			desc:         "no pod monitors created",
 			MonitorCount: 0,
 			BuildOptions: Options{
 				Name:      "test",
@@ -237,7 +238,7 @@ func TestBuildAll_WithFeatureGates_ServiceMonitors(t *testing.T) {
 			},
 		},
 		{
-			desc:         "service monitor per component created",
+			desc:         "pod monitor per component created",
 			MonitorCount: 8,
 			BuildOptions: Options{
 				Name:      "test",
@@ -268,7 +269,7 @@ func TestBuildAll_WithFeatureGates_ServiceMonitors(t *testing.T) {
 			objects, buildErr := BuildAll(tst.BuildOptions)
 
 			require.NoError(t, buildErr)
-			require.Equal(t, tst.MonitorCount, serviceMonitorCount(objects))
+			require.Equal(t, tst.MonitorCount, podMonitorCount(objects))
 		})
 	}
 }
@@ -435,7 +436,7 @@ func TestBuildAll_WithFeatureGates_ServiceMonitorTLSEndpoints(t *testing.T) {
 	require.NoError(t, err)
 	objects, buildErr := BuildAll(opts)
 	require.NoError(t, buildErr)
-	require.Equal(t, 8, serviceMonitorCount(objects))
+	require.Equal(t, 8, podMonitorCount(objects))
 
 	for _, obj := range objects {
 		var (
@@ -937,10 +938,11 @@ func TestBuildAll_WithFeatureGates_LokiStackAlerts(t *testing.T) {
 	}
 }
 
-func serviceMonitorCount(objects []client.Object) int {
+func podMonitorCount(objects []client.Object) int {
 	monitors := 0
 	for _, obj := range objects {
-		if obj.GetObjectKind().GroupVersionKind().Kind == "ServiceMonitor" {
+		switch obj.(type) {
+		case *monitoringv1.PodMonitor:
 			monitors++
 		}
 	}

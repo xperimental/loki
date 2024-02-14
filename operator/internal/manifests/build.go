@@ -92,7 +92,7 @@ func BuildAll(opts Options) ([]client.Object, error) {
 	}
 
 	if opts.Gates.ServiceMonitors {
-		res = append(res, BuildServiceMonitors(opts)...)
+		res = append(res, BuildPodMonitors(opts)...)
 	}
 
 	if opts.Gates.LokiStackAlerts {

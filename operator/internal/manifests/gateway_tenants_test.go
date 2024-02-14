@@ -1395,11 +1395,11 @@ func TestConfigureServiceForMode(t *testing.T) {
 
 func TestConfigureServiceMonitorForMode(t *testing.T) {
 	type tt struct {
-		desc string
-		opts Options
-		mode lokiv1.ModeType
-		sm   *monitoringv1.ServiceMonitor
-		want *monitoringv1.ServiceMonitor
+		desc        string
+		opts        Options
+		mode        lokiv1.ModeType
+		monitor     *monitoringv1.PodMonitor
+		wantMonitor *monitoringv1.PodMonitor
 	}
 
 	tc := []tt{
@@ -1412,8 +1412,8 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					},
 				},
 			},
-			sm:   &monitoringv1.ServiceMonitor{},
-			want: &monitoringv1.ServiceMonitor{},
+			monitor:     &monitoringv1.PodMonitor{},
+			wantMonitor: &monitoringv1.PodMonitor{},
 		},
 		{
 			desc: "dynamic mode",
@@ -1424,8 +1424,8 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					},
 				},
 			},
-			sm:   &monitoringv1.ServiceMonitor{},
-			want: &monitoringv1.ServiceMonitor{},
+			monitor:     &monitoringv1.PodMonitor{},
+			wantMonitor: &monitoringv1.PodMonitor{},
 		},
 		{
 			desc: "openshift-logging mode",
@@ -1436,10 +1436,10 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					},
 				},
 			},
-			sm: &monitoringv1.ServiceMonitor{},
-			want: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
-					Endpoints: []monitoringv1.Endpoint{
+			monitor: &monitoringv1.PodMonitor{},
+			wantMonitor: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
 							Port:   openshift.GatewayOPAInternalPortName,
 							Path:   "/metrics",
@@ -1458,10 +1458,10 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					},
 				},
 			},
-			sm: &monitoringv1.ServiceMonitor{},
-			want: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
-					Endpoints: []monitoringv1.Endpoint{
+			monitor: &monitoringv1.PodMonitor{},
+			wantMonitor: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
 							Port:   openshift.GatewayOPAInternalPortName,
 							Path:   "/metrics",
@@ -1486,14 +1486,35 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					ServiceMonitorTLSEndpoints: true,
 				},
 			},
-			sm: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
-					Endpoints: []monitoringv1.Endpoint{
+			monitor: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							TLSConfig: &monitoringv1.TLSConfig{
-								CAFile:   "/path/to/ca/file",
-								CertFile: "/path/to/cert/file",
-								KeyFile:  "/path/to/key/file",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
+								SafeTLSConfig: monitoringv1.SafeTLSConfig{
+									CA: monitoringv1.SecretOrConfigMap{
+										ConfigMap: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-ca-bundle",
+											},
+											Key: caFile,
+										},
+									},
+									Cert: monitoringv1.SecretOrConfigMap{
+										Secret: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-service-name",
+											},
+											Key: corev1.TLSCertKey,
+										},
+									},
+									KeySecret: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "test-service-name",
+										},
+										Key: corev1.TLSPrivateKeyKey,
+									},
+								},
 							},
 							BearerTokenSecret: corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
@@ -1505,14 +1526,35 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					},
 				},
 			},
-			want: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
-					Endpoints: []monitoringv1.Endpoint{
+			wantMonitor: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							TLSConfig: &monitoringv1.TLSConfig{
-								CAFile:   "/path/to/ca/file",
-								CertFile: "/path/to/cert/file",
-								KeyFile:  "/path/to/key/file",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
+								SafeTLSConfig: monitoringv1.SafeTLSConfig{
+									CA: monitoringv1.SecretOrConfigMap{
+										ConfigMap: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-ca-bundle",
+											},
+											Key: caFile,
+										},
+									},
+									Cert: monitoringv1.SecretOrConfigMap{
+										Secret: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-service-name",
+											},
+											Key: corev1.TLSCertKey,
+										},
+									},
+									KeySecret: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "test-service-name",
+										},
+										Key: corev1.TLSPrivateKeyKey,
+									},
+								},
 							},
 							BearerTokenSecret: corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
@@ -1531,10 +1573,31 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 								},
 								Key: corev1.ServiceAccountTokenKey,
 							},
-							TLSConfig: &monitoringv1.TLSConfig{
-								CAFile:   "/path/to/ca/file",
-								CertFile: "/path/to/cert/file",
-								KeyFile:  "/path/to/key/file",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
+								SafeTLSConfig: monitoringv1.SafeTLSConfig{
+									CA: monitoringv1.SecretOrConfigMap{
+										ConfigMap: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-ca-bundle",
+											},
+											Key: caFile,
+										},
+									},
+									Cert: monitoringv1.SecretOrConfigMap{
+										Secret: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-service-name",
+											},
+											Key: corev1.TLSCertKey,
+										},
+									},
+									KeySecret: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "test-service-name",
+										},
+										Key: corev1.TLSPrivateKeyKey,
+									},
+								},
 							},
 						},
 					},
@@ -1557,14 +1620,35 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					ServiceMonitorTLSEndpoints: true,
 				},
 			},
-			sm: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
-					Endpoints: []monitoringv1.Endpoint{
+			monitor: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							TLSConfig: &monitoringv1.TLSConfig{
-								CAFile:   "/path/to/ca/file",
-								CertFile: "/path/to/cert/file",
-								KeyFile:  "/path/to/key/file",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
+								SafeTLSConfig: monitoringv1.SafeTLSConfig{
+									CA: monitoringv1.SecretOrConfigMap{
+										ConfigMap: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-ca-bundle",
+											},
+											Key: caFile,
+										},
+									},
+									Cert: monitoringv1.SecretOrConfigMap{
+										Secret: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-service-name",
+											},
+											Key: corev1.TLSCertKey,
+										},
+									},
+									KeySecret: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "test-service-name",
+										},
+										Key: corev1.TLSPrivateKeyKey,
+									},
+								},
 							},
 							BearerTokenSecret: corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
@@ -1576,14 +1660,35 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 					},
 				},
 			},
-			want: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
-					Endpoints: []monitoringv1.Endpoint{
+			wantMonitor: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							TLSConfig: &monitoringv1.TLSConfig{
-								CAFile:   "/path/to/ca/file",
-								CertFile: "/path/to/cert/file",
-								KeyFile:  "/path/to/key/file",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
+								SafeTLSConfig: monitoringv1.SafeTLSConfig{
+									CA: monitoringv1.SecretOrConfigMap{
+										ConfigMap: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-ca-bundle",
+											},
+											Key: caFile,
+										},
+									},
+									Cert: monitoringv1.SecretOrConfigMap{
+										Secret: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-service-name",
+											},
+											Key: corev1.TLSCertKey,
+										},
+									},
+									KeySecret: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "test-service-name",
+										},
+										Key: corev1.TLSPrivateKeyKey,
+									},
+								},
 							},
 							BearerTokenSecret: corev1.SecretKeySelector{
 								LocalObjectReference: corev1.LocalObjectReference{
@@ -1602,10 +1707,31 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 								},
 								Key: corev1.ServiceAccountTokenKey,
 							},
-							TLSConfig: &monitoringv1.TLSConfig{
-								CAFile:   "/path/to/ca/file",
-								CertFile: "/path/to/cert/file",
-								KeyFile:  "/path/to/key/file",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
+								SafeTLSConfig: monitoringv1.SafeTLSConfig{
+									CA: monitoringv1.SecretOrConfigMap{
+										ConfigMap: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-ca-bundle",
+											},
+											Key: caFile,
+										},
+									},
+									Cert: monitoringv1.SecretOrConfigMap{
+										Secret: &corev1.SecretKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "test-service-name",
+											},
+											Key: corev1.TLSCertKey,
+										},
+									},
+									KeySecret: &corev1.SecretKeySelector{
+										LocalObjectReference: corev1.LocalObjectReference{
+											Name: "test-service-name",
+										},
+										Key: corev1.TLSPrivateKeyKey,
+									},
+								},
 							},
 						},
 					},
@@ -1617,9 +1743,9 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
-			err := configureGatewayServiceMonitorForMode(tc.sm, tc.opts)
+			err := configureGatewayPodMonitorForMode(tc.monitor, tc.opts)
 			require.NoError(t, err)
-			require.Equal(t, tc.want, tc.sm)
+			require.Equal(t, tc.wantMonitor, tc.monitor)
 		})
 	}
 }

@@ -69,7 +69,7 @@ const (
 	// BearerTokenFile declares the path for bearer token file for service monitors.
 	BearerTokenFile string = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-	// labelJobComponent is a ServiceMonitor.Spec.JobLabel.
+	// labelJobComponent is a PodMonitor.Spec.JobLabel.
 	labelJobComponent string = "loki.grafana.com/component"
 
 	// AnnotationCertRotationRequiredAt stores the point in time the last cert rotation happened
@@ -432,10 +432,14 @@ func fqdn(serviceName, namespace string) string {
 	return fmt.Sprintf("%s.%s.svc.cluster.local", serviceName, namespace)
 }
 
-// lokiServiceMonitorEndpoint returns the lokistack endpoint for service monitors.
-func lokiServiceMonitorEndpoint(stackName, portName, serviceName, namespace string, enableTLS bool) monitoringv1.Endpoint {
+func lokiPodMetricsEndpoint(stackName, portName, serviceName, namespace string, enableTLS bool) monitoringv1.PodMetricsEndpoint {
+	var (
+		scheme    = "http"
+		tlsConfig *monitoringv1.PodMetricsEndpointTLSConfig
+	)
 	if enableTLS {
-		tlsConfig := monitoringv1.TLSConfig{
+		scheme = "https"
+		tlsConfig = &monitoringv1.PodMetricsEndpointTLSConfig{
 			SafeTLSConfig: monitoringv1.SafeTLSConfig{
 				CA: monitoringv1.SecretOrConfigMap{
 					ConfigMap: &corev1.ConfigMapKeySelector{
@@ -464,25 +468,27 @@ func lokiServiceMonitorEndpoint(stackName, portName, serviceName, namespace stri
 			},
 		}
 
-		return monitoringv1.Endpoint{
-			Port:      portName,
-			Path:      "/metrics",
-			Scheme:    "https",
-			TLSConfig: &tlsConfig,
-		}
 	}
 
-	return monitoringv1.Endpoint{
-		Port:   portName,
-		Path:   "/metrics",
-		Scheme: "http",
+	return monitoringv1.PodMetricsEndpoint{
+		Port:      portName,
+		Path:      "/metrics",
+		Scheme:    scheme,
+		TLSConfig: tlsConfig,
 	}
 }
 
-// gatewayServiceMonitorEndpoint returns the lokistack endpoint for service monitors.
-func gatewayServiceMonitorEndpoint(gatewayName, portName, serviceName, namespace string, enableTLS bool) monitoringv1.Endpoint {
+// gatewayPodMetricsEndpoint returns the lokistack endpoint for service monitors.
+func gatewayPodMetricsEndpoint(gatewayName, portName, serviceName, namespace string, enableTLS bool) monitoringv1.PodMetricsEndpoint {
+	var (
+		scheme            = "http"
+		tlsConfig         *monitoringv1.PodMetricsEndpointTLSConfig
+		bearerTokenSecret corev1.SecretKeySelector
+	)
+
 	if enableTLS {
-		tlsConfig := monitoringv1.TLSConfig{
+		scheme = "https"
+		tlsConfig = &monitoringv1.PodMetricsEndpointTLSConfig{
 			SafeTLSConfig: monitoringv1.SafeTLSConfig{
 				CA: monitoringv1.SecretOrConfigMap{
 					ConfigMap: &corev1.ConfigMapKeySelector{
@@ -496,25 +502,20 @@ func gatewayServiceMonitorEndpoint(gatewayName, portName, serviceName, namespace
 				ServerName: fqdn(serviceName, namespace),
 			},
 		}
-
-		return monitoringv1.Endpoint{
-			Port:   portName,
-			Path:   "/metrics",
-			Scheme: "https",
-			BearerTokenSecret: corev1.SecretKeySelector{
-				LocalObjectReference: corev1.LocalObjectReference{
-					Name: gatewayTokenSecretName(gatewayName),
-				},
-				Key: corev1.ServiceAccountTokenKey,
+		bearerTokenSecret = corev1.SecretKeySelector{
+			LocalObjectReference: corev1.LocalObjectReference{
+				Name: gatewayTokenSecretName(gatewayName),
 			},
-			TLSConfig: &tlsConfig,
+			Key: corev1.ServiceAccountTokenKey,
 		}
 	}
 
-	return monitoringv1.Endpoint{
-		Port:   portName,
-		Path:   "/metrics",
-		Scheme: "http",
+	return monitoringv1.PodMetricsEndpoint{
+		Port:              portName,
+		Path:              "/metrics",
+		Scheme:            scheme,
+		BearerTokenSecret: bearerTokenSecret,
+		TLSConfig:         tlsConfig,
 	}
 }
 

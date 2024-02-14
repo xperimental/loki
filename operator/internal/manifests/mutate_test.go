@@ -838,29 +838,27 @@ func TestMutateFuncFor_MutateStatefulSetSpec(t *testing.T) {
 	}
 }
 
-func TestGetMutateFunc_MutateServiceMonitorSpec(t *testing.T) {
+func TestGetMutateFunc_MutatePodMonitorSpec(t *testing.T) {
 	type test struct {
 		name string
-		got  *monitoringv1.ServiceMonitor
-		want *monitoringv1.ServiceMonitor
+		got  *monitoringv1.PodMonitor
+		want *monitoringv1.PodMonitor
 	}
 	table := []test{
 		{
 			name: "initial creation",
-			got: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
+			got: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
 					JobLabel: "some-job",
-					Endpoints: []monitoringv1.Endpoint{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							Port:            "loki-test",
-							Path:            "/some-path",
-							Scheme:          "https",
-							BearerTokenFile: BearerTokenFile,
-							TLSConfig: &monitoringv1.TLSConfig{
+							Port:   "loki-test",
+							Path:   "/some-path",
+							Scheme: "https",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 								SafeTLSConfig: monitoringv1.SafeTLSConfig{
 									ServerName: "loki-test.some-ns.svc.cluster.local",
 								},
-								CAFile: PrometheusCAFile,
 							},
 						},
 					},
@@ -874,32 +872,28 @@ func TestGetMutateFunc_MutateServiceMonitorSpec(t *testing.T) {
 					},
 				},
 			},
-			want: &monitoringv1.ServiceMonitor{
-				Spec: monitoringv1.ServiceMonitorSpec{
+			want: &monitoringv1.PodMonitor{
+				Spec: monitoringv1.PodMonitorSpec{
 					JobLabel: "some-job-new",
-					Endpoints: []monitoringv1.Endpoint{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							Port:            "loki-test",
-							Path:            "/some-path",
-							Scheme:          "https",
-							BearerTokenFile: BearerTokenFile,
-							TLSConfig: &monitoringv1.TLSConfig{
+							Port:   "loki-test",
+							Path:   "/some-path",
+							Scheme: "https",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 								SafeTLSConfig: monitoringv1.SafeTLSConfig{
 									ServerName: "loki-test.some-ns.svc.cluster.local",
 								},
-								CAFile: PrometheusCAFile,
 							},
 						},
 						{
-							Port:            "loki-test",
-							Path:            "/some-new-path",
-							Scheme:          "https",
-							BearerTokenFile: BearerTokenFile,
-							TLSConfig: &monitoringv1.TLSConfig{
+							Port:   "loki-test",
+							Path:   "/some-new-path",
+							Scheme: "https",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 								SafeTLSConfig: monitoringv1.SafeTLSConfig{
 									ServerName: "loki-test.some-ns.svc.cluster.local",
 								},
-								CAFile: PrometheusCAFile,
 							},
 						},
 					},
@@ -917,21 +911,19 @@ func TestGetMutateFunc_MutateServiceMonitorSpec(t *testing.T) {
 		},
 		{
 			name: "update spec without selector",
-			got: &monitoringv1.ServiceMonitor{
+			got: &monitoringv1.PodMonitor{
 				ObjectMeta: metav1.ObjectMeta{CreationTimestamp: metav1.Now()},
-				Spec: monitoringv1.ServiceMonitorSpec{
+				Spec: monitoringv1.PodMonitorSpec{
 					JobLabel: "some-job",
-					Endpoints: []monitoringv1.Endpoint{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							Port:            "loki-test",
-							Path:            "/some-path",
-							Scheme:          "https",
-							BearerTokenFile: BearerTokenFile,
-							TLSConfig: &monitoringv1.TLSConfig{
+							Port:   "loki-test",
+							Path:   "/some-path",
+							Scheme: "https",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 								SafeTLSConfig: monitoringv1.SafeTLSConfig{
 									ServerName: "loki-test.some-ns.svc.cluster.local",
 								},
-								CAFile: PrometheusCAFile,
 							},
 						},
 					},
@@ -945,37 +937,33 @@ func TestGetMutateFunc_MutateServiceMonitorSpec(t *testing.T) {
 					},
 				},
 			},
-			want: &monitoringv1.ServiceMonitor{
+			want: &monitoringv1.PodMonitor{
 				ObjectMeta: metav1.ObjectMeta{
 					CreationTimestamp: metav1.Now(),
 					Labels:            map[string]string{"test": "label"},
 					Annotations:       map[string]string{"test": "annotations"},
 				},
-				Spec: monitoringv1.ServiceMonitorSpec{
+				Spec: monitoringv1.PodMonitorSpec{
 					JobLabel: "some-job-new",
-					Endpoints: []monitoringv1.Endpoint{
+					PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
 						{
-							Port:            "loki-test",
-							Path:            "/some-path",
-							Scheme:          "https",
-							BearerTokenFile: BearerTokenFile,
-							TLSConfig: &monitoringv1.TLSConfig{
+							Port:   "loki-test",
+							Path:   "/some-path",
+							Scheme: "https",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 								SafeTLSConfig: monitoringv1.SafeTLSConfig{
 									ServerName: "loki-test.some-ns.svc.cluster.local",
 								},
-								CAFile: PrometheusCAFile,
 							},
 						},
 						{
-							Port:            "loki-test",
-							Path:            "/some-new-path",
-							Scheme:          "https",
-							BearerTokenFile: BearerTokenFile,
-							TLSConfig: &monitoringv1.TLSConfig{
+							Port:   "loki-test",
+							Path:   "/some-new-path",
+							Scheme: "https",
+							TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 								SafeTLSConfig: monitoringv1.SafeTLSConfig{
 									ServerName: "loki-test.some-ns.svc.cluster.local",
 								},
-								CAFile: PrometheusCAFile,
 							},
 						},
 					},
@@ -1003,9 +991,8 @@ func TestGetMutateFunc_MutateServiceMonitorSpec(t *testing.T) {
 			// Ensure not mutated
 			require.Equal(t, tst.got.Annotations, tst.want.Annotations)
 			require.Equal(t, tst.got.Labels, tst.want.Labels)
-			require.Equal(t, tst.got.Spec.Endpoints, tst.want.Spec.Endpoints)
 			require.Equal(t, tst.got.Spec.JobLabel, tst.want.Spec.JobLabel)
-			require.Equal(t, tst.got.Spec.Endpoints, tst.want.Spec.Endpoints)
+			require.Equal(t, tst.got.Spec.PodMetricsEndpoints, tst.want.Spec.PodMetricsEndpoints)
 			require.NotEqual(t, tst.got.Spec.NamespaceSelector, tst.want.Spec.NamespaceSelector)
 			require.NotEqual(t, tst.got.Spec.Selector, tst.want.Spec.Selector)
 		})

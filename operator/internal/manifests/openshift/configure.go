@@ -132,36 +132,35 @@ func ConfigureGatewayService(s *corev1.ServiceSpec) error {
 	return nil
 }
 
-// ConfigureGatewayServiceMonitor merges the OpenPolicyAgent sidecar endpoint into
+// ConfigureGatewayPodMonitor merges the OpenPolicyAgent sidecar endpoint into
 // the service monitor. With this cluster-monitoring prometheus can scrape
 // the sidecar metrics.
-func ConfigureGatewayServiceMonitor(sm *monitoringv1.ServiceMonitor, withTLS bool) error {
-	var opaEndpoint monitoringv1.Endpoint
+func ConfigureGatewayPodMonitor(monitor *monitoringv1.PodMonitor, withTLS bool) error {
+	var (
+		bearerTokenSecret corev1.SecretKeySelector
+		scheme            = "http"
+		tlsConfig         *monitoringv1.PodMetricsEndpointTLSConfig
+	)
 
 	if withTLS {
-		bearerTokenSecret := sm.Spec.Endpoints[0].BearerTokenSecret
-		tlsConfig := sm.Spec.Endpoints[0].TLSConfig
-
-		opaEndpoint = monitoringv1.Endpoint{
-			Port:              opaMetricsPortName,
-			Path:              "/metrics",
-			Scheme:            "https",
-			BearerTokenSecret: bearerTokenSecret,
-			TLSConfig:         tlsConfig,
-		}
-	} else {
-		opaEndpoint = monitoringv1.Endpoint{
-			Port:   opaMetricsPortName,
-			Path:   "/metrics",
-			Scheme: "http",
-		}
+		bearerTokenSecret = monitor.Spec.PodMetricsEndpoints[0].BearerTokenSecret
+		scheme = "https"
+		tlsConfig = monitor.Spec.PodMetricsEndpoints[0].TLSConfig
 	}
 
-	spec := monitoringv1.ServiceMonitorSpec{
-		Endpoints: []monitoringv1.Endpoint{opaEndpoint},
+	spec := monitoringv1.PodMonitorSpec{
+		PodMetricsEndpoints: []monitoringv1.PodMetricsEndpoint{
+			{
+				Port:              opaMetricsPortName,
+				Path:              "/metrics",
+				Scheme:            scheme,
+				BearerTokenSecret: bearerTokenSecret,
+				TLSConfig:         tlsConfig,
+			},
+		},
 	}
 
-	if err := mergo.Merge(&sm.Spec, spec, mergo.WithAppendSlice); err != nil {
+	if err := mergo.Merge(&monitor.Spec, spec, mergo.WithAppendSlice); err != nil {
 		return kverrors.Wrap(err, "failed to merge sidecar service monitor endpoints")
 	}
 

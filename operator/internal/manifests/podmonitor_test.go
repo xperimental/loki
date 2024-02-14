@@ -17,8 +17,8 @@ import (
 // will work when deployed.
 func TestServiceMonitorMatchLabels(t *testing.T) {
 	type test struct {
-		Service        *corev1.Service
-		ServiceMonitor *monitoringv1.ServiceMonitor
+		Service    *corev1.Service
+		PodMonitor *monitoringv1.PodMonitor
 	}
 
 	featureGates := configv1.FeatureGates{
@@ -65,45 +65,45 @@ func TestServiceMonitorMatchLabels(t *testing.T) {
 
 	table := []test{
 		{
-			Service:        NewDistributorHTTPService(opt),
-			ServiceMonitor: NewDistributorServiceMonitor(opt),
+			Service:    NewDistributorHTTPService(opt),
+			PodMonitor: NewDistributorPodMonitor(opt),
 		},
 		{
-			Service:        NewIngesterHTTPService(opt),
-			ServiceMonitor: NewIngesterServiceMonitor(opt),
+			Service:    NewIngesterHTTPService(opt),
+			PodMonitor: NewIngesterPodMonitor(opt),
 		},
 		{
-			Service:        NewQuerierHTTPService(opt),
-			ServiceMonitor: NewQuerierServiceMonitor(opt),
+			Service:    NewQuerierHTTPService(opt),
+			PodMonitor: NewQuerierPodMonitor(opt),
 		},
 		{
-			Service:        NewQueryFrontendHTTPService(opt),
-			ServiceMonitor: NewQueryFrontendServiceMonitor(opt),
+			Service:    NewQueryFrontendHTTPService(opt),
+			PodMonitor: NewQueryFrontendPodMonitor(opt),
 		},
 		{
-			Service:        NewCompactorHTTPService(opt),
-			ServiceMonitor: NewCompactorServiceMonitor(opt),
+			Service:    NewCompactorHTTPService(opt),
+			PodMonitor: NewCompactorPodMonitor(opt),
 		},
 		{
-			Service:        NewGatewayHTTPService(opt),
-			ServiceMonitor: NewGatewayServiceMonitor(opt),
+			Service:    NewGatewayHTTPService(opt),
+			PodMonitor: NewGatewayPodMonitor(opt),
 		},
 		{
-			Service:        NewIndexGatewayHTTPService(opt),
-			ServiceMonitor: NewIndexGatewayServiceMonitor(opt),
+			Service:    NewIndexGatewayHTTPService(opt),
+			PodMonitor: NewIndexGatewayPodMonitor(opt),
 		},
 		{
-			Service:        NewRulerHTTPService(opt),
-			ServiceMonitor: NewRulerServiceMonitor(opt),
+			Service:    NewRulerHTTPService(opt),
+			PodMonitor: NewRulerPodMonitor(opt),
 		},
 	}
 
 	for _, tst := range table {
 		tst := tst
-		testName := fmt.Sprintf("%s_%s", tst.Service.GetName(), tst.ServiceMonitor.GetName())
+		testName := fmt.Sprintf("%s_%s", tst.Service.GetName(), tst.PodMonitor.GetName())
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
-			for k, v := range tst.ServiceMonitor.Spec.Selector.MatchLabels {
+			for k, v := range tst.PodMonitor.Spec.Selector.MatchLabels {
 				if assert.Contains(t, tst.Service.Spec.Selector, k) {
 					// only assert Equal if the previous assertion is successful or this will panic
 					assert.Equal(t, v, tst.Service.Spec.Selector[k])
@@ -115,8 +115,8 @@ func TestServiceMonitorMatchLabels(t *testing.T) {
 
 func TestServiceMonitorEndpoints_ForBuiltInCertRotation(t *testing.T) {
 	type test struct {
-		Service        *corev1.Service
-		ServiceMonitor *monitoringv1.ServiceMonitor
+		Service    *corev1.Service
+		PodMonitor *monitoringv1.PodMonitor
 	}
 
 	featureGates := configv1.FeatureGates{
@@ -160,50 +160,49 @@ func TestServiceMonitorEndpoints_ForBuiltInCertRotation(t *testing.T) {
 
 	table := []test{
 		{
-			Service:        NewDistributorHTTPService(opt),
-			ServiceMonitor: NewDistributorServiceMonitor(opt),
+			Service:    NewDistributorHTTPService(opt),
+			PodMonitor: NewDistributorPodMonitor(opt),
 		},
 		{
-			Service:        NewIngesterHTTPService(opt),
-			ServiceMonitor: NewIngesterServiceMonitor(opt),
+			Service:    NewIngesterHTTPService(opt),
+			PodMonitor: NewIngesterPodMonitor(opt),
 		},
 		{
-			Service:        NewQuerierHTTPService(opt),
-			ServiceMonitor: NewQuerierServiceMonitor(opt),
+			Service:    NewQuerierHTTPService(opt),
+			PodMonitor: NewQuerierPodMonitor(opt),
 		},
 		{
-			Service:        NewQueryFrontendHTTPService(opt),
-			ServiceMonitor: NewQueryFrontendServiceMonitor(opt),
+			Service:    NewQueryFrontendHTTPService(opt),
+			PodMonitor: NewQueryFrontendPodMonitor(opt),
 		},
 		{
-			Service:        NewCompactorHTTPService(opt),
-			ServiceMonitor: NewCompactorServiceMonitor(opt),
+			Service:    NewCompactorHTTPService(opt),
+			PodMonitor: NewCompactorPodMonitor(opt),
 		},
 		{
-			Service:        NewIndexGatewayHTTPService(opt),
-			ServiceMonitor: NewIndexGatewayServiceMonitor(opt),
+			Service:    NewIndexGatewayHTTPService(opt),
+			PodMonitor: NewIndexGatewayPodMonitor(opt),
 		},
 		{
-			Service:        NewRulerHTTPService(opt),
-			ServiceMonitor: NewRulerServiceMonitor(opt),
+			Service:    NewRulerHTTPService(opt),
+			PodMonitor: NewRulerPodMonitor(opt),
 		},
 	}
 
 	for _, tst := range table {
 		tst := tst
-		testName := fmt.Sprintf("%s_%s", tst.Service.GetName(), tst.ServiceMonitor.GetName())
+		testName := fmt.Sprintf("%s_%s", tst.Service.GetName(), tst.PodMonitor.GetName())
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
 
-			require.NotNil(t, tst.ServiceMonitor.Spec.Endpoints)
-			require.NotNil(t, tst.ServiceMonitor.Spec.Endpoints[0].TLSConfig)
+			require.NotNil(t, tst.PodMonitor.Spec.PodMetricsEndpoints)
+			require.NotNil(t, tst.PodMonitor.Spec.PodMetricsEndpoints[0].TLSConfig)
 
 			// Do not use bearer authentication for loki endpoints
-			require.Empty(t, tst.ServiceMonitor.Spec.Endpoints[0].BearerTokenFile)
-			require.Empty(t, tst.ServiceMonitor.Spec.Endpoints[0].BearerTokenSecret)
+			require.Empty(t, tst.PodMonitor.Spec.PodMetricsEndpoints[0].BearerTokenSecret)
 
 			// Check using built-in PKI
-			c := tst.ServiceMonitor.Spec.Endpoints[0].TLSConfig
+			c := tst.PodMonitor.Spec.PodMetricsEndpoints[0].TLSConfig
 			require.Equal(t, c.CA.ConfigMap.LocalObjectReference.Name, signingCABundleName(opt.Name))
 			require.Equal(t, c.Cert.Secret.LocalObjectReference.Name, tst.Service.Name)
 			require.Equal(t, c.KeySecret.LocalObjectReference.Name, tst.Service.Name)
@@ -216,7 +215,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 		desc  string
 		opts  Options
 		total int
-		want  []monitoringv1.Endpoint
+		want  []monitoringv1.PodMetricsEndpoint
 	}{
 		{
 			desc: "default",
@@ -237,7 +236,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 				},
 			},
 			total: 1,
-			want: []monitoringv1.Endpoint{
+			want: []monitoringv1.PodMetricsEndpoint{
 				{
 					Port:   gatewayInternalPortName,
 					Path:   "/metrics",
@@ -270,7 +269,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 				},
 			},
 			total: 1,
-			want: []monitoringv1.Endpoint{
+			want: []monitoringv1.PodMetricsEndpoint{
 				{
 					Port:   gatewayInternalPortName,
 					Path:   "/metrics",
@@ -281,7 +280,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 						},
 						Key: corev1.ServiceAccountTokenKey,
 					},
-					TLSConfig: &monitoringv1.TLSConfig{
+					TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 						SafeTLSConfig: monitoringv1.SafeTLSConfig{
 							CA: monitoringv1.SecretOrConfigMap{
 								ConfigMap: &corev1.ConfigMapKeySelector{
@@ -316,7 +315,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 				},
 			},
 			total: 2,
-			want: []monitoringv1.Endpoint{
+			want: []monitoringv1.PodMetricsEndpoint{
 				{
 					Port:   gatewayInternalPortName,
 					Path:   "/metrics",
@@ -354,7 +353,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 				},
 			},
 			total: 2,
-			want: []monitoringv1.Endpoint{
+			want: []monitoringv1.PodMetricsEndpoint{
 				{
 					Port:   gatewayInternalPortName,
 					Path:   "/metrics",
@@ -365,7 +364,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 						},
 						Key: corev1.ServiceAccountTokenKey,
 					},
-					TLSConfig: &monitoringv1.TLSConfig{
+					TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 						SafeTLSConfig: monitoringv1.SafeTLSConfig{
 							CA: monitoringv1.SecretOrConfigMap{
 								ConfigMap: &corev1.ConfigMapKeySelector{
@@ -389,7 +388,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 						},
 						Key: corev1.ServiceAccountTokenKey,
 					},
-					TLSConfig: &monitoringv1.TLSConfig{
+					TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 						SafeTLSConfig: monitoringv1.SafeTLSConfig{
 							CA: monitoringv1.SecretOrConfigMap{
 								ConfigMap: &corev1.ConfigMapKeySelector{
@@ -424,7 +423,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 				},
 			},
 			total: 2,
-			want: []monitoringv1.Endpoint{
+			want: []monitoringv1.PodMetricsEndpoint{
 				{
 					Port:   gatewayInternalPortName,
 					Path:   "/metrics",
@@ -462,7 +461,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 				},
 			},
 			total: 2,
-			want: []monitoringv1.Endpoint{
+			want: []monitoringv1.PodMetricsEndpoint{
 				{
 					Port:   gatewayInternalPortName,
 					Path:   "/metrics",
@@ -473,7 +472,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 						},
 						Key: corev1.ServiceAccountTokenKey,
 					},
-					TLSConfig: &monitoringv1.TLSConfig{
+					TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 						SafeTLSConfig: monitoringv1.SafeTLSConfig{
 							CA: monitoringv1.SecretOrConfigMap{
 								ConfigMap: &corev1.ConfigMapKeySelector{
@@ -497,7 +496,7 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 						},
 						Key: corev1.ServiceAccountTokenKey,
 					},
-					TLSConfig: &monitoringv1.TLSConfig{
+					TLSConfig: &monitoringv1.PodMetricsEndpointTLSConfig{
 						SafeTLSConfig: monitoringv1.SafeTLSConfig{
 							CA: monitoringv1.SecretOrConfigMap{
 								ConfigMap: &corev1.ConfigMapKeySelector{
@@ -519,11 +518,11 @@ func TestServiceMonitorEndpoints_ForGatewayServiceMonitor(t *testing.T) {
 		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
-			sm := NewGatewayServiceMonitor(tc.opts)
-			require.Len(t, sm.Spec.Endpoints, tc.total)
+			sm := NewGatewayPodMonitor(tc.opts)
+			require.Len(t, sm.Spec.PodMetricsEndpoints, tc.total)
 
 			for _, endpoint := range tc.want {
-				require.Contains(t, sm.Spec.Endpoints, endpoint)
+				require.Contains(t, sm.Spec.PodMetricsEndpoints, endpoint)
 			}
 		})
 	}

@@ -30,7 +30,7 @@ import (
 //   - RoleBinding
 //   - Deployment
 //   - StatefulSet
-//   - ServiceMonitor
+//   - PodMonitor
 //   - Ingress
 //   - Route
 //   - PrometheusRule
@@ -109,10 +109,10 @@ func MutateFuncFor(existing, desired client.Object, depAnnotations map[string]st
 			wantSts := desired.(*appsv1.StatefulSet)
 			mutateStatefulSet(sts, wantSts)
 
-		case *monitoringv1.ServiceMonitor:
-			svcMonitor := existing.(*monitoringv1.ServiceMonitor)
-			wantSvcMonitor := desired.(*monitoringv1.ServiceMonitor)
-			mutateServiceMonitor(svcMonitor, wantSvcMonitor)
+		case *monitoringv1.PodMonitor:
+			podMonitor := existing.(*monitoringv1.PodMonitor)
+			wantPodMonitor := desired.(*monitoringv1.PodMonitor)
+			mutatePodMonitor(podMonitor, wantPodMonitor)
 
 		case *networkingv1.Ingress:
 			ing := existing.(*networkingv1.Ingress)
@@ -196,12 +196,12 @@ func mutateRoleBinding(existing, desired *rbacv1.RoleBinding) {
 	existing.Subjects = desired.Subjects
 }
 
-func mutateServiceMonitor(existing, desired *monitoringv1.ServiceMonitor) {
-	// ServiceMonitor selector is immutable so we set this value only if
+func mutatePodMonitor(existing, desired *monitoringv1.PodMonitor) {
+	// PodMonitor selector is immutable so we set this value only if
 	// a new object is going to be created
 	existing.Annotations = desired.Annotations
 	existing.Labels = desired.Labels
-	existing.Spec.Endpoints = desired.Spec.Endpoints
+	existing.Spec.PodMetricsEndpoints = desired.Spec.PodMetricsEndpoints
 	existing.Spec.JobLabel = desired.Spec.JobLabel
 }
 
