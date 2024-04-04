@@ -1330,7 +1330,7 @@ spec:
                 - /manager
                 env:
                 - name: RELATED_IMAGE_LOKI
-                  value: quay.io/openshift-logging/loki:v2.9.4
+                  value: quay.io/openshift-logging/loki:v2.9.6
                 - name: RELATED_IMAGE_GATEWAY
                   value: quay.io/observatorium/api:latest
                 - name: RELATED_IMAGE_OPA
@@ -1452,7 +1452,7 @@ spec:
   provider:
     name: Grafana.com
   relatedImages:
-  - image: quay.io/openshift-logging/loki:v2.9.4
+  - image: quay.io/openshift-logging/loki:v2.9.6
     name: loki
   - image: quay.io/observatorium/api:latest
     name: gateway
