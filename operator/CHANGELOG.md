@@ -1,6 +1,6 @@
 ## Main
 
-## Release 5.7.13
+## Release 5.6.18
 
 - [12469](https://github.com/grafana/loki/pull/12469) **btaani**: Configure Loki to use virtual-host-style URLs for S3 AWS endpoints
 - [12181](https://github.com/grafana/loki/pull/12181) **btaani**: Improve validation of provided S3 storage configuration
