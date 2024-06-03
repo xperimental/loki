@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.6.20
+
+- [13066](https://github.com/grafana/loki/pull/13066) **xperimental**: Use a minimum value for replay memory ceiling
+
 ## Release 5.6.19
 
 - [12874](https://github.com/grafana/loki/pull/12874) **periklis**: chore(operator): Update Loki operand to v2.9.8
