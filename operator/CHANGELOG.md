@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.6.21
+
+- [13369](https://github.com/grafana/loki/pull/13369) **jatinsu**: feat(operator): Add support for the volume API
+
 ## Release 5.6.20
 
 - [13066](https://github.com/grafana/loki/pull/13066) **xperimental**: Use a minimum value for replay memory ceiling
