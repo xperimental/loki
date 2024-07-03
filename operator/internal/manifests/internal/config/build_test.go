@@ -109,6 +109,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -197,6 +199,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -359,6 +362,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -452,6 +457,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 				Tenants: map[string]lokiv1.LimitsTemplateSpec{
@@ -701,6 +707,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -843,6 +851,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -1052,6 +1061,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -1194,6 +1205,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -1404,6 +1416,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -1559,6 +1573,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -1794,6 +1809,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -1892,6 +1909,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 					Retention: &lokiv1.RetentionLimitSpec{
 						Days: 15,
@@ -2089,6 +2107,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 2m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -2257,6 +2277,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "2m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -2522,6 +2543,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -2647,6 +2670,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -2841,6 +2865,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_addr: ${HASH_RING_INSTANCE_ADDR}
@@ -2930,6 +2956,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
@@ -3095,6 +3122,8 @@ limits_config:
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
   query_timeout: 1m
+  volume_enabled: true
+  volume_max_series: 1000
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_addr: ${HASH_RING_INSTANCE_ADDR}
@@ -3184,6 +3213,7 @@ overrides:
 						MaxQuerySeries:          500,
 						QueryTimeout:            "1m",
 						CardinalityLimit:        100000,
+						MaxVolumeSeries:         1000,
 					},
 				},
 			},
