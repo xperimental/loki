@@ -105,6 +105,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -354,6 +355,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -695,6 +697,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -1045,6 +1048,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -1396,6 +1400,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -1785,6 +1790,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -2079,6 +2085,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 2m
   volume_enabled: true
   volume_max_series: 1000
@@ -2511,6 +2518,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -2829,6 +2837,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
@@ -3082,6 +3091,7 @@ limits_config:
   per_stream_rate_limit: 3MB
   per_stream_rate_limit_burst: 15MB
   split_queries_by_interval: 30m
+  allow_structured_metadata: false
   query_timeout: 1m
   volume_enabled: true
   volume_max_series: 1000
