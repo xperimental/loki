@@ -2,6 +2,7 @@
 
 ## Release 5.6.21
 
+- [13562](https://github.com/grafana/loki/pull/13562) **xperimental**: fix(operator): Set object storage for delete requests when using retention
 - [8579](https://github.com/grafana/loki/pull/8579) **periklis**: operator: Remove deprecated field querier.engine.timeout
 - [319](https://github.com/openshift/loki/pull/319) **periklis**: fix(operator): Disable structured metadata
 - [13422](https://github.com/grafana/loki/pull/13422) **periklis** feat(operator): Update Loki operand to v3.1.0
