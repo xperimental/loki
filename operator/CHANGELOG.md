@@ -1,5 +1,9 @@
 ## Main
 
+## Release 5.6.22
+
+- [13512](https://github.com/grafana/loki/pull/13512) **xperimental**: feat(operator): Add alert for discarded samples
+
 ## Release 5.6.21
 
 - [13562](https://github.com/grafana/loki/pull/13562) **xperimental**: fix(operator): Set object storage for delete requests when using retention
