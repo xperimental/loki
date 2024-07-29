@@ -22,7 +22,6 @@ import (
 	lokiv1beta1 "github.com/grafana/loki/operator/apis/loki/v1beta1"
 	lokictrl "github.com/grafana/loki/operator/controllers/loki"
 	"github.com/grafana/loki/operator/internal/config"
-	"github.com/grafana/loki/operator/internal/metrics"
 	"github.com/grafana/loki/operator/internal/validation"
 	"github.com/grafana/loki/operator/internal/validation/openshift"
 
@@ -174,9 +173,6 @@ func main() {
 		logger.Error(err, "unable to set up ready check")
 		os.Exit(1)
 	}
-
-	logger.Info("registering metrics")
-	metrics.RegisterMetricCollectors()
 
 	logger.Info("Registering profiling endpoints.")
 	err = registerProfiler(mgr)
