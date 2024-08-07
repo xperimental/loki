@@ -2,6 +2,7 @@
 
 ## Release 5.6.22
 
+- [13708](https://github.com/grafana/loki/pull/13708) **periklis**: fix(operator): Don't overwrite annotations for LokiStack ingress resources
 - [openshift#338](https://github.com/openshift/loki/pull/338) **xperimental**: Remove unused telemetry metrics
 - [13512](https://github.com/grafana/loki/pull/13512) **xperimental**: feat(operator): Add alert for discarded samples
 
