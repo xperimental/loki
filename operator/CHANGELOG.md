@@ -2,6 +2,7 @@
 
 ## Release 5.6.22
 
+- [openshift#338](https://github.com/openshift/loki/pull/338) **xperimental**: Remove unused telemetry metrics
 - [13512](https://github.com/grafana/loki/pull/13512) **xperimental**: feat(operator): Add alert for discarded samples
 
 ## Release 5.6.21
