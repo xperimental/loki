@@ -202,8 +202,9 @@ func ConfigOptions(opt Options) config.Options {
 			AlertManager:          amConfig,
 			RemoteWrite:           rwConfig,
 		},
-		Retention: retentionConfig(&opt.Stack),
-		Overrides: overrides,
+		Retention:  retentionConfig(&opt.Stack),
+		OTLPLabels: otlpLabelConfig(&opt.Stack),
+		Overrides:  overrides,
 	}
 }
 
@@ -394,4 +395,8 @@ func retentionConfig(ls *lokiv1.LokiStackSpec) config.RetentionOptions {
 		Enabled:           true,
 		DeleteWorkerCount: deleteWorkerCountMap[ls.Size],
 	}
+}
+
+func otlpLabelConfig(ls *lokiv1.LokiStackSpec) config.OTLPLabelConfig {
+	return config.OTLPLabelConfig{}
 }

@@ -107,16 +107,18 @@ compactor:
 {{- end }}
   delete_request_store: {{.ObjectStorage.SharedStore}}
 {{- end }}
-{{- if $l := .Stack.Limits.Global }}
-{{- with $l.OTLP }}{{- with .IndexedResourceAttributes }}
+{{- with .OTLPLabels.DefaultIndexLabels }}
 distributor:
   otlp_config:
     default_resource_attributes_as_index_labels:
     {{- range . }}
-    - {{ . }}
+      - {{ . }}
     {{- end }}
+{{- else }}
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 {{- end }}
-{{- end }}{{- end }}
 frontend:
   tail_proxy_url: {{ .Querier.Protocol }}://{{ .Querier.FQDN }}:{{ .Querier.Port }}
 {{- if .Gates.HTTPEncryption }}

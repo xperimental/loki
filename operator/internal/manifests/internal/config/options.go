@@ -37,6 +37,8 @@ type Options struct {
 
 	Retention RetentionOptions
 
+	OTLPLabels OTLPLabelConfig
+
 	Overrides map[string]LokiOverrides
 }
 
@@ -244,6 +246,13 @@ func (w WriteAheadLog) ReplayMemoryCeiling() string {
 type RetentionOptions struct {
 	Enabled           bool
 	DeleteWorkerCount uint
+}
+
+// OTLPLabelConfig contains the rendered OTLP label configuration.
+// This is both influenced by the tenancy mode and the custom OTLP configuration on the LokiStack and might
+// contain more labels than the user has configured if some labels are deemed "required".
+type OTLPLabelConfig struct {
+	DefaultIndexLabels []string
 }
 
 type TLSOptions struct {
