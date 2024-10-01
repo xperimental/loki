@@ -123,6 +123,8 @@ func (v *LokiStackValidator) validatePerTenantOTLPSpec(tenants map[string]lokiv1
 func (v *LokiStackValidator) validateOTLPSpec(parent *field.Path, s *lokiv1.OTLPSpec) field.ErrorList {
 	var allErrs field.ErrorList
 
+	// TODO this needs to take "required" and "recommended" labels into account when looking at invalid stream label configurations
+
 	if s.ResourceAttributes != nil && s.ResourceAttributes.IgnoreDefaults {
 		switch {
 		case len(s.ResourceAttributes.Attributes) == 0:
