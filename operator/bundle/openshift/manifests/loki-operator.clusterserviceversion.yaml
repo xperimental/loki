@@ -976,6 +976,18 @@ spec:
           admin-groups: - system:cluster-admins - cluster-admin - dedicated-admin"
         displayName: Admin Groups
         path: tenants.openshift.adminGroups
+      - description: OTLP contains settings for ingesting data using OTLP in an OpenShift
+          context.
+        displayName: OpenTelemetry Protocol
+        path: tenants.openshift.otlp
+      - description: "DisableRecommendedLabels can be used to remove the set of \"recommended
+          labels\" from the generated Loki configuration. This will cause meta information
+          to not be available as stream labels or structured metadata, potentially
+          making queries more expensive and less performant. \n This option is supposed
+          to be combined with a custom label configuration customizing the labels
+          for the specific usecase."
+        displayName: Disable recommended OTLP labels
+        path: tenants.openshift.otlp.disableRecommendedLabels
       statusDescriptors:
       - description: Distributor is a map to the per pod status of the distributor
           deployment
