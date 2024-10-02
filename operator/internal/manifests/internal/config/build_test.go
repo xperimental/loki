@@ -41,6 +41,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -95,6 +98,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -298,6 +302,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -352,6 +359,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -724,6 +732,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -778,6 +789,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -1082,6 +1094,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -1136,6 +1151,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -1441,6 +1457,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -1495,6 +1514,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -1834,6 +1854,9 @@ compactor:
   retention_delete_delay: 4h
   retention_delete_worker_count: 50
   delete_request_store: s3
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -1888,6 +1911,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -2169,6 +2193,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -2223,6 +2250,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -2587,6 +2615,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   tail_tls_config:
@@ -2662,6 +2693,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -2932,6 +2964,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -2986,6 +3021,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -3429,6 +3465,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -3483,6 +3522,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -3689,6 +3729,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -3744,6 +3787,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -3952,6 +3996,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -4006,6 +4053,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -4215,6 +4263,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -4269,6 +4320,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -4514,6 +4566,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -4568,6 +4623,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -4811,6 +4867,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -4865,6 +4924,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -5309,6 +5369,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -5363,6 +5426,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -5485,6 +5549,9 @@ ${STORAGE_CONFIG}
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -5539,6 +5606,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -5654,6 +5722,9 @@ common:
 compactor:
   compaction_interval: 2h
   working_directory: /tmp/loki/compactor
+distributor:
+  otlp_config:
+    default_resource_attributes_as_index_labels: []
 frontend:
   tail_proxy_url: http://loki-querier-http-lokistack-dev.default.svc.cluster.local:3100
   compress_responses: true
@@ -5708,6 +5779,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
@@ -6100,6 +6172,7 @@ limits_config:
   # (See https://github.com/grafana/loki/blob/main/pkg/ingester/limiter.go#L73)
   max_streams_per_user: 0
   max_line_size: 256000
+  discover_service_name: []
   max_entries_limit_per_query: 5000
   max_global_streams_per_user: 0
   max_chunks_per_query: 2000000
