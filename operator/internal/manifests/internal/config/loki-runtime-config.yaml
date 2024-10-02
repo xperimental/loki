@@ -1,3 +1,4 @@
+{{- /*gotype: github.com/grafana/loki/operator/internal/manifests/internal/config.Options*/ -}}
 ---
 overrides:
 {{- $opts := . }}
