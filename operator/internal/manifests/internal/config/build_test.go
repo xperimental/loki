@@ -6201,31 +6201,19 @@ limits_config:
         attributes:
         - res.foo.bar
         - res.bar.baz
-        regex: .*
       - action: structured_metadata
         attributes:
         - res.service.env
-        regex: .*
     scope_attributes:
-    - action: index_label
+    - action: structured_metadata
       attributes:
       - scope.foo.bar
       - scope.bar.baz
-      regex: .*
-    - action: structured_metadata
-      attributes:
-      - scope.service.env
-      regex: .*
     log_attributes:
-    - action: index_label
+    - action: structured_metadata
       attributes:
       - log.foo.bar
       - log.bar.baz
-      regex: .*
-    - action: structured_metadata
-      attributes:
-      - log.service.env
-      regex: .*
 memberlist:
   abort_if_cluster_join_fails: true
   advertise_port: 7946
@@ -6363,31 +6351,19 @@ overrides:
           attributes:
           - res.foo.bar
           - res.bar.baz
-          regex: .*
         - action: structured_metadata
           attributes:
           - res.service.env
-          regex: .*
       scope_attributes:
-      - action: index_label
+      - action: structured_metadata
         attributes:
         - scope.foo.bar
         - scope.bar.baz
-        regex: .*
-      - action: structured_metadata
-        attributes:
-        - scope.service.env
-        regex: .*
       log_attributes:
-      - action: index_label
+      - action: structured_metadata
         attributes:
         - log.foo.bar
         - log.bar.baz
-        regex: .*
-      - action: structured_metadata
-        attributes:
-        - log.service.env
-        regex: .*
 `
 	opts := Options{
 		Stack: lokiv1.LokiStackSpec{
@@ -6407,29 +6383,6 @@ overrides:
 						PerStreamRateLimit:        5,
 						PerStreamRateLimitBurst:   15,
 						PerStreamDesiredRate:      3,
-					},
-					OTLP: &lokiv1.OTLPSpec{
-						StreamLabels: &lokiv1.OTLPStreamLabelSpec{
-							ResourceAttributes: []string{
-								"foo.bar",
-								"bar.baz",
-								"res.foo.bar",
-								"res.bar.baz",
-							},
-						},
-						StructuredMetadata: &lokiv1.OTLPMetadataSpec{
-							ResourceAttributes: []string{
-								"res.service.env",
-							},
-							ScopeAttributes: []string{
-								"scope.foo.bar",
-								"scope.bar.baz",
-							},
-							LogAttributes: []string{
-								"log.foo.bar",
-								"log.bar.baz",
-							},
-						},
 					},
 					QueryLimits: &lokiv1.QueryLimitSpec{
 						MaxEntriesLimitPerQuery: 5000,
@@ -6586,6 +6539,86 @@ overrides:
 									"log.foo.bar",
 									"log.bar.baz",
 								},
+							},
+						},
+					},
+				},
+			},
+		},
+		OTLPAttributes: OTLPAttributeConfig{
+			DefaultIndexLabels: []string{
+				"foo.bar",
+				"bar.baz",
+			},
+			Global: &OTLPTenantAttributeConfig{
+				IgnoreGlobalStreamLabels: true,
+				ResourceAttributes: []OTLPAttribute{
+					{
+						Action: OTLPAttributeActionStreamLabel,
+						Names: []string{
+							"res.foo.bar",
+							"res.bar.baz",
+						},
+					},
+					{
+						Action: OTLPAttributeActionMetadata,
+						Names: []string{
+							"res.service.env",
+						},
+					},
+				},
+				ScopeAttributes: []OTLPAttribute{
+					{
+						Action: OTLPAttributeActionMetadata,
+						Names: []string{
+							"scope.foo.bar",
+							"scope.bar.baz",
+						},
+					},
+				},
+				LogAttributes: []OTLPAttribute{
+					{
+						Action: OTLPAttributeActionMetadata,
+						Names: []string{
+							"log.foo.bar",
+							"log.bar.baz",
+						},
+					},
+				},
+			},
+			Tenants: map[string]*OTLPTenantAttributeConfig{
+				"test-a": {
+					IgnoreGlobalStreamLabels: true,
+					ResourceAttributes: []OTLPAttribute{
+						{
+							Action: OTLPAttributeActionStreamLabel,
+							Names: []string{
+								"res.foo.bar",
+								"res.bar.baz",
+							},
+						},
+						{
+							Action: OTLPAttributeActionMetadata,
+							Names: []string{
+								"res.service.env",
+							},
+						},
+					},
+					ScopeAttributes: []OTLPAttribute{
+						{
+							Action: OTLPAttributeActionMetadata,
+							Names: []string{
+								"scope.foo.bar",
+								"scope.bar.baz",
+							},
+						},
+					},
+					LogAttributes: []OTLPAttribute{
+						{
+							Action: OTLPAttributeActionMetadata,
+							Names: []string{
+								"log.foo.bar",
+								"log.bar.baz",
 							},
 						},
 					},

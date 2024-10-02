@@ -202,9 +202,9 @@ func ConfigOptions(opt Options) config.Options {
 			AlertManager:          amConfig,
 			RemoteWrite:           rwConfig,
 		},
-		Retention:  retentionConfig(&opt.Stack),
-		OTLPLabels: otlpLabelConfig(&opt.Stack),
-		Overrides:  overrides,
+		Retention:      retentionConfig(&opt.Stack),
+		OTLPAttributes: otlpAttributeConfig(&opt.Stack),
+		Overrides:      overrides,
 	}
 }
 
@@ -397,6 +397,65 @@ func retentionConfig(ls *lokiv1.LokiStackSpec) config.RetentionOptions {
 	}
 }
 
-func otlpLabelConfig(ls *lokiv1.LokiStackSpec) config.OTLPLabelConfig {
-	return config.OTLPLabelConfig{}
+func otlpAttributeConfig(ls *lokiv1.LokiStackSpec) config.OTLPAttributeConfig {
+	// TODO provide default stream labels
+	result := config.OTLPAttributeConfig{
+		DefaultIndexLabels: []string{},
+	}
+
+	if ls.Limits != nil {
+		if ls.Limits.Global != nil && ls.Limits.Global.OTLP != nil {
+			globalOTLP := ls.Limits.Global.OTLP
+
+			if globalOTLP.StreamLabels != nil {
+				result.DefaultIndexLabels = append(result.DefaultIndexLabels, globalOTLP.StreamLabels.ResourceAttributes...)
+			}
+
+			if globalOTLP.StructuredMetadata != nil {
+				result.Global = &config.OTLPTenantAttributeConfig{}
+
+				if len(globalOTLP.StructuredMetadata.ResourceAttributes) > 0 {
+					result.Global.ResourceAttributes = []config.OTLPAttribute{
+						{
+							Action: config.OTLPAttributeActionMetadata,
+							Names:  globalOTLP.StructuredMetadata.ResourceAttributes,
+						},
+					}
+				}
+
+				if len(globalOTLP.StructuredMetadata.ScopeAttributes) > 0 {
+					result.Global.ScopeAttributes = []config.OTLPAttribute{
+						{
+							Action: config.OTLPAttributeActionMetadata,
+							Names:  globalOTLP.StructuredMetadata.ScopeAttributes,
+						},
+					}
+				}
+
+				if len(globalOTLP.StructuredMetadata.LogAttributes) > 0 {
+					result.Global.LogAttributes = []config.OTLPAttribute{
+						{
+							Action: config.OTLPAttributeActionMetadata,
+							Names:  globalOTLP.StructuredMetadata.LogAttributes,
+						},
+					}
+				}
+			}
+		}
+
+		for tenant, tenantLimits := range ls.Limits.Tenants {
+			if tenantLimits.OTLP != nil {
+				tenantOTLP := tenantLimits.OTLP
+				tenantResult := &config.OTLPTenantAttributeConfig{
+					IgnoreGlobalStreamLabels: tenantOTLP.IgnoreGlobalStreamLabels,
+				}
+
+				// TODO stream labels and metadata for tenant
+
+				result.Tenants[tenant] = tenantResult
+			}
+		}
+	}
+
+	return result
 }

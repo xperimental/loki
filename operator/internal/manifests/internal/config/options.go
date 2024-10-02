@@ -37,7 +37,7 @@ type Options struct {
 
 	Retention RetentionOptions
 
-	OTLPLabels OTLPLabelConfig
+	OTLPAttributes OTLPAttributeConfig
 
 	Overrides map[string]LokiOverrides
 }
@@ -248,11 +248,33 @@ type RetentionOptions struct {
 	DeleteWorkerCount uint
 }
 
-// OTLPLabelConfig contains the rendered OTLP label configuration.
+// OTLPAttributeConfig contains the rendered OTLP label configuration.
 // This is both influenced by the tenancy mode and the custom OTLP configuration on the LokiStack and might
 // contain more labels than the user has configured if some labels are deemed "required".
-type OTLPLabelConfig struct {
+type OTLPAttributeConfig struct {
 	DefaultIndexLabels []string
+	Global             *OTLPTenantAttributeConfig
+	Tenants            map[string]*OTLPTenantAttributeConfig
+}
+
+type OTLPTenantAttributeConfig struct {
+	IgnoreGlobalStreamLabels bool
+	ResourceAttributes       []OTLPAttribute
+	ScopeAttributes          []OTLPAttribute
+	LogAttributes            []OTLPAttribute
+}
+
+type OTLPAttributeAction string
+
+const (
+	OTLPAttributeActionStreamLabel OTLPAttributeAction = "index_label"
+	OTLPAttributeActionMetadata    OTLPAttributeAction = "structured_metadata"
+	OTLPAttrbiuteActionDrop        OTLPAttributeAction = "drop"
+)
+
+type OTLPAttribute struct {
+	Action OTLPAttributeAction
+	Names  []string
 }
 
 type TLSOptions struct {

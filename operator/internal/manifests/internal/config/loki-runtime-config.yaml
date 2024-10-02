@@ -74,19 +74,16 @@ overrides:
     {{- end }}
     {{- end}}
   {{- end -}}
-  {{- if $l := $spec.OTLP }}
+  {{- if $otlp := index $opts.OTLPAttributes.Tenants $tenant }}
     otlp_config:
-      {{- with $l.ResourceAttributes }}
+      {{- if $otlp.ResourceAttributes  }}
       resource_attributes:
-        ignore_defaults: {{ .IgnoreDefaults }}
-        {{- with .Attributes}}
+        ignore_defaults: {{ $otlp.IgnoreGlobalStreamLabels }}
+        {{- with $otlp.ResourceAttributes}}
         attributes_config:
         {{- range . }}
-        - action: {{ .Action.Value }}
-          {{- with .Regex }}
-          regex: {{ . }}
-          {{- end }}
-          {{- with .Attributes }}
+        - action: {{ .Action }}
+          {{- with .Names }}
           attributes:
           {{- range . }}
           - {{ . }}
@@ -95,14 +92,11 @@ overrides:
         {{- end }}
         {{- end }}
       {{- end}}
-      {{- with $l.ScopeAttributes }}
+      {{- with $otlp.ScopeAttributes }}
       scope_attributes:
       {{- range . }}
-      - action: {{ .Action.Value }}
-        {{- with .Regex }}
-        regex: {{ . }}
-        {{- end }}
-        {{- with .Attributes }}
+      - action: {{ .Action }}
+        {{- with .Names }}
         attributes:
         {{- range . }}
         - {{ . }}
@@ -110,14 +104,11 @@ overrides:
         {{- end }}
       {{- end }}
       {{- end }}
-      {{- with $l.LogAttributes }}
+      {{- with $otlp.LogAttributes }}
       log_attributes:
       {{- range . }}
-      - action: {{ .Action.Value }}
-        {{- with .Regex }}
-        regex: {{ . }}
-        {{- end }}
-        {{- with .Attributes }}
+      - action: {{ .Action }}
+        {{- with .Names }}
         attributes:
         {{- range . }}
         - {{ . }}

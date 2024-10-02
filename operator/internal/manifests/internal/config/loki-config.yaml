@@ -107,7 +107,7 @@ compactor:
 {{- end }}
   delete_request_store: {{.ObjectStorage.SharedStore}}
 {{- end }}
-{{- with .OTLPLabels.DefaultIndexLabels }}
+{{- with .OTLPAttributes.DefaultIndexLabels }}
 distributor:
   otlp_config:
     default_resource_attributes_as_index_labels:
@@ -236,19 +236,16 @@ limits_config:
     enabled: true
     desired_rate: {{ . }}MB
 {{- end }}
-{{- with .Stack.Limits.Global.OTLP }}
+{{- with .OTLPAttributes.Global }}
   otlp_config:
-    {{- with .ResourceAttributes }}
+    {{- if .ResourceAttributes }}
     resource_attributes:
-      ignore_defaults: {{ .IgnoreDefaults }}
-      {{- with .Attributes}}
+      ignore_defaults: {{ .IgnoreGlobalStreamLabels }}
+      {{- with .ResourceAttributes}}
       attributes_config:
       {{- range . }}
-      - action: {{ .Action.Value }}
-        {{- with .Regex }}
-        regex: {{ . }}
-        {{- end }}
-        {{- with .Attributes }}
+      - action: {{ .Action }}
+        {{- with .Names }}
         attributes:
         {{- range . }}
         - {{ . }}
@@ -260,11 +257,8 @@ limits_config:
     {{- with .ScopeAttributes }}
     scope_attributes:
     {{- range . }}
-    - action: {{ .Action.Value }}
-      {{- with .Regex }}
-      regex: {{ . }}
-      {{- end }}
-      {{- with .Attributes }}
+    - action: {{ .Action }}
+      {{- with .Names }}
       attributes:
       {{- range . }}
       - {{ . }}
@@ -275,11 +269,8 @@ limits_config:
     {{- with .LogAttributes }}
     log_attributes:
     {{- range . }}
-    - action: {{ .Action.Value }}
-      {{- with .Regex }}
-      regex: {{ . }}
-      {{- end }}
-      {{- with .Attributes }}
+    - action: {{ .Action }}
+      {{- with .Names }}
       attributes:
       {{- range . }}
       - {{ . }}
