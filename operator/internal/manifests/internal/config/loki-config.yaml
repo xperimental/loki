@@ -114,10 +114,6 @@ distributor:
     {{- range . }}
       - {{ . }}
     {{- end }}
-{{- else }}
-distributor:
-  otlp_config:
-    default_resource_attributes_as_index_labels: []
 {{- end }}
 frontend:
   tail_proxy_url: {{ .Querier.Protocol }}://{{ .Querier.FQDN }}:{{ .Querier.Port }}
