@@ -78,7 +78,9 @@ overrides:
     otlp_config:
       {{- if $otlp.ResourceAttributes  }}
       resource_attributes:
-        ignore_defaults: {{ $otlp.IgnoreGlobalStreamLabels }}
+        {{- if $otlp.IgnoreGlobalStreamLabels }}
+        ignore_defaults: true
+        {{- end }}
         {{- with $otlp.ResourceAttributes}}
         attributes_config:
         {{- range . }}
