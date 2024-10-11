@@ -190,7 +190,6 @@ func TestApplyTLSSettings_OverrideDefaults(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -255,7 +254,6 @@ func TestBuildAll_WithFeatureGates_ServiceMonitors(t *testing.T) {
 	}
 
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -316,7 +314,6 @@ func TestBuildAll_WithFeatureGates_OpenShift_ServingCertsService(t *testing.T) {
 	}
 
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -591,7 +588,6 @@ func TestBuildAll_WithFeatureGates_GRPCEncryption(t *testing.T) {
 	}
 
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -747,7 +743,6 @@ func TestBuildAll_WithFeatureGates_RuntimeSeccompProfile(t *testing.T) {
 	}
 
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -849,7 +844,6 @@ func TestBuildAll_WithFeatureGates_LokiStackGateway(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ApplyDefaultSettings(&tst.BuildOptions)
@@ -903,7 +897,6 @@ func TestBuildAll_WithFeatureGates_LokiStackAlerts(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ApplyDefaultSettings(&tst.BuildOptions)
@@ -938,7 +931,6 @@ func TestBuildAll_WithFeatureGates_DefaultNodeAffinity(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 

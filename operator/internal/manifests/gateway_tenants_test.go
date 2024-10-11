@@ -371,7 +371,6 @@ func TestApplyGatewayDefaultsOptions(t *testing.T) {
 		},
 	}
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ApplyGatewayDefaultOptions(tc.opts)
@@ -841,7 +840,6 @@ func TestConfigureDeploymentForMode(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := configureGatewayDeploymentForMode(tc.dpl, tc.mode, tc.featureGates, "min-version", "cipher1,cipher2")
@@ -900,7 +898,6 @@ func TestConfigureServiceForMode(t *testing.T) {
 		},
 	}
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := configureGatewayServiceForMode(tc.svc, tc.mode)
@@ -1131,7 +1128,6 @@ func TestConfigureServiceMonitorForMode(t *testing.T) {
 		},
 	}
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := configureGatewayServiceMonitorForMode(tc.sm, tc.opts)
