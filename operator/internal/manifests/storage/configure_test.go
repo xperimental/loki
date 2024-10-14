@@ -300,7 +300,6 @@ func TestConfigureDeploymentForStorageType(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ConfigureDeployment(tc.dpl, tc.opts)
@@ -600,7 +599,6 @@ func TestConfigureStatefulSetForStorageType(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ConfigureStatefulSet(tc.sts, tc.opts)
@@ -792,7 +790,6 @@ func TestConfigureDeploymentForStorageCA(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ConfigureDeployment(tc.dpl, tc.opts)
@@ -987,7 +984,6 @@ func TestConfigureStatefulSetForStorageCA(t *testing.T) {
 	}
 
 	for _, tc := range tc {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			err := ConfigureStatefulSet(tc.sts, tc.opts)

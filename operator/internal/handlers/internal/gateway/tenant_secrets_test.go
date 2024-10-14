@@ -154,7 +154,6 @@ func TestExtractSecret(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.name, func(t *testing.T) {
 			t.Parallel()
 

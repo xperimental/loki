@@ -46,8 +46,6 @@ func TestHashSecretData(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tc := tc
-
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -126,7 +124,6 @@ func TestAzureExtract(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -176,7 +173,6 @@ func TestGCSExtract(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -303,7 +299,6 @@ func TestS3Extract(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -366,7 +361,6 @@ func TestS3Extract_S3ForcePathStyle(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 			options, err := extractS3ConfigSecret(tc.secret)
@@ -507,7 +501,6 @@ func TestSwiftExtract(t *testing.T) {
 		},
 	}
 	for _, tst := range table {
-		tst := tst
 		t.Run(tst.name, func(t *testing.T) {
 			t.Parallel()
 
