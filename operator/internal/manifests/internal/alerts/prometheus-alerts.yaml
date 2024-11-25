@@ -193,6 +193,26 @@ groups:
     for: 15m
     labels:
       severity: warning
+  - alert: LokiFlushFailuresWarning
+    annotations:
+      message: |-
+        Loki in namespace {{ $labels.namespace }} is having issues flushing chunks to object storage.
+        This might indicate issues with the network connection, the object storage itself or can point to an
+        issue with the object storage configuration.
+      summary: Loki can not flush chunks to object storage.
+      runbook_url: "[[ .RunbookURL]]#Loki-Flush-Failures-Warning"
+    expr: |
+      sum by(namespace, pod) (
+        rate(loki_ingester_chunks_flush_failures_total[5m])
+      ) / sum by(namespace, pod) (
+        rate(loki_ingester_chunks_flushed_total[5m])
+      ) or
+      sum by(namespace, pod) (
+        rate(loki_ingester_chunks_flush_failures_total[5m])
+      )
+    for: 15m
+    labels:
+      severity: warning
   - alert: LokistackSchemaUpgradesRequired
     annotations:
       message: |-
