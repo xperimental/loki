@@ -543,30 +543,19 @@ func extractSwiftConfigSecret(s *corev1.Secret) (*storage.SwiftStorageConfig, er
 	if len(userDomainName) == 0 {
 		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftUserDomainName)
 	}
-	userDomainID := s.Data[storage.KeySwiftUserDomainID]
-	if len(userDomainID) == 0 {
-		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftUserDomainID)
-	}
-	userID := s.Data[storage.KeySwiftUserID]
-	if len(userID) == 0 {
-		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftUserID)
-	}
 	password := s.Data[storage.KeySwiftPassword]
 	if len(password) == 0 {
 		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftPassword)
-	}
-	domainID := s.Data[storage.KeySwiftDomainID]
-	if len(domainID) == 0 {
-		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftDomainID)
-	}
-	domainName := s.Data[storage.KeySwiftDomainName]
-	if len(domainName) == 0 {
-		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftDomainName)
 	}
 	containerName := s.Data[storage.KeySwiftContainerName]
 	if len(containerName) == 0 {
 		return nil, fmt.Errorf("%w: %s", errSecretMissingField, storage.KeySwiftContainerName)
 	}
+
+	userDomainID := s.Data[storage.KeySwiftUserDomainID]
+	userID := s.Data[storage.KeySwiftUserID]
+	domainID := s.Data[storage.KeySwiftDomainID]
+	domainName := s.Data[storage.KeySwiftDomainName]
 
 	// Extract and validate optional fields
 	projectID := s.Data[storage.KeySwiftProjectID]
