@@ -426,6 +426,63 @@ func Test_IncrementTimestamp(t *testing.T) {
 	}
 }
 
+func Test_MissingEnforcedLabels(t *testing.T) {
+	limits := &validation.Limits{}
+	flagext.DefaultValues(limits)
+
+	limits.EnforcedLabels = []string{"app", "env"}
+	limits.PolicyEnforcedLabels = map[string][]string{
+		"policy1": {"cluster", "namespace"},
+		"policy2": {"namespace"},
+	}
+
+	distributors, _ := prepare(t, 1, 5, limits, nil)
+
+	// request with all required labels.
+	lbs := labels.FromMap(map[string]string{"app": "foo", "env": "prod", "cluster": "cluster1", "namespace": "ns1"})
+	missing, missingLabels := distributors[0].missingEnforcedLabels(lbs, "test", "policy1")
+	assert.False(t, missing)
+	assert.Empty(t, missingLabels)
+
+	// request missing the `app` label from global enforced labels and `cluster` label from policy enforced labels.
+	lbs = labels.FromMap(map[string]string{"env": "prod", "namespace": "ns1"})
+	missing, missingLabels = distributors[0].missingEnforcedLabels(lbs, "test", "policy1")
+	assert.True(t, missing)
+	assert.EqualValues(t, []string{"app", "cluster"}, missingLabels)
+
+	// request missing all required labels.
+	lbs = labels.FromMap(map[string]string{"pod": "distributor-abc"})
+	missing, missingLabels = distributors[0].missingEnforcedLabels(lbs, "test", "policy2")
+	assert.True(t, missing)
+	assert.EqualValues(t, []string{"app", "env", "namespace"}, missingLabels)
+}
+
+func Test_PushWithEnforcedLabels(t *testing.T) {
+	limits := &validation.Limits{}
+	flagext.DefaultValues(limits)
+
+	// makeWriteRequest only contains a `{foo="bar"}` label.
+	req := makeWriteRequest(100, 100)
+	limits.EnforcedLabels = []string{"app", "env"}
+	distributors, _ := prepare(t, 1, 3, limits, nil)
+	// enforced labels configured, but all labels are missing.
+	_, err := distributors[0].Push(ctx, req)
+	require.Error(t, err)
+	expectedErr := httpgrpc.Errorf(http.StatusBadRequest, validation.MissingEnforcedLabelsErrorMsg, "app,env", "test")
+	require.EqualError(t, err, expectedErr.Error())
+
+	// enforced labels, but all labels are present.
+	req = makeWriteRequestWithLabels(100, 100, []string{`{app="foo", env="prod"}`}, false, false, false)
+	_, err = distributors[0].Push(ctx, req)
+	require.NoError(t, err)
+
+	// no enforced labels, so no errors.
+	limits.EnforcedLabels = []string{}
+	distributors, _ = prepare(t, 1, 3, limits, nil)
+	_, err = distributors[0].Push(ctx, req)
+	require.NoError(t, err)
+}
+
 func TestDistributorPushConcurrently(t *testing.T) {
 	limits := &validation.Limits{}
 	flagext.DefaultValues(limits)
@@ -583,6 +640,8 @@ func TestDistributorPushToKafka(t *testing.T) {
 		require.Equal(t, 1, len(ingesters[0].pushed))
 		require.Equal(t, 1, len(ingesters[1].pushed))
 		require.Eventually(t, func() bool {
+			ingesters[2].mu.Lock()
+			defer ingesters[2].mu.Unlock()
 			return len(ingesters[2].pushed) == 1
 		}, time.Second, 10*time.Millisecond)
 	})
@@ -640,6 +699,16 @@ func Test_DiscardEmptyStreamsAfterValidation(t *testing.T) {
 
 		_, err := distributors[0].Push(ctx, makeWriteRequest(1, 10))
 		require.Equal(t, err, httpgrpc.Errorf(http.StatusBadRequest, "%s", fmt.Sprintf(validation.LineTooLongErrorMsg, 5, "{foo=\"bar\"}", 10)))
+		topVal := ingester.Peek()
+		require.Nil(t, topVal)
+	})
+
+	t.Run("it returns unprocessable entity error if the streams is empty", func(t *testing.T) {
+		limits, ingester := setup()
+		distributors, _ := prepare(t, 1, 5, limits, func(_ string) (ring_client.PoolClient, error) { return ingester, nil })
+
+		_, err := distributors[0].Push(ctx, makeWriteRequestWithLabels(1, 1, []string{}, false, false, false))
+		require.Equal(t, err, httpgrpc.Errorf(http.StatusUnprocessableEntity, validation.MissingStreamsErrorMsg))
 		topVal := ingester.Peek()
 		require.Nil(t, topVal)
 	})
@@ -1168,7 +1237,7 @@ func Benchmark_SortLabelsOnPush(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		stream := request.Streams[0]
 		stream.Labels = `{buzz="f", a="b"}`
-		_, _, _, err := d.parseStreamLabels(vCtx, stream.Labels, stream)
+		_, _, _, _, _, err := d.parseStreamLabels(vCtx, stream.Labels, stream)
 		if err != nil {
 			panic("parseStreamLabels fail,err:" + err.Error())
 		}
@@ -1214,7 +1283,7 @@ func TestParseStreamLabels(t *testing.T) {
 		vCtx := d.validator.getValidationContextForTime(testTime, "123")
 
 		t.Run(tc.name, func(t *testing.T) {
-			lbs, lbsString, hash, err := d.parseStreamLabels(vCtx, tc.origLabels, logproto.Stream{
+			lbs, lbsString, hash, _, _, err := d.parseStreamLabels(vCtx, tc.origLabels, logproto.Stream{
 				Labels: tc.origLabels,
 			})
 			if tc.expectedErr != nil {
@@ -1996,5 +2065,64 @@ func TestDistributor_StructuredMetadataSanitization(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, tc.expectedResponse, response)
 		assert.Equal(t, tc.numSanitizations, testutil.ToFloat64(distributors[0].tenantPushSanitizedStructuredMetadata.WithLabelValues("test")))
+	}
+}
+
+func BenchmarkDistributor_PushWithPolicies(b *testing.B) {
+	baselineLimits := &validation.Limits{}
+	flagext.DefaultValues(baselineLimits)
+	lbs := `{foo="bar", env="prod", daz="baz", container="loki", pod="loki-0"}`
+
+	b.Run("push without policies", func(b *testing.B) {
+		limits := baselineLimits
+		limits.PolicyStreamMapping = make(validation.PolicyStreamMapping)
+		distributors, _ := prepare(&testing.T{}, 1, 3, limits, nil)
+		req := makeWriteRequestWithLabels(10, 10, []string{lbs}, false, false, false)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			distributors[0].Push(ctx, req) //nolint:errcheck
+		}
+	})
+
+	for numPolicies := 1; numPolicies <= 100; numPolicies *= 10 {
+		b.Run(fmt.Sprintf("push with %d policies", numPolicies), func(b *testing.B) {
+			limits := baselineLimits
+			limits.PolicyStreamMapping = make(validation.PolicyStreamMapping)
+			for i := 1; i <= numPolicies; i++ {
+				limits.PolicyStreamMapping[fmt.Sprintf("policy%d", i)] = []*validation.PriorityStream{
+					{
+						Selector: `{foo="bar"}`, Priority: i,
+					},
+				}
+			}
+
+			req := makeWriteRequestWithLabels(10, 10, []string{lbs}, false, false, false)
+			distributors, _ := prepare(&testing.T{}, 1, 3, limits, nil)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				distributors[0].Push(ctx, req) //nolint:errcheck
+			}
+		})
+	}
+
+	for numMatchers := 1; numMatchers <= 100; numMatchers *= 10 {
+		b.Run(fmt.Sprintf("push with %d matchers", numMatchers), func(b *testing.B) {
+			limits := baselineLimits
+			limits.PolicyStreamMapping = make(validation.PolicyStreamMapping)
+			for i := 1; i <= numMatchers; i++ {
+				limits.PolicyStreamMapping["policy0"] = append(limits.PolicyStreamMapping["policy0"], &validation.PriorityStream{
+					Selector: `{foo="bar"}`,
+					Matchers: []*labels.Matcher{labels.MustNewMatcher(labels.MatchEqual, "foo", "bar")},
+					Priority: i,
+				})
+			}
+
+			req := makeWriteRequestWithLabels(10, 10, []string{lbs}, false, false, false)
+			distributors, _ := prepare(&testing.T{}, 1, 3, limits, nil)
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				distributors[0].Push(ctx, req) //nolint:errcheck
+			}
+		})
 	}
 }

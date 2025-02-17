@@ -11,6 +11,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -34,10 +35,16 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/common/model"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+
+	"github.com/thanos-io/objstore"
 
 	"github.com/grafana/loki/v3/pkg/analytics"
 	blockbuilder "github.com/grafana/loki/v3/pkg/blockbuilder/builder"
 	blockscheduler "github.com/grafana/loki/v3/pkg/blockbuilder/scheduler"
+	blocktypes "github.com/grafana/loki/v3/pkg/blockbuilder/types"
+	blockprotos "github.com/grafana/loki/v3/pkg/blockbuilder/types/proto"
 	"github.com/grafana/loki/v3/pkg/bloombuild/builder"
 	"github.com/grafana/loki/v3/pkg/bloombuild/planner"
 	bloomprotos "github.com/grafana/loki/v3/pkg/bloombuild/protos"
@@ -47,10 +54,12 @@ import (
 	"github.com/grafana/loki/v3/pkg/compactor/client/grpc"
 	"github.com/grafana/loki/v3/pkg/compactor/deletion"
 	"github.com/grafana/loki/v3/pkg/compactor/generationnumber"
+	"github.com/grafana/loki/v3/pkg/dataobj/consumer"
+	"github.com/grafana/loki/v3/pkg/dataobj/explorer"
+	dataobjquerier "github.com/grafana/loki/v3/pkg/dataobj/querier"
 	"github.com/grafana/loki/v3/pkg/distributor"
 	"github.com/grafana/loki/v3/pkg/indexgateway"
 	"github.com/grafana/loki/v3/pkg/ingester"
-	kclient "github.com/grafana/loki/v3/pkg/kafka/client"
 	"github.com/grafana/loki/v3/pkg/kafka/partition"
 	"github.com/grafana/loki/v3/pkg/logproto"
 	"github.com/grafana/loki/v3/pkg/logql"
@@ -63,12 +72,14 @@ import (
 	"github.com/grafana/loki/v3/pkg/querier"
 	"github.com/grafana/loki/v3/pkg/querier/queryrange"
 	"github.com/grafana/loki/v3/pkg/querier/queryrange/queryrangebase"
+	"github.com/grafana/loki/v3/pkg/querier/tail"
 	"github.com/grafana/loki/v3/pkg/ruler"
 	base_ruler "github.com/grafana/loki/v3/pkg/ruler/base"
 	"github.com/grafana/loki/v3/pkg/runtime"
 	"github.com/grafana/loki/v3/pkg/scheduler"
 	"github.com/grafana/loki/v3/pkg/scheduler/schedulerpb"
 	"github.com/grafana/loki/v3/pkg/storage"
+	"github.com/grafana/loki/v3/pkg/storage/bucket"
 	"github.com/grafana/loki/v3/pkg/storage/chunk/cache"
 	"github.com/grafana/loki/v3/pkg/storage/chunk/client"
 	chunk_util "github.com/grafana/loki/v3/pkg/storage/chunk/client/util"
@@ -80,6 +91,7 @@ import (
 	boltdbcompactor "github.com/grafana/loki/v3/pkg/storage/stores/shipper/indexshipper/boltdb/compactor"
 	"github.com/grafana/loki/v3/pkg/storage/stores/shipper/indexshipper/tsdb"
 	"github.com/grafana/loki/v3/pkg/storage/types"
+	"github.com/grafana/loki/v3/pkg/ui"
 	"github.com/grafana/loki/v3/pkg/util/constants"
 	"github.com/grafana/loki/v3/pkg/util/httpreq"
 	"github.com/grafana/loki/v3/pkg/util/limiter"
@@ -95,52 +107,55 @@ const maxChunkAgeForTableManager = 12 * time.Hour
 
 // The various modules that make up Loki.
 const (
-	Ring                     string = "ring"
-	RuntimeConfig            string = "runtime-config"
-	Overrides                string = "overrides"
-	OverridesExporter        string = "overrides-exporter"
-	TenantConfigs            string = "tenant-configs"
-	Server                   string = "server"
-	InternalServer           string = "internal-server"
-	Distributor              string = "distributor"
-	Querier                  string = "querier"
-	CacheGenerationLoader    string = "cache-generation-loader"
-	Ingester                 string = "ingester"
-	PatternIngester          string = "pattern-ingester"
-	PatternIngesterTee       string = "pattern-ingester-tee"
-	PatternRingClient        string = "pattern-ring-client"
-	IngesterQuerier          string = "ingester-querier"
-	IngesterGRPCInterceptors string = "ingester-query-tags-interceptors"
-	QueryFrontend            string = "query-frontend"
-	QueryFrontendTripperware string = "query-frontend-tripperware"
-	QueryLimiter             string = "query-limiter"
-	QueryLimitsInterceptors  string = "query-limits-interceptors"
-	QueryLimitsTripperware   string = "query-limits-tripper"
-	RulerStorage             string = "ruler-storage"
-	Ruler                    string = "ruler"
-	RuleEvaluator            string = "rule-evaluator"
-	Store                    string = "store"
-	TableManager             string = "table-manager"
-	MemberlistKV             string = "memberlist-kv"
-	Compactor                string = "compactor"
-	BloomGateway             string = "bloom-gateway"
-	IndexGateway             string = "index-gateway"
-	IndexGatewayRing         string = "index-gateway-ring"
-	IndexGatewayInterceptors string = "index-gateway-interceptors"
-	QueryScheduler           string = "query-scheduler"
-	QuerySchedulerRing       string = "query-scheduler-ring"
-	BloomPlanner             string = "bloom-planner"
-	BloomBuilder             string = "bloom-builder"
-	BloomStore               string = "bloom-store"
-	All                      string = "all"
-	Read                     string = "read"
-	Write                    string = "write"
-	Backend                  string = "backend"
-	Analytics                string = "analytics"
-	InitCodec                string = "init-codec"
-	PartitionRing            string = "partition-ring"
-	BlockBuilder             string = "block-builder"
-	BlockScheduler           string = "block-scheduler"
+	Ring                     = "ring"
+	Overrides                = "overrides"
+	OverridesExporter        = "overrides-exporter"
+	TenantConfigs            = "tenant-configs"
+	Server                   = "server"
+	InternalServer           = "internal-server"
+	Distributor              = "distributor"
+	Ingester                 = "ingester"
+	PatternIngester          = "pattern-ingester"
+	PatternRingClient        = "pattern-ring-client"
+	PatternIngesterTee       = "pattern-ingester-tee"
+	Querier                  = "querier"
+	QueryFrontend            = "query-frontend"
+	QueryFrontendTripperware = "query-frontend-tripperware"
+	QueryLimiter             = "query-limiter"
+	QueryLimitsInterceptors  = "query-limits-interceptors"
+	QueryLimitsTripperware   = "query-limits-tripperware"
+	Store                    = "store"
+	TableManager             = "table-manager"
+	RulerStorage             = "ruler-storage"
+	Ruler                    = "ruler"
+	RuleEvaluator            = "rule-evaluator"
+	Compactor                = "compactor"
+	IndexGateway             = "index-gateway"
+	IndexGatewayRing         = "index-gateway-ring"
+	IndexGatewayInterceptors = "index-gateway-interceptors"
+	BloomStore               = "bloom-store"
+	BloomGateway             = "bloom-gateway"
+	BloomGatewayClient       = "bloom-gateway-client"
+	BloomPlanner             = "bloom-planner"
+	BloomBuilder             = "bloom-builder"
+	QueryScheduler           = "query-scheduler"
+	QuerySchedulerRing       = "query-scheduler-ring"
+	IngesterQuerier          = "ingester-querier"
+	IngesterGRPCInterceptors = "ingester-grpc-interceptors"
+	RuntimeConfig            = "runtime-config"
+	MemberlistKV             = "memberlist-kv"
+	Analytics                = "analytics"
+	CacheGenerationLoader    = "cache-generation-loader"
+	PartitionRing            = "partition-ring"
+	BlockBuilder             = "block-builder"
+	BlockScheduler           = "block-scheduler"
+	DataObjExplorer          = "dataobj-explorer"
+	DataObjConsumer          = "dataobj-consumer"
+	UI                       = "ui"
+	All                      = "all"
+	Read                     = "read"
+	Write                    = "write"
+	Backend                  = "backend"
 )
 
 const (
@@ -196,6 +211,7 @@ func (t *Loki) initServer() (services.Service, error) {
 	}(t.Server.HTTPServer.Handler)
 
 	t.Server.HTTPServer.Handler = middleware.Merge(serverutil.RecoveryHTTPMiddleware).Wrap(h)
+	t.Server.HTTPServer.Handler = h2c.NewHandler(t.Server.HTTPServer.Handler, &http2.Server{})
 
 	if t.Cfg.Server.HTTPListenPort == 0 {
 		t.Cfg.Server.HTTPListenPort = portFromAddr(t.Server.HTTPListenAddr().String())
@@ -387,6 +403,36 @@ func (t *Loki) initCodec() (services.Service, error) {
 	return nil, nil
 }
 
+func (t *Loki) getQuerierStore() (querier.Store, error) {
+	if !t.Cfg.DataObj.Querier.Enabled {
+		return t.Store, nil
+	}
+
+	// verify that there's no schema with a date after the dataobj querier from date
+	for _, schema := range t.Cfg.SchemaConfig.Configs {
+		if schema.From.After(t.Cfg.DataObj.Querier.From) {
+			return nil, fmt.Errorf("dataobj querier From should be after the last schema date")
+		}
+	}
+
+	store, err := t.createDataObjBucket("dataobj-querier")
+	if err != nil {
+		return nil, err
+	}
+
+	storeCombiner := querier.NewStoreCombiner([]querier.StoreConfig{
+		{
+			Store: dataobjquerier.NewStore(store),
+			From:  t.Cfg.DataObj.Querier.From.Time,
+		},
+		{
+			Store: t.Store,
+		},
+	})
+
+	return storeCombiner, nil
+}
+
 func (t *Loki) initQuerier() (services.Service, error) {
 	logger := log.With(util_log.Logger, "component", "querier")
 	if t.Cfg.Ingester.QueryStoreMaxLookBackPeriod != 0 {
@@ -399,7 +445,12 @@ func (t *Loki) initQuerier() (services.Service, error) {
 		return nil, err
 	}
 
-	t.Querier, err = querier.New(t.Cfg.Querier, t.Store, t.ingesterQuerier, t.Overrides, deleteStore, prometheus.DefaultRegisterer, logger)
+	querierStore, err := t.getQuerierStore()
+	if err != nil {
+		return nil, err
+	}
+
+	t.Querier, err = querier.New(t.Cfg.Querier, querierStore, t.ingesterQuerier, t.Overrides, deleteStore, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -549,8 +600,9 @@ func (t *Loki) initQuerier() (services.Service, error) {
 	// is standalone ALL routes are registered externally, and when it's in the same process as a frontend,
 	// we disable the proxying of the tail routes in initQueryFrontend() and we still want these routes regiestered
 	// on the external router.
-	t.Server.HTTP.Path("/loki/api/v1/tail").Methods("GET", "POST").Handler(httpMiddleware.Wrap(http.HandlerFunc(t.querierAPI.TailHandler)))
-	t.Server.HTTP.Path("/api/prom/tail").Methods("GET", "POST").Handler(httpMiddleware.Wrap(http.HandlerFunc(t.querierAPI.TailHandler)))
+	tailQuerier := tail.NewQuerier(t.ingesterQuerier, t.Querier, deleteStore, t.Overrides, t.Cfg.Querier.TailMaxDuration, tail.NewMetrics(prometheus.DefaultRegisterer), log.With(util_log.Logger, "component", "tail-querier"))
+	t.Server.HTTP.Path("/loki/api/v1/tail").Methods("GET", "POST").Handler(httpMiddleware.Wrap(http.HandlerFunc(tailQuerier.TailHandler)))
+	t.Server.HTTP.Path("/api/prom/tail").Methods("GET", "POST").Handler(httpMiddleware.Wrap(http.HandlerFunc(tailQuerier.TailHandler)))
 
 	internalMiddlewares := []queryrangebase.Middleware{
 		serverutil.RecoveryMiddleware,
@@ -784,7 +836,7 @@ func (t *Loki) initBloomStore() (services.Service, error) {
 	bsCfg := t.Cfg.StorageConfig.BloomShipperConfig
 
 	var metasCache cache.Cache
-	if t.Cfg.isTarget(IndexGateway) && cache.IsCacheConfigured(bsCfg.MetasCache) {
+	if (t.Cfg.isTarget(IndexGateway) || t.Cfg.isTarget(Backend)) && cache.IsCacheConfigured(bsCfg.MetasCache) {
 		metasCache, err = cache.New(bsCfg.MetasCache, reg, logger, stats.BloomMetasCache, constants.Loki)
 
 		// always enable LRU cache
@@ -1010,13 +1062,23 @@ func (i ingesterQueryOptions) QueryIngestersWithin() time.Duration {
 func (t *Loki) initQueryFrontendMiddleware() (_ services.Service, err error) {
 	level.Debug(util_log.Logger).Log("msg", "initializing query frontend tripperware")
 
+	schemas := t.Cfg.SchemaConfig
+	// Adjust schema config to use constant sharding for the timerange of dataobj querier.
+	if t.Cfg.DataObj.Querier.Enabled {
+		schemas = schemas.Clone()
+		schemas.Configs = append(schemas.Configs, t.Cfg.DataObj.Querier.PeriodConfig())
+		sort.Slice(schemas.Configs, func(i, j int) bool {
+			return schemas.Configs[i].From.UnixNano() < schemas.Configs[j].From.UnixNano()
+		})
+	}
+
 	middleware, stopper, err := queryrange.NewMiddleware(
 		t.Cfg.QueryRange,
 		t.Cfg.Querier.Engine,
 		ingesterQueryOptions{t.Cfg.Querier},
 		util_log.Logger,
 		t.Overrides,
-		t.Cfg.SchemaConfig,
+		schemas,
 		t.cacheGenerationLoader, t.Cfg.CompactorConfig.RetentionEnabled,
 		prometheus.DefaultRegisterer,
 		t.Cfg.MetricsNamespace,
@@ -1118,13 +1180,14 @@ func (t *Loki) initQueryFrontend() (_ services.Service, err error) {
 		level.Debug(util_log.Logger).Log("msg", "no query frontend configured")
 	}
 
-	roundTripper := queryrange.NewSerializeRoundTripper(t.QueryFrontEndMiddleware.Wrap(frontendTripper), queryrange.DefaultCodec)
+	roundTripper := queryrange.NewSerializeRoundTripper(t.QueryFrontEndMiddleware.Wrap(frontendTripper), queryrange.DefaultCodec, t.Cfg.Frontend.SupportParquetEncoding)
 
 	frontendHandler := transport.NewHandler(t.Cfg.Frontend.Handler, roundTripper, util_log.Logger, prometheus.DefaultRegisterer, t.Cfg.MetricsNamespace)
 	if t.Cfg.Frontend.CompressResponses {
 		frontendHandler = gziphandler.GzipHandler(frontendHandler)
 	}
 
+	// TODO: add SerializeHTTPHandler
 	toMerge := []middleware.Interface{
 		httpreq.ExtractQueryTagsMiddleware(),
 		httpreq.PropagateHeadersMiddleware(httpreq.LokiActorPathHeader, httpreq.LokiEncodingFlagsHeader, httpreq.LokiDisablePipelineWrappersHeader),
@@ -1338,16 +1401,29 @@ func (t *Loki) initRuleEvaluator() (services.Service, error) {
 	mode := t.Cfg.Ruler.Evaluation.Mode
 	logger := log.With(util_log.Logger, "component", "ruler", "evaluation_mode", mode)
 
+	var svc services.Service
 	switch mode {
 	case ruler.EvalModeLocal:
-		var engine *logql.Engine
+		var deleteStore deletion.DeleteRequestsClient
+		deleteStore, err = t.deleteRequestsClient("rule-evaluator", t.Overrides)
+		if err != nil {
+			break
+		}
 
-		engine, err = t.createRulerQueryEngine(logger)
+		var engine *logql.Engine
+		engine, err = t.createRulerQueryEngine(logger, deleteStore)
 		if err != nil {
 			break
 		}
 
 		evaluator, err = ruler.NewLocalEvaluator(engine, logger)
+
+		// The delete client needs to be stopped when the evaluator is stopped.
+		// We wrap the client on a IDLE service and call Stop on shutdown.
+		svc = services.NewIdleService(nil, func(_ error) error {
+			deleteStore.Stop()
+			return nil
+		})
 	case ruler.EvalModeRemote:
 		qfClient, e := ruler.DialQueryFrontend(&t.Cfg.Ruler.Evaluation.QueryFrontend)
 		if e != nil {
@@ -1365,7 +1441,7 @@ func (t *Loki) initRuleEvaluator() (services.Service, error) {
 
 	t.ruleEvaluator = ruler.NewEvaluatorWithJitter(evaluator, t.Cfg.Ruler.Evaluation.MaxJitter, fnv.New32a(), logger)
 
-	return nil, nil
+	return svc, nil
 }
 
 func (t *Loki) initMemberlistKV() (services.Service, error) {
@@ -1462,10 +1538,11 @@ func (t *Loki) initCompactor() (services.Service, error) {
 
 	t.compactor.RegisterIndexCompactor(types.BoltDBShipperType, boltdbcompactor.NewIndexCompactor())
 	t.compactor.RegisterIndexCompactor(types.TSDBType, tsdb.NewIndexCompactor())
-	t.Server.HTTP.Path("/compactor/ring").Methods("GET", "POST").Handler(t.compactor)
+	prefix, compactorHandler := t.compactor.Handler()
+	t.Server.HTTP.PathPrefix(prefix).Handler(compactorHandler)
 
 	if t.Cfg.InternalServer.Enable {
-		t.InternalServer.HTTP.Path("/compactor/ring").Methods("GET", "POST").Handler(t.compactor)
+		t.InternalServer.HTTP.PathPrefix(prefix).Handler(compactorHandler)
 	}
 
 	if t.Cfg.CompactorConfig.RetentionEnabled {
@@ -1480,7 +1557,7 @@ func (t *Loki) initCompactor() (services.Service, error) {
 }
 
 func (t *Loki) addCompactorMiddleware(h http.HandlerFunc) http.Handler {
-	return t.HTTPAuthMiddleware.Wrap(deletion.TenantMiddleware(t.Overrides, h))
+	return middleware.Merge(t.HTTPAuthMiddleware, deletion.TenantMiddleware(t.Overrides)).Wrap(h)
 }
 
 func (t *Loki) initBloomGateway() (services.Service, error) {
@@ -1529,22 +1606,12 @@ func (t *Loki) initIndexGateway() (services.Service, error) {
 
 	var bloomQuerier indexgateway.BloomQuerier
 	if t.Cfg.BloomGateway.Enabled {
-		bloomGatewayClient, err := bloomgateway.NewClient(
-			t.Cfg.BloomGateway.Client,
-			t.Overrides,
-			prometheus.DefaultRegisterer,
-			logger,
-			t.cacheGenerationLoader,
-			t.Cfg.CompactorConfig.RetentionEnabled,
-		)
-		if err != nil {
-			return nil, err
-		}
 		resolver := bloomgateway.NewBlockResolver(t.BloomStore, logger)
 		querierCfg := bloomgateway.QuerierConfig{
-			MinTableOffset: t.Cfg.BloomBuild.Planner.MinTableOffset,
+			BuildTableOffset: t.Cfg.BloomBuild.Planner.MinTableOffset,
+			BuildInterval:    t.Cfg.BloomBuild.Planner.PlanningInterval,
 		}
-		bloomQuerier = bloomgateway.NewQuerier(bloomGatewayClient, querierCfg, t.Overrides, resolver, prometheus.DefaultRegisterer, logger)
+		bloomQuerier = bloomgateway.NewQuerier(t.bloomGatewayClient, querierCfg, t.Overrides, resolver, prometheus.DefaultRegisterer, logger)
 	}
 
 	gateway, err := indexgateway.NewIndexGateway(t.Cfg.IndexGateway, t.Overrides, logger, prometheus.DefaultRegisterer, t.Store, indexClients, bloomQuerier)
@@ -1639,6 +1706,18 @@ func (t *Loki) initBloomPlanner() (services.Service, error) {
 	return p, nil
 }
 
+func (t *Loki) initBloomGatewayClient() (services.Service, error) {
+	var err error
+	if t.Cfg.BloomGateway.Enabled {
+		logger := log.With(util_log.Logger, "component", "bloom-gateway-client")
+		t.bloomGatewayClient, err = bloomgateway.NewClient(t.Cfg.BloomGateway.Client, prometheus.DefaultRegisterer, logger)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return nil, nil
+}
+
 func (t *Loki) initBloomBuilder() (services.Service, error) {
 	if !t.Cfg.BloomBuild.Enabled {
 		return nil, nil
@@ -1656,22 +1735,6 @@ func (t *Loki) initBloomBuilder() (services.Service, error) {
 		ringManager = t.indexGatewayRingManager
 	}
 
-	var bloomGatewayClient bloomgateway.Client
-	if t.Cfg.BloomGateway.Enabled {
-		var err error
-		bloomGatewayClient, err = bloomgateway.NewClient(
-			t.Cfg.BloomGateway.Client,
-			t.Overrides,
-			prometheus.DefaultRegisterer,
-			logger,
-			t.cacheGenerationLoader,
-			t.Cfg.CompactorConfig.RetentionEnabled,
-		)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return builder.New(
 		t.Cfg.BloomBuild.Builder,
 		t.Overrides,
@@ -1680,7 +1743,7 @@ func (t *Loki) initBloomBuilder() (services.Service, error) {
 		t.ClientMetrics,
 		t.Store,
 		t.BloomStore,
-		bloomGatewayClient,
+		t.bloomGatewayClient,
 		logger,
 		prometheus.DefaultRegisterer,
 		ringManager,
@@ -1820,27 +1883,16 @@ func (t *Loki) initBlockBuilder() (services.Service, error) {
 		return nil, err
 	}
 
-	readerMetrics := partition.NewReaderMetrics(prometheus.DefaultRegisterer)
-	readerFactory := func(partitionID int32) (partition.Reader, error) {
-		return partition.NewKafkaReader(
-			t.Cfg.KafkaConfig,
-			partitionID,
-			logger,
-			readerMetrics,
-		)
-	}
-
 	bb, err := blockbuilder.NewBlockBuilder(
 		id,
 		t.Cfg.BlockBuilder,
+		t.Cfg.KafkaConfig,
 		t.Cfg.SchemaConfig.Configs,
-		readerFactory,
 		t.Store,
 		objectStore,
 		logger,
 		prometheus.DefaultRegisterer,
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -1852,17 +1904,101 @@ func (t *Loki) initBlockBuilder() (services.Service, error) {
 func (t *Loki) initBlockScheduler() (services.Service, error) {
 	logger := log.With(util_log.Logger, "component", "block_scheduler")
 
-	clientMetrics := kclient.NewReaderClientMetrics("block-scheduler", prometheus.DefaultRegisterer)
-	c, err := kclient.NewReaderClient(
+	offsetManager, err := partition.NewKafkaOffsetManager(
 		t.Cfg.KafkaConfig,
-		clientMetrics,
-		log.With(logger, "component", "kafka-client"),
+		t.Cfg.Ingester.LifecyclerConfig.ID,
+		logger,
+		prometheus.DefaultRegisterer,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("creating kafka client: %w", err)
+		return nil, fmt.Errorf("creating kafka offset manager: %w", err)
 	}
-	offsetReader := blockscheduler.NewOffsetReader(t.Cfg.KafkaConfig.Topic, t.Cfg.BlockScheduler.ConsumerGroup, t.Cfg.BlockScheduler.LookbackPeriod, c)
-	return blockscheduler.NewScheduler(t.Cfg.BlockScheduler, blockscheduler.NewJobQueue(), offsetReader, logger, prometheus.DefaultRegisterer), nil
+
+	s, err := blockscheduler.NewScheduler(
+		t.Cfg.BlockScheduler,
+		offsetManager,
+		logger,
+		prometheus.DefaultRegisterer,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	t.Server.HTTP.Path("/blockscheduler/status").Methods("GET").Handler(s)
+
+	blockprotos.RegisterSchedulerServiceServer(
+		t.Server.GRPC,
+		blocktypes.NewSchedulerServer(s),
+	)
+
+	return s, nil
+}
+
+func (t *Loki) initDataObjExplorer() (services.Service, error) {
+	store, err := t.createDataObjBucket("dataobj-explorer")
+	if err != nil {
+		return nil, err
+	}
+
+	explorer, err := explorer.New(store, util_log.Logger)
+	if err != nil {
+		return nil, err
+	}
+	path, handler := explorer.Handler()
+	t.Server.HTTP.PathPrefix(path).Handler(handler)
+	return explorer, nil
+}
+
+func (t *Loki) initUI() (services.Service, error) {
+	t.Cfg.UI = t.Cfg.UI.WithAdvertisePort(t.Cfg.Server.HTTPListenPort)
+	svc, err := ui.NewService(t.Cfg.UI, t.Server.HTTP, log.With(util_log.Logger, "component", "ui"))
+	if err != nil {
+		return nil, err
+	}
+	t.UI = svc
+	return svc, nil
+}
+
+func (t *Loki) initDataObjConsumer() (services.Service, error) {
+	if !t.Cfg.Ingester.KafkaIngestion.Enabled {
+		return nil, nil
+	}
+	store, err := t.createDataObjBucket("dataobj-consumer")
+	if err != nil {
+		return nil, err
+	}
+
+	level.Info(util_log.Logger).Log("msg", "initializing dataobj consumer", "instance", t.Cfg.Ingester.LifecyclerConfig.ID)
+	t.dataObjConsumer = consumer.New(
+		t.Cfg.KafkaConfig,
+		t.Cfg.DataObj.Consumer,
+		t.Cfg.Distributor.TenantTopic.TopicPrefix,
+		store,
+		t.Cfg.Ingester.LifecyclerConfig.ID,
+		t.partitionRing,
+		prometheus.DefaultRegisterer,
+		util_log.Logger,
+	)
+
+	return t.dataObjConsumer, nil
+}
+
+func (t *Loki) createDataObjBucket(clientName string) (objstore.Bucket, error) {
+	schema, err := t.Cfg.SchemaConfig.SchemaForTime(model.Now())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get schema for now: %w", err)
+	}
+	var objstoreBucket objstore.Bucket
+	objstoreBucket, err = bucket.NewClient(context.Background(), schema.ObjectType, t.Cfg.StorageConfig.ObjectStore.Config, clientName, util_log.Logger)
+	if err != nil {
+		return nil, err
+	}
+
+	if t.Cfg.DataObj.StorageBucketPrefix != "" {
+		objstoreBucket = objstore.NewPrefixedBucket(objstoreBucket, t.Cfg.DataObj.StorageBucketPrefix)
+	}
+
+	return objstoreBucket, nil
 }
 
 func (t *Loki) deleteRequestsClient(clientType string, limits limiter.CombinedLimits) (deletion.DeleteRequestsClient, error) {
@@ -1897,13 +2033,13 @@ func (t *Loki) deleteRequestsClient(clientType string, limits limiter.CombinedLi
 	return deletion.NewPerTenantDeleteRequestsClient(client, limits), nil
 }
 
-func (t *Loki) createRulerQueryEngine(logger log.Logger) (eng *logql.Engine, err error) {
-	deleteStore, err := t.deleteRequestsClient("rule-evaluator", t.Overrides)
+func (t *Loki) createRulerQueryEngine(logger log.Logger, deleteStore deletion.DeleteRequestsClient) (eng *logql.Engine, err error) {
+	querierStore, err := t.getQuerierStore()
 	if err != nil {
-		return nil, fmt.Errorf("could not create delete requests store: %w", err)
+		return nil, err
 	}
 
-	q, err := querier.New(t.Cfg.Querier, t.Store, t.ingesterQuerier, t.Overrides, deleteStore, nil, logger)
+	q, err := querier.New(t.Cfg.Querier, querierStore, t.ingesterQuerier, t.Overrides, deleteStore, logger)
 	if err != nil {
 		return nil, fmt.Errorf("could not create querier: %w", err)
 	}
