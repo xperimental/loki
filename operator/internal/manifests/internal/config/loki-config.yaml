@@ -81,12 +81,14 @@ common:
       secret_access_key: ${ALIBABA_CLOUD_ACCESS_KEY_SECRET}
     {{- end }}
   compactor_grpc_address: {{ .Compactor.FQDN }}:{{ .Compactor.Port }}
+  {{- $stack := .Stack }}
   {{- with .GossipRing }}
   ring:
     kvstore:
       store: memberlist
     heartbeat_period: 5s
     heartbeat_timeout: 1m
+    replication_factor: {{ $stack.Replication.Factor }}
     {{- with .InstanceAddr }}
     instance_addr: {{ . }}
     {{- end }}
@@ -154,8 +156,6 @@ ingester:
     {{- if .GossipRing.EnableIPv6 }}
     enable_inet6: true
     {{- end}}
-    ring:
-      replication_factor: {{ .Stack.Replication.Factor }}
   wal:
     enabled: true
     dir: {{ .WriteAheadLog.Directory }}
