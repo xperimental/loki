@@ -290,11 +290,18 @@ func configureIngesterGRPCServicePKI(sts *appsv1.StatefulSet, opts Options) erro
 // Ingester pods.
 func newIngesterPodDisruptionBudget(opts Options) *policyv1.PodDisruptionBudget {
 	l := ComponentLabels(LabelIngesterComponent, opts.Name)
-	// Default to 1 if not defined in ResourceRequirementsTable for a given size
-	mu := intstr.FromInt(1)
-	if opts.ResourceRequirements.Ingester.PDBMinAvailable > 0 {
-		mu = intstr.FromInt(opts.ResourceRequirements.Ingester.PDBMinAvailable)
+
+	replicationFactor := int32(1)
+	if opts.Stack.Replication != nil {
+		replicationFactor = opts.Stack.Replication.Factor
 	}
+
+	minAvailable := replicationFactor
+	if opts.Stack.Template.Ingester.Replicas <= minAvailable {
+		minAvailable = opts.Stack.Template.Ingester.Replicas - 1
+	}
+	mu := intstr.FromInt32(minAvailable)
+
 	return &policyv1.PodDisruptionBudget{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "PodDisruptionBudget",
