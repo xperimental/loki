@@ -32,6 +32,7 @@ const (
 	messageDegradedMissingNodes            = "Cluster contains no nodes matching the labels used for zone-awareness"
 	messageDegradedEmptyNodeLabel          = "No value for the labels used for zone-awareness"
 	messageWarningNeedsSchemaVersionUpdate = "The schema configuration does not contain the most recent schema version and needs an update"
+	messageWarningNotEnoughIngesters       = "The number of ingester replicas should be at least one more than the replication factor"
 )
 
 var (
@@ -79,7 +80,7 @@ func (e *DegradedError) Error() string {
 }
 
 func generateConditions(ctx context.Context, cs *lokiv1.LokiStackComponentStatus, k k8s.Client, stack *lokiv1.LokiStack, degradedErr *DegradedError) ([]metav1.Condition, error) {
-	conditions := generateWarnings(stack.Status.Storage.Schemas)
+	conditions := generateWarnings(stack)
 
 	mainCondition, err := generateCondition(ctx, cs, k, stack, degradedErr)
 	if err != nil {
@@ -187,7 +188,8 @@ func checkForZoneawareNodes(ctx context.Context, k client.Client, zones []lokiv1
 	return true, true, nil
 }
 
-func generateWarnings(schemas []lokiv1.ObjectStorageSchema) []metav1.Condition {
+func generateWarnings(stack *lokiv1.LokiStack) []metav1.Condition {
+	schemas := stack.Status.Storage.Schemas
 	warnings := make([]metav1.Condition, 0, 2)
 
 	if len(schemas) > 0 && schemas[len(schemas)-1].Version != lokiv1.ObjectStorageSchemaV13 {
@@ -198,5 +200,35 @@ func generateWarnings(schemas []lokiv1.ObjectStorageSchema) []metav1.Condition {
 		})
 	}
 
+	replicationFactor := stack.Spec.ReplicationFactor
+	if stack.Spec.Replication != nil {
+		replicationFactor = stack.Spec.Replication.Factor
+	}
+
+	if replicationFactor == 0 {
+		replicationFactor = defaultReplicationFactor(stack.Spec.Size)
+	}
+
+	ingesterPods := 0
+	for _, status := range stack.Status.Components.Ingester {
+		ingesterPods += len(status)
+	}
+
+	if ingesterPods <= int(replicationFactor) {
+		warnings = append(warnings, metav1.Condition{
+			Type:    string(lokiv1.ConditionWarning),
+			Reason:  string(lokiv1.ReasonNotEnoughIngesters),
+			Message: messageWarningNotEnoughIngesters,
+		})
+	}
+
 	return warnings
+}
+
+func defaultReplicationFactor(size lokiv1.LokiStackSizeType) int32 {
+	if size == lokiv1.SizeOneXDemo {
+		return 1
+	}
+
+	return 2
 }
