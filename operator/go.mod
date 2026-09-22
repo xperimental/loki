@@ -205,6 +205,3 @@ require (
 )
 
 replace github.com/grafana/loki/operator/api/loki => ./api/loki
-
-// Replace v2.4.0+incompatible indirect refs with v5.1.1 for compatibility with google.golang.org/grpc >=v1.56.3
-replace github.com/sercand/kuberesolver => github.com/sercand/kuberesolver/v5 v5.1.1
