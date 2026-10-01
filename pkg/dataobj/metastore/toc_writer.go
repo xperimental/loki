@@ -16,8 +16,8 @@ import (
 	"github.com/thanos-io/objstore"
 
 	"github.com/grafana/loki/v3/pkg/dataobj"
-	"github.com/grafana/loki/v3/pkg/dataobj/consumer/logsobj"
 	"github.com/grafana/loki/v3/pkg/dataobj/index/indexobj"
+	"github.com/grafana/loki/v3/pkg/dataobj/logsobj"
 	"github.com/grafana/loki/v3/pkg/dataobj/metastore/multitenancy"
 	"github.com/grafana/loki/v3/pkg/dataobj/sections/indexpointers"
 )
@@ -72,7 +72,7 @@ func (m *TableOfContentsWriter) initBuilder() error {
 
 	m.builderOnce.Do(func() {
 		m.buf = bytes.NewBuffer(make([]byte, 0, tocBuilderCfg.TargetObjectSize))
-		indexBuilder, err := indexobj.NewBuilder(tocBuilderCfg, nil)
+		indexBuilder, err := indexobj.NewBuilder(tocBuilderCfg, nil, indexobj.NewBuilderMetrics(nil))
 		if err != nil {
 			initErr = err
 			return
@@ -144,11 +144,9 @@ func (m *TableOfContentsWriter) WriteEntry(ctx context.Context, dataobjPath stri
 				for _, timeRange := range tenantTimeRanges {
 					if timeRange.MinTime.Before(tocTimeRange.MaxTime) && !timeRange.MaxTime.Before(tocTimeRange.MinTime) {
 						err := m.tocBuilder.AppendIndexPointer(timeRange.Tenant, indexpointers.IndexPointer{
-							Path:                 dataobjPath,
-							StartTs:              timeRange.MinTime,
-							EndTs:                timeRange.MaxTime,
-							FileSize:             timeRange.FileSize,
-							UncompressedLogsSize: timeRange.UncompressedLogsSize,
+							Path:    dataobjPath,
+							StartTs: timeRange.MinTime,
+							EndTs:   timeRange.MaxTime,
 						})
 						if err != nil {
 							return nil, errors.Wrap(err, "appending index pointer")
