@@ -243,13 +243,10 @@ func NewPipeline(stages Stages) Pipeline {
 		return NewNoopPipeline()
 	}
 
-	hints := NewParserHint(nil, nil, false, false, "", stages)
+	hints := NewParserHint(nil, nil, false, false, "")
 
-	// A log query returns an errored line either way, so it must not record the answer. Otherwise
-	// every errored entry would report a __preserve_error__ label of its own.
-	hints.shouldPreserveError = false
-
-	builder := NewBaseLabelsBuilderWithGrouping(nil, hints, false, false)
+	builder := NewBaseLabelsBuilderWithGrouping(nil, hints, false, false).
+		WithLabelFilterHints(NewLabelFilterHints(stages))
 	return &pipeline{
 		stages:          stages,
 		baseBuilder:     builder,
