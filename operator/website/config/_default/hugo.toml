@@ -71,7 +71,7 @@ copyRight = "Copyright (c) 2020-2026 Thulite"
 
 [permalinks]
   blog = "/blog/:slug/"
-  docs = "/:sections[1:]/:filename.md"
+  docs = "/docs/:sections[1:]/:filename.md"
 
 [minify.tdewolff.html]
   keepComments = true # If set to false, build signatures are removed
