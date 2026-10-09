@@ -12,6 +12,11 @@
   source = "content"
   target = "content"
 
+[[mounts]]
+  source = "../"
+  target = "content"
+  files = [ "ADOPTERS.md", "CONTRIBUTING.md", "docs/**" ]
+
 ## data
 [[mounts]]
   source = "node_modules/@thulite/doks-core/data"
