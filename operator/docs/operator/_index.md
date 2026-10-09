@@ -1,3 +1,4 @@
 ---
-title : "Loki Operator"
+title: Loki Operator
+weight: 20
 ---

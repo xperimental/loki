@@ -1,33 +1,3 @@
-[[docs]]
-name = "Prologue"
-weight = 10
-identifier = "prologue"
-url = "/docs/prologue"
-
-[[docs]]
-name = "Loki Operator"
-weight = 40
-identifier = "operator"
-url = "/docs/operator/"
-
-[[docs]]
-name = "LokiStack"
-weight = 40
-identifier = "lokistack"
-url = "/docs/lokistack/"
-
-[[docs]]
-name = "User Guides"
-weight = 40
-identifier = "user-guides"
-url = "/docs/user-guides/"
-
-[[docs]]
-name = "Enhancements"
-weight = 50
-identifier = "enhancements"
-url = "/docs/enhancements/"
-
 [[main]]
 name = "Docs"
 url = "/docs/prologue/introduction.md/"
