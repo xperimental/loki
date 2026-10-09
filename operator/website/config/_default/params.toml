@@ -1,7 +1,7 @@
 # Hugo
-title = "My Docs"
-description = "Congrats on setting up a new Doks project!"
-images = ["cover.png"]
+title = "Loki Operator"
+description = "A Kubernetes Operator for Loki provided by the Grafana Loki SIG operator."
+images = ["logo.png"]
 
 # mainSections
 mainSections = ["docs"]
@@ -11,7 +11,7 @@ math = false # false (default) or true
 mathEngine = "KaTeX" # "KaTeX" (default) or "MathJax"
 
 [social]
-  twitter = "getdoks"
+  twitter = ""
 
 # Doks (@thulite/doks-core)
 [doks]
@@ -25,7 +25,7 @@ mathEngine = "KaTeX" # "KaTeX" (default) or "MathJax"
 
   ## Button
   navBarButton = false # false (default) or true
-  navBarButtonUrl = "/docs/prologue/introduction/"
+  navBarButtonUrl = "/docs/prologue/introduction.md/"
   navBarButtonText = "Get started"
 
   # FlexSearch
@@ -64,9 +64,9 @@ mathEngine = "KaTeX" # "KaTeX" (default) or "MathJax"
   docsVersion = "1.0"
 
   # UX
-  headerBar = false # true (default) or false
+  headerBar = true # true (default) or false
   backgroundDots = false # true (default) or false
-  aiButtons = true # true (default) or false
+  aiButtons = false # true (default) or false
 
   # Homepage
   sectionFooter = false # false (default) or true
