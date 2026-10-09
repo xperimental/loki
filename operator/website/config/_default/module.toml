@@ -13,9 +13,15 @@
   target = "content"
 
 [[mounts]]
-  source = "../"
+  # Disable watching on this mount, because hugo is triggered on the website changes
+  disableWatch = true
+  source = ".."
   target = "content"
-  files = [ "ADOPTERS.md", "CONTRIBUTING.md", "docs/**" ]
+  files = [ "ADOPTERS.md", "CONTRIBUTING.md"]
+
+[[mounts]]
+  source = "../docs"
+  target = "content/docs"
 
 ## data
 [[mounts]]
