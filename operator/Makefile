@@ -349,13 +349,23 @@ docs/operator/feature-gates.md: $(FEATURE_GATES_TARGET) $(GEN_CRD_API_REFERENCE_
 	sed -i 's/##/\n##/' $@
 	sed -i 's/+newline/\n/' $@
 
+.PHONY: web-dependencies
+.ONESHELL:
+web-dependencies: ## Install dependencies needed for website build
+	cd website
+	npm ci
+
 .PHONY: web
-web: docs ## Run production build of the loki-operator.dev website
+web: docs web-dependencies ## Run production build of the loki-operator.dev website
 	$(HUGO) -b $(WEBSITE_BASE_URL) -s $(WEBSITE_DIR)
 
 .PHONY: web-serve
-web-serve: docs ## Run local preview version of the loki-operator.dev website
+web-serve: docs web-dependencies ## Run local preview version of the loki-operator.dev website
 	$(HUGO) serve -s $(WEBSITE_DIR)
+
+.PHONY: web-clean
+web-clean: ## Remove outputs created by website build
+	rm -fr website/public website/resources website/.hugo_build.lock website/hugo_stats.json
 
 JSONNET_SRC = $(shell find . -type f -not -path './jsonnet/vendor/*' \( -name '*.libsonnet' -o -name '*.jsonnet' \))
 JSONNET_VENDOR_DIR = jsonnet/vendor
