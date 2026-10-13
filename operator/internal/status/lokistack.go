@@ -194,21 +194,16 @@ func generateWarnings(stack *lokiv1.LokiStack) []metav1.Condition {
 
 	// Check for any deprecated v11 or v12 schemas in the configuration.
 	// These schemas are deprecated and will be rejected in future operator versions.
-	hasDeprecatedSchema := false
 	for _, schema := range schemas {
 		//nolint:staticcheck
 		if schema.Version == lokiv1.ObjectStorageSchemaV11 || schema.Version == lokiv1.ObjectStorageSchemaV12 {
-			hasDeprecatedSchema = true
+			warnings = append(warnings, metav1.Condition{
+				Type:    string(lokiv1.ConditionWarning),
+				Reason:  string(lokiv1.ReasonStorageNeedsSchemaUpdate),
+				Message: messageWarningNeedsSchemaVersionUpdate,
+			})
 			break
 		}
-	}
-
-	if hasDeprecatedSchema {
-		warnings = append(warnings, metav1.Condition{
-			Type:    string(lokiv1.ConditionWarning),
-			Reason:  string(lokiv1.ReasonStorageNeedsSchemaUpdate),
-			Message: messageWarningNeedsSchemaVersionUpdate,
-		})
 	}
 
 	// Check if the ingester's replicas are less than or equal to the replication factor
