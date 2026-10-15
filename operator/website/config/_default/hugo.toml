@@ -2,7 +2,7 @@ title = "Loki Operator"
 baseurl = "https://loki-operator.dev/"
 disableAliases = true
 disableHugoGeneratorInject = true
-# disableKinds = ["taxonomy", "term"]
+disableKinds = ["taxonomy", "term"]
 enableEmoji = true
 enableGitInfo = true
 enableRobotsTXT = true
@@ -12,16 +12,15 @@ summarylength = 20 # 70 (default)
 
 # Multilingual
 defaultContentLanguage = "en"
-disableLanguages = ["de", "nl"]
 defaultContentLanguageInSubdir = false
 
-copyRight = "Copyright (c) 2020-2026 Thulite"
+copyRight = ""
 
 [build.buildStats]
   enable = true
 
 [outputs]
-  home = ["html", "rss", "sitemap", "searchIndex", "llms"]
+  home = ["html", "sitemap"]
   page = ["html", "markdown"]
   section = ["html", "rss", "sitemap"]
   taxonomy = ["html", "rss", "sitemap"]
@@ -63,11 +62,6 @@ copyRight = "Copyright (c) 2020-2026 Thulite"
   [caches.getresource]
     dir = ":cacheDir/:project"
     maxAge = -1 # "30m"
-
-[taxonomies]
-  contributor = "contributors"
-  category = "categories"
-  tag = "tags"
 
 [permalinks]
   blog = "/blog/:slug/"
