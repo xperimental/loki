@@ -65,7 +65,7 @@ copyRight = ""
 
 [permalinks]
   blog = "/blog/:slug/"
-  docs = "/docs/:sections[1:]/:filename.md"
+  docs = "/docs/:sections[1:]/:filename"
 
 [minify.tdewolff.html]
   keepComments = true # If set to false, build signatures are removed
