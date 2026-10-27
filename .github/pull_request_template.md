@@ -10,5 +10,3 @@ Fixes #<issue number>
 - [ ] Documentation added
 - [ ] Tests updated
 - [ ] Title matches the required conventional commits format, see [here](https://www.conventionalcommits.org/en/v1.0.0/)
-- [ ] Changes that require user attention or interaction to upgrade are documented in `docs/sources/setup/upgrade/_index.md`
-- [ ] If the change is deprecating or removing a configuration option, update the `deprecated-config.yaml` and `deleted-config.yaml` files respectively in the `tools/deprecated-config-checker` directory. [Example PR](https://github.com/grafana/loki/pull/10840/commits/0d4416a4b03739583349934b96f272fb4f685d15)
