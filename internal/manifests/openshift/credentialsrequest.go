@@ -8,8 +8,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/grafana/loki/operator/internal/config"
-	"github.com/grafana/loki/operator/internal/manifests/storage"
+	"github.com/grafana-community/loki-operator/internal/config"
+	"github.com/grafana-community/loki-operator/internal/manifests/storage"
 )
 
 const azureFallbackRegion = "centralus"

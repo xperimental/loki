@@ -5,7 +5,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/grafana/loki/operator/internal/manifests/internal/alerts"
+	"github.com/grafana-community/loki-operator/internal/manifests/internal/alerts"
 )
 
 // BuildPrometheusRule returns a list of k8s objects for Loki PrometheusRule

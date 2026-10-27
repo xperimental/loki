@@ -10,8 +10,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/validation"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/validation"
 )
 
 var ltt = []struct {

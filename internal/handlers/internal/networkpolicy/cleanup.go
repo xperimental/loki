@@ -11,8 +11,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/external/k8s"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/external/k8s"
 )
 
 // Cleanup deletes operator-managed NetworkPolicies for a LokiStack

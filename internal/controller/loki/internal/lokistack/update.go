@@ -7,8 +7,8 @@ import (
 	"k8s.io/client-go/util/retry"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/external/k8s"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/external/k8s"
 )
 
 func updateAnnotation(ctx context.Context, k k8s.Client, stack *lokiv1.LokiStack, key, value string) error {

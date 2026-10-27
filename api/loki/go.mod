@@ -1,4 +1,4 @@
-module github.com/grafana/loki/operator/api/loki
+module github.com/grafana-community/loki-operator/api/loki
 
 go 1.26.0
 

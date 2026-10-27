@@ -12,9 +12,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
-	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
-	"github.com/grafana/loki/operator/internal/handlers/internal/tlsprofile"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	"github.com/grafana-community/loki-operator/internal/external/k8s/k8sfakes"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/tlsprofile"
 )
 
 func TestGetTLSSecurityProfile(t *testing.T) {

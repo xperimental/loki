@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
+	"github.com/grafana-community/loki-operator/internal/external/k8s/k8sfakes"
 )
 
 func TestLokiStackZoneAwarePodController_RegisterWatchedResources(t *testing.T) {

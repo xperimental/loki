@@ -1,4 +1,4 @@
-module github.com/grafana/loki/operator
+module github.com/grafana-community/loki-operator
 
 go 1.26.7
 
@@ -10,7 +10,7 @@ require (
 	github.com/go-logr/logr v1.4.4
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
-	github.com/grafana/loki/operator/api/loki v0.0.0-20260827121917-dd170be07101
+	github.com/grafana-community/loki-operator/api/loki v0.0.0-20260827121917-dd170be07101
 	github.com/grafana/loki/v3 v3.7.8
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.14.0
 	github.com/openshift/api v0.0.0-20260827103138-252412308277 // release-5.0
@@ -216,7 +216,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.2 // indirect
 )
 
-replace github.com/grafana/loki/operator/api/loki => ./api/loki
+replace github.com/grafana-community/loki-operator/api/loki => ./api/loki
 
 // Replace memberlist with Grafana's fork which includes some fixes that haven't been
 // merged upstream yet.

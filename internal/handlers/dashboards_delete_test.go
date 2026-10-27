@@ -9,8 +9,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/grafana/loki/operator/internal/external/k8s/k8sfakes"
-	"github.com/grafana/loki/operator/internal/manifests/openshift"
+	"github.com/grafana-community/loki-operator/internal/external/k8s/k8sfakes"
+	"github.com/grafana-community/loki-operator/internal/manifests/openshift"
 )
 
 func TestDeleteDashboards(t *testing.T) {

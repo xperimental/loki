@@ -18,11 +18,11 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/external/k8s"
-	"github.com/grafana/loki/operator/internal/manifests/storage"
-	"github.com/grafana/loki/operator/internal/status"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/external/k8s"
+	"github.com/grafana-community/loki-operator/internal/manifests/storage"
+	"github.com/grafana-community/loki-operator/internal/status"
 )
 
 var (

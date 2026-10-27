@@ -6,8 +6,8 @@ import (
 
 	"github.com/ViaQ/logerr/v2/kverrors"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/validation"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/validation"
 )
 
 // BuildSchemaConfig creates a list of schemas to be used to configure

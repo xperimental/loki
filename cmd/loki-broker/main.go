@@ -12,10 +12,10 @@ import (
 	openshiftv1 "github.com/openshift/api/config/v1"
 	"sigs.k8s.io/yaml"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/manifests"
-	"github.com/grafana/loki/operator/internal/manifests/storage"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/manifests"
+	"github.com/grafana-community/loki-operator/internal/manifests/storage"
 )
 
 // Define the manifest options here as structured objects

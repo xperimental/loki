@@ -15,17 +15,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlutil "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/external/k8s"
-	"github.com/grafana/loki/operator/internal/handlers/internal/gateway"
-	"github.com/grafana/loki/operator/internal/handlers/internal/networkpolicy"
-	"github.com/grafana/loki/operator/internal/handlers/internal/rules"
-	"github.com/grafana/loki/operator/internal/handlers/internal/serviceaccounts"
-	"github.com/grafana/loki/operator/internal/handlers/internal/storage"
-	"github.com/grafana/loki/operator/internal/handlers/internal/tlsprofile"
-	"github.com/grafana/loki/operator/internal/manifests"
-	"github.com/grafana/loki/operator/internal/status"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/external/k8s"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/gateway"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/networkpolicy"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/rules"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/serviceaccounts"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/storage"
+	"github.com/grafana-community/loki-operator/internal/handlers/internal/tlsprofile"
+	"github.com/grafana-community/loki-operator/internal/manifests"
+	"github.com/grafana-community/loki-operator/internal/status"
 )
 
 // CreateOrUpdateLokiStack handles LokiStack create and update events.

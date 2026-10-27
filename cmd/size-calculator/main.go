@@ -9,7 +9,7 @@ import (
 	"github.com/ViaQ/logerr/v2/log"
 	"github.com/prometheus/common/model"
 
-	"github.com/grafana/loki/operator/internal/sizes"
+	"github.com/grafana-community/loki-operator/internal/sizes"
 )
 
 const (

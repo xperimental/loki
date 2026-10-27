@@ -4,7 +4,7 @@ import (
 	"maps"
 	"strings"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
 )
 
 func AlertingRuleTenantLabels(ar *lokiv1.AlertingRule) {

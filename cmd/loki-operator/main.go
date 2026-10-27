@@ -17,15 +17,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	runtimemetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
 
-	ctrlconfigv1 "github.com/grafana/loki/operator/api/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	lokiv1beta1 "github.com/grafana/loki/operator/api/loki/v1beta1"
-	"github.com/grafana/loki/operator/internal/config"
-	lokictrl "github.com/grafana/loki/operator/internal/controller/loki"
-	"github.com/grafana/loki/operator/internal/metrics"
-	"github.com/grafana/loki/operator/internal/operator"
-	"github.com/grafana/loki/operator/internal/validation"
-	"github.com/grafana/loki/operator/internal/validation/openshift"
+	ctrlconfigv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	lokiv1beta1 "github.com/grafana-community/loki-operator/api/loki/v1beta1"
+	"github.com/grafana-community/loki-operator/internal/config"
+	lokictrl "github.com/grafana-community/loki-operator/internal/controller/loki"
+	"github.com/grafana-community/loki-operator/internal/metrics"
+	"github.com/grafana-community/loki-operator/internal/operator"
+	"github.com/grafana-community/loki-operator/internal/validation"
+	"github.com/grafana-community/loki-operator/internal/validation/openshift"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.

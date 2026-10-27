@@ -6,7 +6,7 @@ import (
 	"dario.cat/mergo"
 	corev1 "k8s.io/api/core/v1"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
 )
 
 const (

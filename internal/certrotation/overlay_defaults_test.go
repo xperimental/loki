@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"sigs.k8s.io/yaml"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
 )
 
 const openshiftCertAlertThreshold = 30 * 24 * time.Hour

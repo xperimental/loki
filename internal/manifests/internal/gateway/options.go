@@ -1,8 +1,8 @@
 package gateway
 
 import (
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/manifests/openshift"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/manifests/openshift"
 )
 
 // Options is used to render the rbac.yaml and tenants.yaml file template

@@ -11,9 +11,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client" //nolint:typecheck
 	ctrlutil "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
-	"github.com/grafana/loki/operator/internal/external/k8s"
-	"github.com/grafana/loki/operator/internal/manifests"
-	"github.com/grafana/loki/operator/internal/manifests/openshift"
+	"github.com/grafana-community/loki-operator/internal/external/k8s"
+	"github.com/grafana-community/loki-operator/internal/manifests"
+	"github.com/grafana-community/loki-operator/internal/manifests/openshift"
 )
 
 // CreateDashboards handles the LokiStack dashboards create events.

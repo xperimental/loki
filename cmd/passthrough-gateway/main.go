@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/collectors"
 
-	"github.com/grafana/loki/operator/internal/passthroughgateway"
+	"github.com/grafana-community/loki-operator/internal/passthroughgateway"
 )
 
 func main() {

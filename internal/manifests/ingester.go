@@ -14,8 +14,8 @@ import (
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/grafana/loki/operator/internal/manifests/internal/config"
-	"github.com/grafana/loki/operator/internal/manifests/storage"
+	"github.com/grafana-community/loki-operator/internal/manifests/internal/config"
+	"github.com/grafana-community/loki-operator/internal/manifests/storage"
 )
 
 // BuildIngester builds the k8s objects required to run Loki Ingester

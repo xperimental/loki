@@ -3,8 +3,8 @@ package v1beta1_test
 import (
 	"testing"
 
-	v1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/api/loki/v1beta1"
+	v1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/api/loki/v1beta1"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

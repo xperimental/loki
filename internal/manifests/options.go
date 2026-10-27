@@ -4,12 +4,12 @@ import (
 	"strings"
 	"time"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/manifests/internal"
-	"github.com/grafana/loki/operator/internal/manifests/internal/config"
-	"github.com/grafana/loki/operator/internal/manifests/openshift"
-	"github.com/grafana/loki/operator/internal/manifests/storage"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/manifests/internal"
+	"github.com/grafana-community/loki-operator/internal/manifests/internal/config"
+	"github.com/grafana-community/loki-operator/internal/manifests/openshift"
+	"github.com/grafana-community/loki-operator/internal/manifests/storage"
 )
 
 // Options is a set of configuration values to use when building manifests such as resource sizes, etc.

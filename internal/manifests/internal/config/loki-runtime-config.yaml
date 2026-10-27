@@ -1,4 +1,4 @@
-{{- /*gotype: github.com/grafana/loki/operator/internal/manifests/internal/config.Options*/ -}}
+{{- /*gotype: github.com/grafana-community/loki-operator/internal/manifests/internal/config.Options*/ -}}
 ---
 overrides:
 {{- $opts := . }}
@@ -167,7 +167,7 @@ overrides:
       {{- end }}
       {{- if .Notifier }}
       {{- with .Notifier }}
-      alertmanager_client: 
+      alertmanager_client:
         {{- if .TLS.CertPath }}
         tls_cert_path: {{ .TLS.CertPath }}
         {{- end }}
@@ -235,4 +235,3 @@ overrides:
   {{- end }}
 
   {{- end -}}
-

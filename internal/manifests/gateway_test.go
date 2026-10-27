@@ -16,11 +16,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/utils/ptr"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/manifests/internal/gateway"
-	"github.com/grafana/loki/operator/internal/manifests/openshift"
-	"github.com/grafana/loki/operator/internal/manifests/storage"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/manifests/internal/gateway"
+	"github.com/grafana-community/loki-operator/internal/manifests/openshift"
+	"github.com/grafana-community/loki-operator/internal/manifests/storage"
 )
 
 func TestNewGatewayDeployment_HasTemplateConfigHashAnnotation(t *testing.T) {

@@ -15,7 +15,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	configv1 "github.com/grafana/loki/operator/api/config/v1"
+	configv1 "github.com/grafana-community/loki-operator/api/config/v1"
 )
 
 // LoadConfig initializes the controller configuration, optionally overriding the defaults

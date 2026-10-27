@@ -38,7 +38,7 @@ formatters:
       sections:
         - standard
         - default
-        - prefix(github.com/grafana/loki/operator)
+        - prefix(github.com/grafana-community/loki-operator)
         - blank
         - dot
   exclusions:

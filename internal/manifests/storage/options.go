@@ -1,7 +1,7 @@
 package storage
 
 import (
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
 )
 
 // Options is used to configure Loki to integrate with

@@ -7,7 +7,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/grafana/loki/operator/internal/external/k8s"
+	"github.com/grafana-community/loki-operator/internal/external/k8s"
 )
 
 // GetUID return the server-side generated UID for a created serviceaccount to

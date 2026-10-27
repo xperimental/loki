@@ -3,8 +3,8 @@ package openshift
 import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
-	lokiv1 "github.com/grafana/loki/operator/api/loki/v1"
-	"github.com/grafana/loki/operator/internal/manifests/openshift/otlp"
+	lokiv1 "github.com/grafana-community/loki-operator/api/loki/v1"
+	"github.com/grafana-community/loki-operator/internal/manifests/openshift/otlp"
 )
 
 // ValidateOTLPInvalidDrop validates that a spec does not drop required OTLP attributes in the openshift-logging tenancy mode.
