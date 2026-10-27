@@ -40,7 +40,7 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           echo $TAG
-          TAG=${TAG:10} # remove "operator/v" (prefix)
+          TAG=${TAG:1} # remove "v" (prefix)
           echo version=${TAG} >> $GITHUB_ENV # update GitHub ENV vars
 
       - name: Sync fork
@@ -66,7 +66,7 @@ jobs:
       - name: Checkout loki to tmp/ directory
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          repository: grafana/loki
+          repository: grafana-community/loki-operator
           token: ${{ steps.get-github-app-token.outputs.token }}
           path: tmp/
           persist-credentials: false

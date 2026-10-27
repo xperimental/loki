@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   check-title:
-    runs-on: ubuntu-x64-small
+    runs-on: ubuntu-latest
     permissions:
       contents: "read"
       id-token: "write"

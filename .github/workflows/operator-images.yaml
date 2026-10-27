@@ -2,8 +2,6 @@ name: operator images
 
 on:
   push:
-    paths:
-      - 'operator/**'
     branches:
       - main
   workflow_dispatch:
@@ -18,7 +16,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/operator-reusable-image-build.yml
     with:
-      dockerfile: "operator/Dockerfile"
+      dockerfile: "Dockerfile"
       registry: "us-docker.pkg.dev"
       organization: "grafanalabs-global/dockerhub-loki-prod-mirror"
       image_name: "loki-operator"
@@ -30,7 +28,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/operator-reusable-image-build.yml
     with:
-      dockerfile: "operator/Dockerfile"
+      dockerfile: "Dockerfile"
       registry: "quay.io"
       organization: "openshift-logging"
       image_name: "loki-operator"
@@ -42,7 +40,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/operator-reusable-image-build.yml
     with:
-      dockerfile: "operator/bundle/openshift/bundle.Dockerfile"
+      dockerfile: "bundle/openshift/bundle.Dockerfile"
       registry: "quay.io"
       organization: "openshift-logging"
       image_name: "loki-operator-bundle"
@@ -54,7 +52,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/operator-reusable-image-build.yml
     with:
-      dockerfile: "operator/calculator.Dockerfile"
+      dockerfile: "calculator.Dockerfile"
       registry: "quay.io"
       organization: "openshift-logging"
       image_name: "storage-size-calculator"
@@ -66,7 +64,7 @@ jobs:
       id-token: write
     uses: ./.github/workflows/operator-reusable-image-build.yml
     with:
-      dockerfile: "operator/passthrough-gateway.Dockerfile"
+      dockerfile: "passthrough-gateway.Dockerfile"
       registry: "quay.io"
       organization: "openshift-logging"
       image_name: "passthrough-gateway"

@@ -2,8 +2,6 @@ name: operator-release-please
 
 on:
   push:
-    paths:
-      - 'operator/**'
     branches:
       - main
 
@@ -34,8 +32,7 @@ jobs:
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         id: release
         with:
-          path: operator
-          config-file: operator/release-please-config.json
+          config-file: release-please-config.json
           token: ${{ steps.app-token.outputs.token }}
   publishImages:
     needs:
@@ -46,7 +43,7 @@ jobs:
       id-token: "write"
     uses: ./.github/workflows/operator-reusable-image-build.yml
     with:
-      dockerfile: "operator/Dockerfile"
+      dockerfile: "Dockerfile"
       registry: "us-docker.pkg.dev"
       organization: "grafanalabs-global/dockerhub-loki-prod-mirror"
       image_name: "loki-operator"

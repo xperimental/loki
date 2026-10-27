@@ -64,7 +64,7 @@ jobs:
         with:
           # Context has to be inferred from the image name due to zizmor high warning:
           # > WARNING: may expand into attacker-controllable code
-          context: ${{ inputs.image_name == 'loki-operator-bundle' && 'operator/bundle/openshift' || 'operator' }}
+          context: ${{ inputs.image_name == 'loki-operator-bundle' && 'bundle/openshift' || '.' }}
           file: ${{ inputs.dockerfile }}
           platforms: "linux/amd64,linux/arm64,linux/arm"
           push: true
