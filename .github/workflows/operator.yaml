@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - main
+    - repository-migration-workflow # FIXME remove after testing in fork
   pull_request:
 
 permissions:
