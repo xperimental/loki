@@ -15,7 +15,7 @@ Storage Size Calculator is used to have an idea on how to properly size a Loki c
 
 ## Installation
 
-* Deploy the [Loki Operator](https://github.com/grafana/loki/blob/main/operator/docs/operator/hack_loki_operator.md#hacking-on-loki-operator-on-openshift) to the cluster.
+* Deploy the [Loki Operator](hack_loki_operator.md#hacking-on-openshift) to the cluster.
 
 * Create the `openshift-logging` namespace in the cluster:
 
@@ -63,13 +63,13 @@ This will cleanup the resources related to storage size calculator. However, the
 
 If you want to contribute to the storage size calculator, you can follow this local development and testing process.
 
-* Fork and clone the [Loki Operator](https://github.com/grafana/loki/tree/main/operator) repo.
+* Fork and clone the [Loki Operator](https://github.com/grafana-community/loki-operator) repo.
 
-* All the files related to storage size calculator exists at [`operator/config/overlays/openshift/size-calculator`](https://github.com/grafana/loki/tree/main/operator/config/overlays/openshift/size-calculator) and the main file is at [`operator/cmd/size-calculator`](https://github.com/grafana/loki/tree/main/operator/cmd/size-calculator).
+* All the files related to storage size calculator exists at [`config/overlays/openshift/size-calculator`](https://github.com/grafana-community/loki-operator/tree/main/config/overlays/openshift/size-calculator) and the main file is at [`cmd/size-calculator`](https://github.com/grafana-community/loki-operator/tree/main/cmd/size-calculator).
 
 * Update the code to fix a bug or add a new feature.
 
-* To test the changes made, build the image and push it to quay. Replace the `image` value in [storage_size_calculator.yaml](https://github.com/grafana/loki/blob/main/operator/config/overlays/openshift/size-calculator/storage_size_calculator.yaml) with your quay image to test the changes.
+* To test the changes made, build the image and push it to quay. Replace the `image` value in [storage_size_calculator.yaml](https://github.com/grafana-community/loki-operator/blob/main/config/overlays/openshift/size-calculator/storage_size_calculator.yaml) with your quay image to test the changes.
 
   Build the image using:
 
@@ -77,7 +77,7 @@ If you want to contribute to the storage size calculator, you can follow this lo
   make oci-build-calculator
   ```
 
-  This will build the storage size calculator image using [dockerfile](https://github.com/grafana/loki/blob/main/operator/calculator.Dockerfile)
+  This will build the storage size calculator image using [dockerfile](https://github.com/grafana-community/loki-operator/blob/main/calculator.Dockerfile)
 
   Push the image to quay using:
 
@@ -99,7 +99,7 @@ If you want to contribute to the storage size calculator, you can follow this lo
 
 ### Permission denied on deploying prometheus secret
 
-If you get `permission denied` error while running `make deploy-size-calculator` then make [this file](https://github.com/grafana/loki/blob/main/operator/hack/deploy-prometheus-secret.sh) executable by running:
+If you get `permission denied` error while running `make deploy-size-calculator` then make [this file](https://github.com/grafana-community/loki-operator/blob/main/hack/deploy-prometheus-secret.sh) executable by running:
 
 ```console
 chmod +x hack/deploy-prometheus-secret.sh

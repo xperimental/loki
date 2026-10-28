@@ -17,7 +17,7 @@ metadata:
     features.operators.openshift.io/token-auth-aws: "true"
     features.operators.openshift.io/token-auth-azure: "true"
     features.operators.openshift.io/token-auth-gcp: "true"
-    repository: https://github.com/grafana/loki/tree/main/operator
+    repository: https://github.com/grafana-community/loki-operator
     support: Grafana Loki SIG Operator
   labels:
     operatorframework.io/arch.amd64: supported

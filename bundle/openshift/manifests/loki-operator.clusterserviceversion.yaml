@@ -2084,7 +2084,7 @@ spec:
   - loki
   links:
   - name: Loki Operator
-    url: https://github.com/grafana/loki
+    url: https://github.com/grafana-community/loki-operator
   maintainers:
   - email: team-logging@redhat.com
     name: Red Hat, AOS Logging

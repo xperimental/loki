@@ -10,7 +10,7 @@ metadata:
     createdAt: "2022-12-22T13:28:40+00:00"
     description: The Community Loki Operator provides Kubernetes native deployment
       and management of Loki and related logging components.
-    repository: https://github.com/grafana/loki/tree/main/operator
+    repository: https://github.com/grafana-community/loki-operator
     support: Grafana Loki SIG Operator
   labels:
     operatorframework.io/arch.amd64: supported
